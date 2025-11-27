@@ -1,5 +1,6 @@
 package com.example.waystoneinjector;
 
+import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -11,6 +12,9 @@ public class WaystoneInjectorMod {
 
     public WaystoneInjectorMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        
+        // Register config
+        WaystoneConfig.register();
         
         // Register client-only event handlers on the client
         if (FMLEnvironment.dist.isClient()) {

@@ -1,5 +1,6 @@
 package com.example.waystoneinjector.client;
 
+import com.example.waystoneinjector.config.WaystoneConfig;
 import com.example.waystoneinjector.network.Networking;
 import com.example.waystoneinjector.network.WaystoneButtonPacket;
 import net.minecraft.client.gui.components.Button;
@@ -9,6 +10,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.List;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector")
 public class ClientEvents {
@@ -24,24 +27,35 @@ public class ClientEvents {
             return;
         }
 
-        // Button dimensions and positions
+        // Get config values
+        List<? extends String> labels = WaystoneConfig.BUTTON_LABELS.get();
+        List<? extends String> commands = WaystoneConfig.BUTTON_COMMANDS.get();
+        
+        int numButtons = Math.min(labels.size(), commands.size());
+        if (numButtons == 0) return;
+
+        // Button dimensions
         int bw = 95;
         int bh = 20;
         int centerX = screen.width / 2;
         int bottomY = screen.height - 50;
+        
+        // Calculate spacing for buttons
+        int totalWidth = (numButtons * bw) + ((numButtons - 1) * 5);
+        int startX = centerX - (totalWidth / 2);
 
-        // Chaos Town Button (left)
-        Button chaosTown = Button.builder(
-            Component.translatable("waystoneinjector.button.chaos_town"),
-            btn -> Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(0))
-        ).bounds(centerX - 100, bottomY, bw, bh).build();
-        event.addListener(chaosTown);
-
-        // The Undergrown Button (right)
-        Button undergrown = Button.builder(
-            Component.translatable("waystoneinjector.button.undergrown"),
-            btn -> Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(1))
-        ).bounds(centerX + 5, bottomY, bw, bh).build();
-        event.addListener(undergrown);
+        // Add buttons dynamically from config
+        for (int i = 0; i < numButtons; i++) {
+            final int buttonIndex = i;
+            String label = labels.get(i);
+            int x = startX + (i * (bw + 5));
+            
+            Button button = Button.builder(
+                Component.literal(label),
+                btn -> Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex))
+            ).bounds(x, bottomY, bw, bh).build();
+            
+            event.addListener(button);
+        }
     }
 }
