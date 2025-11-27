@@ -18,10 +18,11 @@ public class ClientEvents {
         Screen screen = event.getScreen();
         if (screen == null) return;
 
-        // Detect Waystones screen by class name
-        String cls = screen.getClass().getName().toLowerCase();
-        String title = screen.getTitle() != null ? screen.getTitle().getString().toLowerCase() : "";
-        if (!cls.contains("waystones") && !title.contains("waystones")) return;
+        // Detect Waystones selection screen specifically
+        String className = screen.getClass().getName();
+        if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
+            return;
+        }
 
         // Button dimensions and positions
         int bw = 95;
