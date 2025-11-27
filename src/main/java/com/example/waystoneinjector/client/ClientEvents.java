@@ -1,8 +1,7 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
-import com.example.waystoneinjector.network.Networking;
-import com.example.waystoneinjector.network.WaystoneButtonPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -48,11 +47,18 @@ public class ClientEvents {
         for (int i = 0; i < numButtons; i++) {
             final int buttonIndex = i;
             String label = labels.get(i);
+            String command = commands.get(buttonIndex);
             int x = startX + (i * (bw + 5));
             
             Button button = Button.builder(
                 Component.literal(label),
-                btn -> Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex))
+                btn -> {
+                    // Execute command on client
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.player != null) {
+                        mc.player.connection.sendCommand(command);
+                    }
+                }
             ).bounds(x, bottomY, bw, bh).build();
             
             event.addListener(button);
