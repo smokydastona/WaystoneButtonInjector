@@ -10,17 +10,27 @@ Forge 1.20.1 mod that adds custom configurable buttons to the Waystones selectio
 
 ## Configuration
 
-After first run, edit `config/waystoneinjector-common.toml`:
+After first run, edit `config/waystoneinjector-common.toml`. By default, no buttons are configured:
 
 ```toml
 [buttons]
     # Button labels (displayed on buttons)
-    labels = ["Chaos Town", "The Undergrown"]
+    labels = []
     
     # Commands to execute (without leading /)
+    commands = []
+```
+
+### Example Configuration
+
+Add your own server buttons:
+
+```toml
+[buttons]
+    labels = ["Server 1", "Server 2"]
     commands = [
-        "redirect @s chaostowntest.modrinth.gg",
-        "redirect @s 51.222.244.61:10020"
+        "redirect @s server1.example.com",
+        "redirect @s server2.example.com"
     ]
 ```
 
@@ -35,9 +45,3 @@ Add as many buttons as needed - just ensure labels and commands arrays have the 
 1. Install on both client and server
 2. Requires Waystones mod installed
 3. Server needs `redirect` command (ServerRedirect or similar mod)
-
-## Server Addresses
-- Chaos Town: `chaostowntest.modrinth.gg`
-- The Undergrown: `51.222.244.61:10020`
-
-Edit `WaystoneButtonHandler.java` to change addresses.

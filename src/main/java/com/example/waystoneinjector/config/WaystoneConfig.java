@@ -20,16 +20,13 @@ public class WaystoneConfig {
         BUTTON_LABELS = builder
                 .comment("Button labels (use & for color codes, e.g., &aChaos Town)")
                 .defineList("labels", 
-                    Arrays.asList("Chaos Town", "The Undergrown"),
+                    Arrays.asList(),
                     obj -> obj instanceof String);
 
         BUTTON_COMMANDS = builder
                 .comment("Commands to execute when buttons are clicked (without leading /)")
                 .defineList("commands",
-                    Arrays.asList(
-                        "redirect @s chaostowntest.modrinth.gg",
-                        "redirect @s 51.222.244.61:10020"
-                    ),
+                    Arrays.asList(),
                     obj -> obj instanceof String);
 
         builder.pop();
