@@ -27,3 +27,5 @@ out/
 # Minecraft runs
 run/
 logs/
+
+gradle-temp.zip
