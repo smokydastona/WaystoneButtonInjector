@@ -21,11 +21,11 @@ public class WaystoneButtonHandler {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        // Run command as the player
+        // Run command as the player with permission level 0 (no op required)
         server.execute(() -> {
             try {
                 server.getCommands().performPrefixedCommand(
-                    player.createCommandSourceStack(), 
+                    player.createCommandSourceStack().withPermission(0), 
                     cmd
                 );
             } catch (Exception e) {
