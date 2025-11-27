@@ -30,36 +30,60 @@ public class ClientEvents {
         List<? extends String> labels = WaystoneConfig.BUTTON_LABELS.get();
         List<? extends String> commands = WaystoneConfig.BUTTON_COMMANDS.get();
         
-        int numButtons = Math.min(labels.size(), commands.size());
+        int numButtons = Math.min(Math.min(labels.size(), commands.size()), 6); // Max 6 buttons
         if (numButtons == 0) return;
 
-        // Button dimensions
-        int bw = 95;
-        int bh = 20;
-        int centerX = screen.width / 2;
-        int bottomY = screen.height - 50;
+        // Calculate button dimensions based on number of buttons
+        // Split buttons to left and right sides
+        int leftButtons = (numButtons + 1) / 2;  // Ceiling division
+        int rightButtons = numButtons / 2;        // Floor division
         
-        // Calculate spacing for buttons
-        int totalWidth = (numButtons * bw) + ((numButtons - 1) * 5);
-        int startX = centerX - (totalWidth / 2);
-
-        // Add buttons dynamically from config
-        for (int i = 0; i < numButtons; i++) {
+        int buttonWidth = 60;
+        int buttonHeight = 30;
+        int verticalSpacing = 5;
+        int sideMargin = 10; // Distance from screen edge
+        
+        int centerY = screen.height / 2;
+        
+        // Add left side buttons
+        for (int i = 0; i < leftButtons; i++) {
             final int buttonIndex = i;
-            String label = labels.get(i);
+            String label = labels.get(buttonIndex);
             String command = commands.get(buttonIndex);
-            int x = startX + (i * (bw + 5));
+            
+            int y = centerY - ((leftButtons * buttonHeight + (leftButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
             
             Button button = Button.builder(
                 Component.literal(label),
                 btn -> {
-                    // Execute command on client
                     Minecraft mc = Minecraft.getInstance();
                     if (mc.player != null) {
                         mc.player.connection.sendCommand(command);
                     }
                 }
-            ).bounds(x, bottomY, bw, bh).build();
+            ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
+            
+            event.addListener(button);
+        }
+        
+        // Add right side buttons
+        for (int i = 0; i < rightButtons; i++) {
+            final int buttonIndex = leftButtons + i;
+            String label = labels.get(buttonIndex);
+            String command = commands.get(buttonIndex);
+            
+            int y = centerY - ((rightButtons * buttonHeight + (rightButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
+            int x = screen.width - buttonWidth - sideMargin;
+            
+            Button button = Button.builder(
+                Component.literal(label),
+                btn -> {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.player != null) {
+                        mc.player.connection.sendCommand(command);
+                    }
+                }
+            ).bounds(x, y, buttonWidth, buttonHeight).build();
             
             event.addListener(button);
         }
