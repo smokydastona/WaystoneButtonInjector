@@ -11,10 +11,10 @@ public class WaystoneInjectorMod {
     public static final String MODID = "waystoneinjector";
 
     public WaystoneInjectorMod() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        
-        // Register config
+        // Register config FIRST
         WaystoneConfig.register();
+        
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         
         // Register client-only event handlers on the client
         if (FMLEnvironment.dist.isClient()) {
