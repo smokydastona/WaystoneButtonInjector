@@ -1,0 +1,55 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'java'
+}
+
+group = 'com.example'
+version = '1.0.0'
+archivesBaseName = 'waystoneinjector'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                waystoneinjector {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                waystoneinjector {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+}
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': 'waystoneinjector',
+            'Specification-Vendor': 'example',
+            'Specification-Version': '1.0.0',
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'example'
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
