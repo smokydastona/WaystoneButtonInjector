@@ -8,12 +8,21 @@ group = 'com.example'
 // Auto-version based on git commit count
 def getVersionFromGit() {
     try {
-        def commitCount = 'git rev-list --count HEAD'.execute().text.trim()
-        def shortHash = 'git rev-parse --short HEAD'.execute().text.trim()
-        return "1.0.${commitCount}+${shortHash}"
+        def proc = 'git rev-list --count HEAD'.execute()
+        proc.waitFor()
+        if (proc.exitValue() == 0) {
+            def commitCount = proc.text.trim()
+            def hashProc = 'git rev-parse --short HEAD'.execute()
+            hashProc.waitFor()
+            if (hashProc.exitValue() == 0) {
+                def shortHash = hashProc.text.trim()
+                return "1.0.${commitCount}+${shortHash}"
+            }
+        }
     } catch (Exception e) {
-        return '1.0.0-dev'
+        println "Git not available, using fallback version"
     }
+    return '1.0.0'
 }
 
 version = getVersionFromGit()
