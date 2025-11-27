@@ -4,7 +4,19 @@ plugins {
 }
 
 group = 'com.example'
-version = '1.0.0'
+
+// Auto-version based on git commit count
+def getVersionFromGit() {
+    try {
+        def commitCount = 'git rev-list --count HEAD'.execute().text.trim()
+        def shortHash = 'git rev-parse --short HEAD'.execute().text.trim()
+        return "1.0.${commitCount}+${shortHash}"
+    } catch (Exception e) {
+        return '1.0.0-dev'
+    }
+}
+
+version = getVersionFromGit()
 archivesBaseName = 'waystoneinjector'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -49,11 +61,11 @@ jar {
     manifest {
         attributes([
             'Specification-Title': 'waystoneinjector',
-            'Specification-Vendor': 'example',
-            'Specification-Version': '1.0.0',
+            'Specification-Vendor': 'smokydastona',
+            'Specification-Version': version,
             'Implementation-Title': project.name,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor': 'example'
+            'Implementation-Version': version,
+            'Implementation-Vendor': 'smokydastona'
         ])
     }
     finalizedBy 'reobfJar'
