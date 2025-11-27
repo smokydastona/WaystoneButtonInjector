@@ -21,11 +21,11 @@ public class WaystoneButtonHandler {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        // Run command as console
+        // Run command as the player
         server.execute(() -> {
             try {
                 server.getCommands().performPrefixedCommand(
-                    server.createCommandSourceStack(), 
+                    player.createCommandSourceStack(), 
                     cmd
                 );
             } catch (Exception e) {
