@@ -27,10 +27,10 @@ public class ClientEvents {
         }
 
         // Get config values
-        List<? extends String> labels = WaystoneConfig.BUTTON_LABELS.get();
-        List<? extends String> commands = WaystoneConfig.BUTTON_COMMANDS.get();
+        List<String> labels = WaystoneConfig.getEnabledLabels();
+        List<String> commands = WaystoneConfig.getEnabledCommands();
         
-        int numButtons = Math.min(Math.min(labels.size(), commands.size()), 6); // Max 6 buttons
+        int numButtons = Math.min(labels.size(), 6); // Max 6 buttons
         if (numButtons == 0) return;
 
         // Calculate button dimensions based on number of buttons
