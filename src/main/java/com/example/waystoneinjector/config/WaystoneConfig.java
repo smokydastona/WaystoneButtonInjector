@@ -46,7 +46,7 @@ public class WaystoneConfig {
                 .comment("Enable Button 1")
                 .define("enabled", false);
         BUTTON1_LABEL = builder
-                .comment("Button label (use & for color codes, e.g., &aChaos Town)")
+                .comment("Button label (use & for color codes, e.g., &aGreen Text)")
                 .define("label", "Button 1");
         BUTTON1_COMMAND = builder
                 .comment("Command to execute (without leading /)")
