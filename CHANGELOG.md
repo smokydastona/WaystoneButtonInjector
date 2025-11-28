@@ -2,6 +2,28 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [Unreleased] - 2025-11-27
+
+### Changed
+- **BREAKING**: Commands now execute server-side with OP level 2 permissions
+- Switched from client-side command execution to server-side packet handling
+- Players no longer need OP status to use buttons - commands execute with elevated permissions
+- Simplified version numbering to `1.0.<commit-count>` format (removed git hash)
+- Updated mods.toml to dynamically pull version from build.gradle
+
+### Added
+- Server-side command execution system allowing non-OP players to use redirect buttons
+- CommandSourceStack creation with permission level 2 at player's position
+- Network packet communication from client to server for button clicks
+
+### Technical
+- Commands now run via `CommandSourceStack` with permission level 2
+- Client sends `WaystoneButtonPacket` with button index to server
+- Server executes command on server thread with `server.execute()`
+- Command source positioned at player location for proper targeting
+
+---
+
 ## [1.0.28] - 2025-11-27
 
 ### Added
