@@ -1,6 +1,8 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
+import com.example.waystoneinjector.network.Networking;
+import com.example.waystoneinjector.network.WaystoneButtonPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -56,10 +58,8 @@ public class ClientEvents {
             Button button = Button.builder(
                 Component.literal(label),
                 btn -> {
-                    Minecraft mc = Minecraft.getInstance();
-                    if (mc.player != null) {
-                        mc.player.connection.sendCommand(command);
-                    }
+                    // Send packet to server to execute command with OP permissions
+                    Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
                 }
             ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
             
@@ -78,10 +78,8 @@ public class ClientEvents {
             Button button = Button.builder(
                 Component.literal(label),
                 btn -> {
-                    Minecraft mc = Minecraft.getInstance();
-                    if (mc.player != null) {
-                        mc.player.connection.sendCommand(command);
-                    }
+                    // Send packet to server to execute command with OP permissions
+                    Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
                 }
             ).bounds(x, y, buttonWidth, buttonHeight).build();
             
