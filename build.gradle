@@ -5,19 +5,14 @@ plugins {
 
 group = 'com.example'
 
-// Auto-version based on git commit count
+// Auto-increment version based on git commit count
 def getVersionFromGit() {
     try {
         def proc = 'git rev-list --count HEAD'.execute()
         proc.waitFor()
         if (proc.exitValue() == 0) {
             def commitCount = proc.text.trim()
-            def hashProc = 'git rev-parse --short HEAD'.execute()
-            hashProc.waitFor()
-            if (hashProc.exitValue() == 0) {
-                def shortHash = hashProc.text.trim()
-                return "1.0.${commitCount}+${shortHash}"
-            }
+            return "1.0.${commitCount}"
         }
     } catch (Exception e) {
         println "Git not available, using fallback version"
