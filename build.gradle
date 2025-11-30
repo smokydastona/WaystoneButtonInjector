@@ -12,12 +12,12 @@ def getVersionFromGit() {
         proc.waitFor()
         if (proc.exitValue() == 0) {
             def commitCount = proc.text.trim()
-            return "1.0.${commitCount}"
+            return "2.0.${commitCount}"
         }
     } catch (Exception e) {
         println "Git not available, using fallback version"
     }
-    return '1.0.0'
+    return '2.0.0'
 }
 
 version = getVersionFromGit()

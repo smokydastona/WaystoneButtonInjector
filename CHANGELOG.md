@@ -2,7 +2,35 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
-## [Unreleased] - 2025-11-27
+## [2.0.0] - 2025-11-30
+
+### Changed
+- **MAJOR REWRITE**: Removed all server-side command execution - now uses pure client-side server transfers
+- No longer requires OP permissions at all - everything happens client-side
+- No longer requires ServerRedirect mod - built-in server transfer functionality
+- Commands are now parsed for server addresses and client directly connects to new servers
+
+### Added
+- Direct client-to-server connection system bypassing all permission requirements
+- Server address parsing from redirect commands (supports `redirect server.com` and `redirect server.com:25565`)
+- Automatic disconnection from current server and connection to target server
+- Support for custom ports in server addresses
+
+### Removed
+- Server-side command execution with elevated permissions
+- Dependency on ServerRedirect mod
+- All OP permission requirements
+
+### Technical
+- Client parses server address from command string
+- Uses `ConnectScreen.startConnecting()` for direct server connections
+- `ExecuteClientCommandPacket` now handles full connection logic
+- Server only validates button press and forwards to client
+- Works with any Minecraft server (no special setup needed on destination server)
+
+---
+
+## [1.0.x] - 2025-11-27
 
 ### Changed
 - **BREAKING**: Commands now execute server-side with OP level 2 permissions

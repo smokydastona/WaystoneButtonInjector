@@ -1,11 +1,7 @@
 package com.example.waystoneinjector.network;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -23,34 +19,13 @@ public class WaystoneButtonHandler {
         }
         
         String command = commands.get(pkt.getButtonId());
-        System.out.println("[WaystoneInjector] Executing command as OP: " + command + " for player: " + player.getName().getString());
+        System.out.println("[WaystoneInjector] Button pressed: " + pkt.getButtonId() + " by player: " + player.getName().getString());
+        System.out.println("[WaystoneInjector] Sending command to client: " + command);
         
-        MinecraftServer server = player.getServer();
-        if (server != null) {
-            server.execute(() -> {
-                // First, send command to client for client-side execution
-                Networking.CHANNEL.sendTo(new ExecuteClientCommandPacket(command), 
-                    player.connection.connection, 
-                    net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT);
-                
-                // Then execute on server with max OP permissions
-                // Create command source with OP level 4 permissions (max level, same as command blocks)
-                CommandSourceStack css = new CommandSourceStack(
-                    player,                          // source entity
-                    player.position(),               // position
-                    player.getRotationVector(),      // rotation
-                    player.serverLevel(),            // level
-                    4,                               // permission level (4 = max OP, same as command blocks)
-                    player.getName().getString(),    // name
-                    player.getDisplayName(),         // display name
-                    server,                          // server
-                    player                           // entity
-                ).withPermission(4);                 // Explicitly set permission level 4
-                int result = server.getCommands().performPrefixedCommand(css, command);
-                System.out.println("[WaystoneInjector] Command execution result: " + result);
-            });
-        } else {
-            System.err.println("[WaystoneInjector] Server is null!");
-        }
+        // Send command to client for client-side execution
+        // This bypasses the need for OP permissions since the client executes it
+        Networking.CHANNEL.sendTo(new ExecuteClientCommandPacket(command), 
+            player.connection.connection, 
+            net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT);
     }
 }

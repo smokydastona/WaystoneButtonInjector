@@ -7,6 +7,22 @@ Forge 1.20.1 mod that adds custom configurable buttons to the Waystones selectio
 - Fully configurable via config file
 - Supports unlimited buttons
 - Works alongside normal Waystone functionality
+- **Client-side command execution** - No OP permissions required!
+- Compatible with ServerRedirect mod for server transfers
+
+## How It Works
+
+This mod uses a client-server packet system with **built-in server redirection**:
+1. Player clicks a button in the Waystones GUI
+2. Client sends a packet to the server indicating which button was pressed
+3. Server validates the request and sends the command back to the client
+4. **Client directly connects to the new server** (no commands, no OP needed!)
+5. Player is seamlessly transferred to the new server
+
+This approach means:
+- **No OP permissions required** - Everything happens client-side
+- **No dependency on ServerRedirect mod** - Built-in redirection functionality
+- **Works with any Minecraft server** - No special server-side setup needed (besides having this mod installed)
 
 ## Configuration
 
@@ -44,4 +60,5 @@ Add as many buttons as needed - just ensure labels and commands arrays have the 
 ## Installation
 1. Install on both client and server
 2. Requires Waystones mod installed
-3. Server needs `redirect` command (ServerRedirect or similar mod)
+3. Configure buttons in `config/waystoneinjector-common.toml` on both client and server (configs should match)
+4. **No other dependencies needed!** ServerRedirect is NOT required - this mod handles server transfers directly
