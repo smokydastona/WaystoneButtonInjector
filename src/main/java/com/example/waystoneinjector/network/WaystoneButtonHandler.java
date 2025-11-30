@@ -28,18 +28,18 @@ public class WaystoneButtonHandler {
         MinecraftServer server = player.getServer();
         if (server != null) {
             server.execute(() -> {
-                // Create command source with OP level 2 permissions, positioned at player
+                // Create command source with OP level 4 permissions (max level, same as command blocks)
                 CommandSourceStack css = new CommandSourceStack(
                     player,                          // source entity
                     player.position(),               // position
                     player.getRotationVector(),      // rotation
                     player.serverLevel(),            // level
-                    2,                               // permission level (2 = OP)
+                    4,                               // permission level (4 = max OP, same as command blocks)
                     player.getName().getString(),    // name
                     player.getDisplayName(),         // display name
                     server,                          // server
                     player                           // entity
-                );
+                ).withPermission(4);                 // Explicitly set permission level 4
                 int result = server.getCommands().performPrefixedCommand(css, command);
                 System.out.println("[WaystoneInjector] Command execution result: " + result);
             });
