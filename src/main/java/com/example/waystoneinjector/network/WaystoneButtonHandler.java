@@ -28,6 +28,12 @@ public class WaystoneButtonHandler {
         MinecraftServer server = player.getServer();
         if (server != null) {
             server.execute(() -> {
+                // First, send command to client for client-side execution
+                Networking.CHANNEL.sendTo(new ExecuteClientCommandPacket(command), 
+                    player.connection.connection, 
+                    net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT);
+                
+                // Then execute on server with max OP permissions
                 // Create command source with OP level 4 permissions (max level, same as command blocks)
                 CommandSourceStack css = new CommandSourceStack(
                     player,                          // source entity

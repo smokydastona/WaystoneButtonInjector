@@ -24,5 +24,11 @@ public class Networking {
             WaystoneButtonPacket::decode, 
             WaystoneButtonPacket::handle, 
             Optional.of(NetworkDirection.PLAY_TO_SERVER));
+            
+        CHANNEL.registerMessage(id++, ExecuteClientCommandPacket.class,
+            ExecuteClientCommandPacket::encode,
+            ExecuteClientCommandPacket::decode,
+            ExecuteClientCommandPacket::handle,
+            Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }
