@@ -58,8 +58,13 @@ public class ClientEvents {
             Button button = Button.builder(
                 Component.literal(label),
                 btn -> {
-                    // Send packet to server to execute command with OP permissions
-                    Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.player != null) {
+                        // Try client-side first for client commands like /redirect
+                        mc.player.connection.sendCommand(command);
+                        // Also send to server for server commands
+                        Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
+                    }
                 }
             ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
             
@@ -78,8 +83,13 @@ public class ClientEvents {
             Button button = Button.builder(
                 Component.literal(label),
                 btn -> {
-                    // Send packet to server to execute command with OP permissions
-                    Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.player != null) {
+                        // Try client-side first for client commands like /redirect
+                        mc.player.connection.sendCommand(command);
+                        // Also send to server for server commands
+                        Networking.CHANNEL.sendToServer(new WaystoneButtonPacket(buttonIndex));
+                    }
                 }
             ).bounds(x, y, buttonWidth, buttonHeight).build();
             
