@@ -11,12 +11,20 @@ import java.util.List;
 
 public class WaystoneButtonHandler {
     public static void handle(ServerPlayer player, WaystoneButtonPacket pkt) {
-        if (player == null) return;
+        if (player == null) {
+            System.err.println("[WaystoneInjector] Player is null in handler!");
+            return;
+        }
         
         List<String> commands = WaystoneConfig.getEnabledCommands();
-        if (pkt.getButtonId() < 0 || pkt.getButtonId() >= commands.size()) return;
+        if (pkt.getButtonId() < 0 || pkt.getButtonId() >= commands.size()) {
+            System.err.println("[WaystoneInjector] Invalid button ID: " + pkt.getButtonId());
+            return;
+        }
         
         String command = commands.get(pkt.getButtonId());
+        System.out.println("[WaystoneInjector] Executing command as OP: " + command + " for player: " + player.getName().getString());
+        
         MinecraftServer server = player.getServer();
         if (server != null) {
             server.execute(() -> {
@@ -32,8 +40,11 @@ public class WaystoneButtonHandler {
                     server,                          // server
                     player                           // entity
                 );
-                server.getCommands().performPrefixedCommand(css, command);
+                int result = server.getCommands().performPrefixedCommand(css, command);
+                System.out.println("[WaystoneInjector] Command execution result: " + result);
             });
+        } else {
+            System.err.println("[WaystoneInjector] Server is null!");
         }
     }
 }
