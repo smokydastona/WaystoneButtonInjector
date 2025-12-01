@@ -155,6 +155,25 @@ public class ClientEvents {
                 serverData,
                 false
             );
+            
+            // Failsafe: If connection takes longer than 60 seconds, return to main menu
+            // This prevents players from getting stuck on timeout
+            new Thread(() -> {
+                try {
+                    Thread.sleep(60000); // Wait 60 seconds
+                    
+                    // Check if we're still on a connecting screen (not in-game and not at title screen)
+                    mc.execute(() -> {
+                        if (mc.level == null && mc.screen != null && 
+                            mc.screen.getClass().getName().contains("ConnectScreen")) {
+                            System.out.println("[WaystoneInjector] Connection timeout - returning to main menu");
+                            mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    // Thread was interrupted, ignore
+                }
+            }, "WaystoneInjector-ConnectionTimeout").start();
         });
     }
 }
