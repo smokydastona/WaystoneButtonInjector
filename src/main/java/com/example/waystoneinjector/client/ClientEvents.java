@@ -24,16 +24,28 @@ public class ClientEvents {
 
         // Detect Waystones selection screen specifically
         String className = screen.getClass().getName();
+        System.out.println("[WaystoneInjector] Screen detected: " + className);
+        
         if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
             return;
         }
 
+        System.out.println("[WaystoneInjector] Waystone screen detected! Adding buttons...");
+        
         // Get config values
         List<String> labels = WaystoneConfig.getEnabledLabels();
         List<String> commands = WaystoneConfig.getEnabledCommands();
         
+        System.out.println("[WaystoneInjector] Enabled buttons: " + labels.size());
+        for (int i = 0; i < labels.size(); i++) {
+            System.out.println("[WaystoneInjector] Button " + i + ": " + labels.get(i) + " -> " + commands.get(i));
+        }
+        
         int numButtons = Math.min(labels.size(), 6); // Max 6 buttons
-        if (numButtons == 0) return;
+        if (numButtons == 0) {
+            System.out.println("[WaystoneInjector] No enabled buttons found!");
+            return;
+        }
 
         // Calculate button dimensions based on number of buttons
         // Split buttons to left and right sides
