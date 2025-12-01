@@ -2,23 +2,26 @@ modLoader="javafml"
 loaderVersion="[47,)"
 license="MIT"
 
+# Client-side only mod - server doesn't need it installed
 [[mods]]
 modId="waystoneinjector"
 version="${file.jarVersion}"
 displayName="Waystone Button Injector"
-description="Injects configurable buttons into the Waystones GUI and sends a server packet to run commands."
+description="Client-side mod that adds server transfer buttons to Waystones GUI. Handles server connections directly without requiring server-side installation."
 authors=["RunawayStone"]
+# This mod is CLIENT ONLY and does not need to be installed on the server
+displayURL="https://github.com/smokydastona/WaystoneButtonInjector"
 
 [[dependencies.waystoneinjector]]
     modId="forge"
     mandatory=true
     versionRange="[47,)"
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"
 
 [[dependencies.waystoneinjector]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.20.1]"
     ordering="NONE"
-    side="BOTH"
+    side="CLIENT"

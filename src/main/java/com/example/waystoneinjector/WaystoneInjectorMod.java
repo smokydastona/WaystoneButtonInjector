@@ -11,17 +11,13 @@ public class WaystoneInjectorMod {
     public static final String MODID = "waystoneinjector";
 
     public WaystoneInjectorMod() {
-        // Register config FIRST
-        WaystoneConfig.register();
-        
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        
-        // Register client-only event handlers on the client
+        // Client-side only mod - only register on client
         if (FMLEnvironment.dist.isClient()) {
+            // Register config
+            WaystoneConfig.register();
+            
+            // Register client-only event handlers
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new com.example.waystoneinjector.client.ClientEvents());
         }
-
-        // Register networking
-        com.example.waystoneinjector.network.Networking.register();
     }
 }
