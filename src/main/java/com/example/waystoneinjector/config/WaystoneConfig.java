@@ -36,6 +36,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
     
     // Feverdream integration settings
+    public static final ForgeConfigSpec.BooleanValue FEVERDREAM_DEATH_REDIRECT_ENABLED;
     public static final ForgeConfigSpec.IntValue FEVERDREAM_DEATH_COUNT;
     public static final ForgeConfigSpec.BooleanValue FEVERDREAM_SLEEP_TP_ENABLED;
 
@@ -124,12 +125,18 @@ public class WaystoneConfig {
         
         // Feverdream Integration Settings
         builder.push("feverdream");
+        FEVERDREAM_DEATH_REDIRECT_ENABLED = builder
+                .comment("Enable death-based redirects",
+                        "When enabled, death packets from Feverdream will trigger server redirects",
+                        "When disabled, all death packets are ignored")
+                .define("deathRedirectEnabled", true);
         FEVERDREAM_DEATH_COUNT = builder
-                .comment("Number of deaths before auto-redirect activates (0-10)",
-                        "Set to 0 to redirect immediately on first death",
-                        "Set to 1 to redirect on second death, etc.",
-                        "Set to 10 to require 10 deaths before redirecting")
-                .defineInRange("deathCount", 0, 0, 10);
+                .comment("Number of deaths before auto-redirect activates (1-10)",
+                        "Set to 1 to redirect on first death",
+                        "Set to 2 to redirect on second death, etc.",
+                        "Set to 10 to require 10 deaths before redirecting",
+                        "Only applies if deathRedirectEnabled is true")
+                .defineInRange("deathCount", 1, 1, 10);
         FEVERDREAM_SLEEP_TP_ENABLED = builder
                 .comment("Enable sleep-based teleportation",
                         "When enabled, sleeping in a bed can trigger server redirects",
@@ -164,6 +171,10 @@ public class WaystoneConfig {
     }
     
     // Feverdream config getters
+    public static boolean isFeverdreamDeathRedirectEnabled() {
+        return FEVERDREAM_DEATH_REDIRECT_ENABLED.get();
+    }
+    
     public static int getFeverdreamDeathCount() {
         return FEVERDREAM_DEATH_COUNT.get();
     }

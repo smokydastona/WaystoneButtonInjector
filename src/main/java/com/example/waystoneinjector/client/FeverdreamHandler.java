@@ -40,6 +40,12 @@ public class FeverdreamHandler {
                     processedServerName = processedServerName.substring(6);
                     System.out.println("[WaystoneInjector] Death-based redirect detected");
                     
+                    // Check if death redirects are enabled
+                    if (!WaystoneConfig.isFeverdreamDeathRedirectEnabled()) {
+                        System.out.println("[WaystoneInjector] Death redirects are disabled in config - ignoring death redirect");
+                        return;
+                    }
+                    
                     // Track death count
                     UUID playerId = mc.player.getUUID();
                     int currentDeaths = playerDeathCounts.getOrDefault(playerId, 0);
@@ -47,9 +53,9 @@ public class FeverdreamHandler {
                     playerDeathCounts.put(playerId, currentDeaths);
                     
                     int requiredDeaths = WaystoneConfig.getFeverdreamDeathCount();
-                    System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + (requiredDeaths + 1));
+                    System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
                     
-                    if (currentDeaths <= requiredDeaths) {
+                    if (currentDeaths < requiredDeaths) {
                         System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
                         return;
                     }
