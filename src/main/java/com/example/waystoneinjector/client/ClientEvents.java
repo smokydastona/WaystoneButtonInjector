@@ -1,10 +1,10 @@
 package com.example.waystoneinjector.client;
 
+import com.example.waystoneinjector.client.gui.widget.ThemedButton;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -691,10 +691,16 @@ public class ClientEvents {
             final String command = config.command;
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
             
-            Button button = Button.builder(
+            // Create themed button with waystone type background
+            ThemedButton button = new ThemedButton(
+                x, y, config.width, config.height,
                 labelComponent,
-                btn -> handleServerTransfer(command)
-            ).bounds(x, y, config.width, config.height).build();
+                btn -> handleServerTransfer(command),
+                currentWaystoneType.get(),
+                "left",
+                i,
+                leftButtons.size()
+            );
             
             renderables.add(button);
             children.add(button);
@@ -713,10 +719,16 @@ public class ClientEvents {
             final String command = config.command;
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
             
-            Button button = Button.builder(
+            // Create themed button with waystone type background
+            ThemedButton button = new ThemedButton(
+                x, y, config.width, config.height,
                 labelComponent,
-                btn -> handleServerTransfer(command)
-            ).bounds(x, y, config.width, config.height).build();
+                btn -> handleServerTransfer(command),
+                currentWaystoneType.get(),
+                "right",
+                i,
+                rightButtons.size()
+            );
             
             renderables.add(button);
             children.add(button);
