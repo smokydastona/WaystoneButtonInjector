@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPacketListener.class)
 public class MixinResourcePackPrompt {
     
-    @Inject(method = "handleResourcePack", at = @At("HEAD"))
+    @Inject(method = "handleResourcePack(Lnet/minecraft/network/protocol/game/ClientboundResourcePackPacket;)V", 
+            at = @At("HEAD"), 
+            remap = false)
     private void onResourcePackRequest(ClientboundResourcePackPacket packet, CallbackInfo ci) {
         if (ResourcePackHandler.shouldAutoAccept()) {
             System.out.println("[WaystoneInjector] Auto-accepting resource pack: " + packet.getUrl());
