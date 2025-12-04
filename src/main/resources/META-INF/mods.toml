@@ -16,6 +16,10 @@ displayURL="https://github.com/smokydastona/WaystoneButtonInjector"
 [[mixins]]
 config = "waystoneinjector.mixins.json"
 
+# Tell servers we provide Feverdream functionality
+[[provides.waystoneinjector]]
+    modId="feverdream"
+
 [[dependencies.waystoneinjector]]
     modId="forge"
     mandatory=true
