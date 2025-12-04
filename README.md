@@ -21,8 +21,21 @@ Forge 1.20.1 **client-side mod** that adds custom configurable buttons to the Wa
 ### Automatic Redirection (Feverdream Integration)
 1. Server-side Feverdream mod sends a redirect packet when player respawns
 2. WaystoneButtonInjector receives the packet on channel `feverdreamrespawn:main`
-3. Client automatically connects to the specified server
-4. Perfect for death-based server transfers!
+3. Packet can contain either:
+   - A server address (e.g., "feverdream" or "hub.example.com")
+   - A secret button ID (6-11) to trigger one of the configured buttons
+4. Client automatically connects to the specified server
+5. Perfect for death-based server transfers!
+
+**Secret Buttons (IDs 6-11):**
+- Button 6 mirrors the command from visible Button 1
+- Button 7 mirrors the command from visible Button 2
+- Button 8 mirrors the command from visible Button 3
+- Button 9 mirrors the command from visible Button 4
+- Button 10 mirrors the command from visible Button 5
+- Button 11 mirrors the command from visible Button 6
+
+The Feverdream mod can send packet with value "6" through "11" to trigger the corresponding configured button without the player needing to open the Waystone menu.
 
 This approach means:
 - **No OP permissions required** - Everything happens client-side

@@ -1,8 +1,11 @@
 package com.example.waystoneinjector.client;
 
+import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+
+import java.util.List;
 
 public class FeverdreamHandler {
     
@@ -13,6 +16,19 @@ public class FeverdreamHandler {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
+                // Try to parse as button ID first (for secret buttons 6-11)
+                try {
+                    int buttonId = Integer.parseInt(serverName);
+                    if (buttonId >= 6 && buttonId <= 11) {
+                        // Secret button - map to visible button (6->0, 7->1, 8->2, 9->3, 10->4, 11->5)
+                        int visibleButtonIndex = buttonId - 6;
+                        handleSecretButton(visibleButtonIndex);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    // Not a number, treat as server name
+                }
+                
                 // Use the same redirect logic as button clicks
                 // The serverName from Feverdream is just the server identifier
                 // We'll construct a redirect command for it
@@ -29,6 +45,29 @@ public class FeverdreamHandler {
                 }
             }
         });
+    }
+    
+    private static void handleSecretButton(int buttonIndex) {
+        System.out.println("[WaystoneInjector] Secret button triggered: " + buttonIndex);
+        
+        // Get the command from the visible button configuration
+        List<String> commands = WaystoneConfig.getEnabledCommands();
+        
+        if (buttonIndex >= 0 && buttonIndex < commands.size()) {
+            String command = commands.get(buttonIndex);
+            System.out.println("[WaystoneInjector] Executing command from button " + buttonIndex + ": " + command);
+            
+            // Parse and connect
+            String serverAddress = parseRedirectAddress(command);
+            if (serverAddress != null && !serverAddress.isEmpty()) {
+                System.out.println("[WaystoneInjector] Connecting to server: " + serverAddress);
+                connectToServer(serverAddress);
+            } else {
+                System.err.println("[WaystoneInjector] Could not parse server address from: " + command);
+            }
+        } else {
+            System.err.println("[WaystoneInjector] Invalid secret button index: " + buttonIndex + " (enabled buttons: " + commands.size() + ")");
+        }
     }
     
     private static String parseRedirectAddress(String command) {

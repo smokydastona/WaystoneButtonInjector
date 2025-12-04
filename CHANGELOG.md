@@ -5,16 +5,20 @@ All notable changes to the Waystone Button Injector mod will be documented in th
 ## [Unreleased] - 2025-12-03
 
 ### Added
-- **Feverdream Respawn Integration**: Added packet listener for automatic server redirects
-- New network channel `feverdreamrespawn:main` to receive redirect packets from server-side Feverdream mod
-- `FeverdreamRedirectPacket` class to handle incoming redirect requests
-- `FeverdreamHandler` class to process redirect packets and trigger server transfers
-- Automatic server redirection when player respawns (when used with Feverdream server mod)
+- **Secret Buttons (IDs 6-11)**: Hidden buttons that mirror the 6 visible buttons for Feverdream integration
+- Feverdream mod can now send button IDs (6-11) to trigger configured buttons programmatically
+- Secret button 6 executes the same command as visible button 1, button 7 = button 2, etc.
+- Improved connection monitoring - checks every 2 seconds instead of just at 60 second timeout
+- Better error handling - returns to multiplayer screen instead of blank screen on connection failure
 
-### Technical
-- Added `FeverdreamNetworking` to register packet listener on client
-- Reused existing connection logic with timeout failsafe for Feverdream redirects
-- Maintains full client-side only architecture - no server installation required
+### Changed
+- Connection failure now returns players to multiplayer server list instead of title screen
+- FeverdreamHandler now supports both server names and button IDs (6-11)
+- Enhanced connection monitoring with active checks for faster failure detection
+
+### Fixed
+- Players no longer get stuck on blank screen when connection fails
+- Connection timeout now properly returns to multiplayer screen
 
 ---
 
