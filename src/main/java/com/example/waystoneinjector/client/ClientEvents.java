@@ -190,6 +190,16 @@ public class ClientEvents {
                 }
             }
             
+            // Try to extract coordinates
+            Field posField = findField(waystone.getClass(), "pos", "position", "blockPos");
+            if (posField != null) {
+                posField.setAccessible(true);
+                Object pos = posField.get(waystone);
+                if (pos != null) {
+                    tooltip.add(Component.literal("§7Position: §f" + pos.toString()));
+                }
+            }
+            
             // Try to extract global flag
             Field globalField = findField(waystone.getClass(), "isGlobal", "global");
             if (globalField != null) {
