@@ -57,22 +57,24 @@ public class ClientEvents {
             System.out.println("[WaystoneInjector] Screen detected: " + className);
         
             if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
+                System.out.println("[WaystoneInjector] Not a waystone screen, ignoring");
                 return;
             }
 
-            System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
+            System.out.println("[WaystoneInjector] ✓✓✓ WAYSTONE SCREEN DETECTED! Adding enhancements... ✓✓✓");
             
             // Reset to default before detection
             currentWaystoneType.set("regular");
             
             // Detect waystone type from the screen
             detectWaystoneType(screen);
-            System.out.println("[WaystoneInjector] Final detected type: " + currentWaystoneType.get());
+            System.out.println("[WaystoneInjector] ✓ Final detected type: " + currentWaystoneType.get());
             
             // Store screen reference
             currentWaystoneScreen.set(screen);
             
             // Add custom server transfer buttons
+            System.out.println("[WaystoneInjector] ✓ Adding custom buttons...");
             addCustomButtons(event, screen);
             
             // Add search box enhancement
@@ -637,10 +639,10 @@ public class ClientEvents {
             ));
         }
         
-        System.out.println("[WaystoneInjector] Enabled buttons: " + buttonConfigs.size());
+        System.out.println("[WaystoneInjector] ✓ Enabled buttons: " + buttonConfigs.size());
         
         if (buttonConfigs.isEmpty()) {
-            System.out.println("[WaystoneInjector] No enabled buttons found!");
+            System.out.println("[WaystoneInjector] ✗ No enabled buttons found!");
             return;
         }
         
@@ -674,6 +676,8 @@ public class ClientEvents {
             }
         }
         
+        System.out.println("[WaystoneInjector] ✓ Button distribution - Left: " + leftButtons.size() + ", Right: " + rightButtons.size());
+        
         int centerY = screen.height / 2;
         int verticalSpacing = 5;
         int sideMargin = 10;
@@ -690,6 +694,8 @@ public class ClientEvents {
             
             final String command = config.command;
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
+            
+            System.out.println("[WaystoneInjector] ✓ Creating LEFT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
             
             // Create themed button with waystone type background
             ThemedButton button = new ThemedButton(
@@ -719,6 +725,8 @@ public class ClientEvents {
             final String command = config.command;
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
             
+            System.out.println("[WaystoneInjector] ✓ Creating RIGHT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
+            
             // Create themed button with waystone type background
             ThemedButton button = new ThemedButton(
                 x, y, config.width, config.height,
@@ -733,6 +741,9 @@ public class ClientEvents {
             renderables.add(button);
             children.add(button);
         }
+        
+        System.out.println("[WaystoneInjector] ✓✓✓ Successfully added " + (leftButtons.size() + rightButtons.size()) + " buttons! ✓✓✓");
+        
         } catch (Exception e) {
             System.out.println("[WaystoneInjector] Could not add custom buttons: " + e.getMessage());
             e.printStackTrace();

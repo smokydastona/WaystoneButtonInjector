@@ -32,8 +32,15 @@ public class ThemedButton extends Button {
         // Render themed background
         renderThemedBackground(graphics);
         
-        // Render button text using parent's rendering
-        super.renderWidget(graphics, mouseX, mouseY, partialTick);
+        // Render button text manually
+        int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
+        graphics.drawCenteredString(
+            net.minecraft.client.Minecraft.getInstance().font,
+            this.getMessage(),
+            getX() + width / 2,
+            getY() + (height - 8) / 2,
+            textColor
+        );
     }
     
     private void renderThemedBackground(GuiGraphics graphics) {
