@@ -100,99 +100,166 @@ public class WaystoneConfig {
                         "  Waystone Button Injector - Client Configuration",
                         "═══════════════════════════════════════════════════════════════════════════════",
                         "",
-                        "Configure up to 6 buttons that appear in the Waystone menu.",
-                        "Each button can redirect you to a different server when clicked.",
+                        "QUICK START GUIDE:",
+                        "  1. Enable a button: Set 'enabled = true'",
+                        "  2. Set button label: Use plain text or color codes (&a = green, &c = red, etc.)",
+                        "  3. Set command: Use 'redirect @s server.ip:port' OR any server command",
+                        "  4. Customize appearance (optional): width, height, position, color",
                         "",
-                        "AUTOMATIC REDIRECTS:",
-                        "  - deathRedirect: Where to go when you DIE on this button's server",
-                        "  - sleepRedirect: Where to go when you SLEEP on this button's server",
-                        "  - sleepChance: Probability (0-100%) that sleep redirect triggers",
-                        "");
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "  COMPLETE BUTTON EXAMPLE",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "",
+                        "[button1]",
+                        "    # Turn this button ON",
+                        "    enabled = true",
+                        "",
+                        "    # Button text (supports Minecraft color codes with &)",
+                        "    label = \"&aHub Server\"",
+                        "",
+                        "    # What happens when you click the button:",
+                        "    # - For server transfers: \"redirect @s server.address.com:25565\"",
+                        "    # - For commands: \"spawn\", \"warp lobby\", \"waystone teleport MyWaystone\"",
+                        "    command = \"redirect @s hub.example.com:25565\"",
+                        "",
+                        "    # BUTTON APPEARANCE (all optional - leave as default if unsure)",
+                        "    width = 80          # Button width in pixels (default: 60, range: 20-200)",
+                        "    height = 35         # Button height in pixels (default: 30, range: 15-100)",
+                        "    textColor = \"0x00FF00\"  # Hex color for text (0xFFFFFF=white, 0xFF0000=red, 0x00FF00=green)",
+                        "",
+                        "    # BUTTON POSITION (all optional - defaults work for most setups)",
+                        "    side = \"left\"       # Where to place: \"auto\", \"left\", or \"right\"",
+                        "    xOffset = 0         # Move left/right from default position (-500 to 500)",
+                        "    yOffset = -10       # Move up/down from default position (-500 to 500)",
+                        "",
+                        "    # AUTOMATIC REDIRECTS (optional - leave empty to disable)",
+                        "    # When you DIE on this server, run this command:",
+                        "    deathRedirect = \"spawn\"",
+                        "",
+                        "    # When you SLEEP on this server, run this command:",
+                        "    sleepRedirect = \"\"",
+                        "",
+                        "    # Sleep redirect chance (0-100%, only applies if sleepRedirect is set)",
+                        "    sleepChance = 100",
+                        "",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "  COMMON COLOR CODES FOR LABELS",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "  &0 = Black    &1 = Dark Blue   &2 = Dark Green   &3 = Dark Aqua",
+                        "  &4 = Dark Red &5 = Dark Purple &6 = Gold         &7 = Gray",
+                        "  &8 = Dark Gray &9 = Blue       &a = Green        &b = Aqua",
+                        "  &c = Red      &d = Light Purple &e = Yellow      &f = White",
+                        "  &l = Bold     &o = Italic      &n = Underline    &r = Reset",
+                        "",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "  COMMON TEXT COLORS (HEX)",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "  0xFFFFFF = White     0xFF0000 = Red        0x00FF00 = Green",
+                        "  0x0000FF = Blue      0xFFFF00 = Yellow     0xFF00FF = Magenta",
+                        "  0x00FFFF = Cyan      0xFFA500 = Orange     0x800080 = Purple",
+                        "  0xFFD700 = Gold      0xC0C0C0 = Silver     0x808080 = Gray",
+                        "",
+                        "═══════════════════════════════════════════════════════════════════════════════");
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // Button 1
+        // Button 1 - Configure your first custom button here!
         // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button1");
-        builder.comment("",
-                        "BUTTON 1 - Manual Redirect",
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        BUTTON1_ENABLED = builder
-                .comment("Enable this button?")
-                .define("enabled", false);
-        BUTTON1_LABEL = builder
-                .comment("Button text (supports color codes with &, e.g., &aGreen &bBlue)")
-                .define("label", "Button 1");
-        BUTTON1_COMMAND = builder
-                .comment("Server to connect to (format: 'redirect @s server.address.com:25565')")
-                .define("command", "");
-        BUTTON1_WIDTH = builder
-                .comment("Button width in pixels (default: 60)")
-                .defineInRange("width", 60, 20, 200);
-        BUTTON1_HEIGHT = builder
-                .comment("Button height in pixels (default: 30)")
-                .defineInRange("height", 30, 15, 100);
-        BUTTON1_X_OFFSET = builder
-                .comment("X position offset from auto-calculated position (-500 to 500)")
-                .defineInRange("xOffset", 0, -500, 500);
-        BUTTON1_Y_OFFSET = builder
-                .comment("Y position offset from auto-calculated position (-500 to 500)")
-                .defineInRange("yOffset", 0, -500, 500);
-        BUTTON1_TEXT_COLOR = builder
-                .comment("Button text color in hex format (e.g., 0xFFFFFF for white, 0xFF0000 for red)")
-                .define("textColor", "0xFFFFFF");
-        BUTTON1_SIDE = builder
-                .comment("Which side to place button: 'auto' (distribute evenly), 'left', or 'right'")
-                .define("side", "auto");
         
         builder.comment("",
-                        "Automatic Redirect Settings",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                        "  BUTTON 1 CONFIGURATION",
                         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        
+        BUTTON1_ENABLED = builder
+                .comment("",
+                        "Enable this button? Set to 'true' to activate",
+                        "")
+                .define("enabled", false);
+        
+        BUTTON1_LABEL = builder
+                .comment("Button label (supports & color codes: &aGreen, &cRed, &bBlue, etc.)")
+                .define("label", "Button 1");
+        
+        BUTTON1_COMMAND = builder
+                .comment("Command when clicked:",
+                        "  - Server transfer: 'redirect @s server.ip:25565'",
+                        "  - Any command: 'spawn', 'warp lobby', 'waystone teleport Home'")
+                .define("command", "");
+        
+        builder.comment("",
+                        "────────────────────────────────────────────────────────────────────────────────",
+                        "  Appearance Settings (Optional - leave as default if unsure)",
+                        "────────────────────────────────────────────────────────────────────────────────");
+        
+        BUTTON1_WIDTH = builder
+                .comment("Button width in pixels (20-200)")
+                .defineInRange("width", 60, 20, 200);
+        
+        BUTTON1_HEIGHT = builder
+                .comment("Button height in pixels (15-100)")
+                .defineInRange("height", 30, 15, 100);
+        
+        BUTTON1_TEXT_COLOR = builder
+                .comment("Text color in hex (0xFFFFFF=white, 0xFF0000=red, 0x00FF00=green)")
+                .define("textColor", "0xFFFFFF");
+        
+        builder.comment("",
+                        "────────────────────────────────────────────────────────────────────────────────",
+                        "  Position Settings (Optional)",
+                        "────────────────────────────────────────────────────────────────────────────────");
+        
+        BUTTON1_SIDE = builder
+                .comment("Placement: 'auto' (balanced), 'left' (force left side), 'right' (force right side)")
+                .define("side", "auto");
+        
+        BUTTON1_X_OFFSET = builder
+                .comment("Horizontal adjustment in pixels (negative = left, positive = right)")
+                .defineInRange("xOffset", 0, -500, 500);
+        
+        BUTTON1_Y_OFFSET = builder
+                .comment("Vertical adjustment in pixels (negative = up, positive = down)")
+                .defineInRange("yOffset", 0, -500, 500);
+        
+        builder.comment("",
+                        "────────────────────────────────────────────────────────────────────────────────",
+                        "  Automatic Events (Optional - leave empty to disable)",
+                        "────────────────────────────────────────────────────────────────────────────────");
+        
         BUTTON1_DEATH_REDIRECT = builder
-                .comment("When you DIE on this server, redirect to: (leave empty to disable)")
+                .comment("When you DIE on this server, run this command (e.g., 'spawn', 'warp hub')")
                 .define("deathRedirect", "");
+        
         BUTTON1_SLEEP_REDIRECT = builder
-                .comment("When you SLEEP on this server, redirect to: (leave empty to disable)")
+                .comment("When you SLEEP on this server, run this command")
                 .define("sleepRedirect", "");
+        
         BUTTON1_SLEEP_CHANCE = builder
-                .comment("Sleep redirect probability: 100=always, 50=half the time, 0=never")
+                .comment("Sleep redirect chance: 100=always, 50=half the time, 0=never")
                 .defineInRange("sleepChance", 100, 0, 100);
+        
         builder.pop();
         
         // ═══════════════════════════════════════════════════════════════════════════════
-        // Button 2
+        // Button 2 - Same options as Button 1
         // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button2");
         builder.comment("",
-                        "BUTTON 2 - Manual Redirect",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                        "  BUTTON 2 CONFIGURATION",
                         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        BUTTON2_ENABLED = builder
-                .comment("Enable this button?")
-                .define("enabled", false);
-        BUTTON2_LABEL = builder
-                .comment("Button text (supports color codes with &)")
-                .define("label", "Button 2");
-        BUTTON2_COMMAND = builder
-                .comment("Server to connect to")
-                .define("command", "");
+        BUTTON2_ENABLED = builder.define("enabled", false);
+        BUTTON2_LABEL = builder.define("label", "Button 2");
+        BUTTON2_COMMAND = builder.define("command", "");
         BUTTON2_WIDTH = builder.defineInRange("width", 60, 20, 200);
         BUTTON2_HEIGHT = builder.defineInRange("height", 30, 15, 100);
-        BUTTON2_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
-        BUTTON2_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON2_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON2_SIDE = builder.define("side", "auto");
-        
-        builder.comment("",
-                        "Automatic Redirect Settings",
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        BUTTON2_DEATH_REDIRECT = builder
-                .comment("When you DIE on this server, redirect to:")
-                .define("deathRedirect", "");
-        BUTTON2_SLEEP_REDIRECT = builder
-                .comment("When you SLEEP on this server, redirect to:")
-                .define("sleepRedirect", "");
-        BUTTON2_SLEEP_CHANCE = builder
-                .comment("Sleep redirect probability (0-100%)")
-                .defineInRange("sleepChance", 100, 0, 100);
+        BUTTON2_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON2_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON2_DEATH_REDIRECT = builder.define("deathRedirect", "");
+        BUTTON2_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
+        BUTTON2_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -204,10 +271,10 @@ public class WaystoneConfig {
         BUTTON3_COMMAND = builder.define("command", "");
         BUTTON3_WIDTH = builder.defineInRange("width", 60, 20, 200);
         BUTTON3_HEIGHT = builder.defineInRange("height", 30, 15, 100);
-        BUTTON3_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
-        BUTTON3_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON3_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON3_SIDE = builder.define("side", "auto");
+        BUTTON3_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON3_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON3_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON3_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON3_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -222,10 +289,10 @@ public class WaystoneConfig {
         BUTTON4_COMMAND = builder.define("command", "");
         BUTTON4_WIDTH = builder.defineInRange("width", 60, 20, 200);
         BUTTON4_HEIGHT = builder.defineInRange("height", 30, 15, 100);
-        BUTTON4_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
-        BUTTON4_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON4_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON4_SIDE = builder.define("side", "auto");
+        BUTTON4_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON4_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON4_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON4_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON4_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -240,10 +307,10 @@ public class WaystoneConfig {
         BUTTON5_COMMAND = builder.define("command", "");
         BUTTON5_WIDTH = builder.defineInRange("width", 60, 20, 200);
         BUTTON5_HEIGHT = builder.defineInRange("height", 30, 15, 100);
-        BUTTON5_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
-        BUTTON5_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON5_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON5_SIDE = builder.define("side", "auto");
+        BUTTON5_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON5_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON5_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON5_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON5_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -258,10 +325,10 @@ public class WaystoneConfig {
         BUTTON6_COMMAND = builder.define("command", "");
         BUTTON6_WIDTH = builder.defineInRange("width", 60, 20, 200);
         BUTTON6_HEIGHT = builder.defineInRange("height", 30, 15, 100);
-        BUTTON6_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
-        BUTTON6_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON6_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON6_SIDE = builder.define("side", "auto");
+        BUTTON6_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON6_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON6_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON6_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON6_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
