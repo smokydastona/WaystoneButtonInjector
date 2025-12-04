@@ -34,6 +34,10 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON6_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
+    
+    // Feverdream integration settings
+    public static final ForgeConfigSpec.IntValue FEVERDREAM_DEATH_COUNT;
+    public static final ForgeConfigSpec.BooleanValue FEVERDREAM_SLEEP_TP_ENABLED;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -117,6 +121,21 @@ public class WaystoneConfig {
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
         builder.pop();
+        
+        // Feverdream Integration Settings
+        builder.push("feverdream");
+        FEVERDREAM_DEATH_COUNT = builder
+                .comment("Number of deaths before auto-redirect activates (0-10)",
+                        "Set to 0 to redirect immediately on first death",
+                        "Set to 1 to redirect on second death, etc.",
+                        "Set to 10 to require 10 deaths before redirecting")
+                .defineInRange("deathCount", 0, 0, 10);
+        FEVERDREAM_SLEEP_TP_ENABLED = builder
+                .comment("Enable sleep-based teleportation",
+                        "When enabled, sleeping in a bed can trigger server redirects",
+                        "When disabled, only death-based redirects will work")
+                .define("sleepTpEnabled", true);
+        builder.pop();
 
         SPEC = builder.build();
     }
@@ -142,6 +161,15 @@ public class WaystoneConfig {
         if (BUTTON5_ENABLED.get()) commands.add(BUTTON5_COMMAND.get());
         if (BUTTON6_ENABLED.get()) commands.add(BUTTON6_COMMAND.get());
         return commands;
+    }
+    
+    // Feverdream config getters
+    public static int getFeverdreamDeathCount() {
+        return FEVERDREAM_DEATH_COUNT.get();
+    }
+    
+    public static boolean isFeverdreamSleepTpEnabled() {
+        return FEVERDREAM_SLEEP_TP_ENABLED.get();
     }
 
     public static void register() {

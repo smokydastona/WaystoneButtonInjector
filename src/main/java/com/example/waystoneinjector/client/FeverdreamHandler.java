@@ -5,9 +5,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class FeverdreamHandler {
+    
+    // Track death counts per player (client-side)
+    private static final Map<UUID, Integer> playerDeathCounts = new HashMap<>();
     
     public static void handleRedirect(String serverName) {
         System.out.println("[WaystoneInjector] Received Feverdream redirect packet for server: " + serverName);
@@ -16,9 +22,48 @@ public class FeverdreamHandler {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
+                String processedServerName = serverName;
+                
+                // Check if this is a sleep-based redirect (will be prefixed with "sleep:")
+                if (processedServerName.startsWith("sleep:")) {
+                    if (!WaystoneConfig.isFeverdreamSleepTpEnabled()) {
+                        System.out.println("[WaystoneInjector] Sleep TP is disabled in config - ignoring sleep redirect");
+                        return;
+                    }
+                    // Remove the "sleep:" prefix and continue with redirect
+                    processedServerName = processedServerName.substring(6);
+                    System.out.println("[WaystoneInjector] Sleep-based redirect detected");
+                }
+                
+                // Check if this is a death-based redirect (will be prefixed with "death:")
+                if (processedServerName.startsWith("death:")) {
+                    processedServerName = processedServerName.substring(6);
+                    System.out.println("[WaystoneInjector] Death-based redirect detected");
+                    
+                    // Track death count
+                    UUID playerId = mc.player.getUUID();
+                    int currentDeaths = playerDeathCounts.getOrDefault(playerId, 0);
+                    currentDeaths++;
+                    playerDeathCounts.put(playerId, currentDeaths);
+                    
+                    int requiredDeaths = WaystoneConfig.getFeverdreamDeathCount();
+                    System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + (requiredDeaths + 1));
+                    
+                    if (currentDeaths <= requiredDeaths) {
+                        System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
+                        return;
+                    }
+                    
+                    // Reset death count after triggering redirect
+                    playerDeathCounts.remove(playerId);
+                    System.out.println("[WaystoneInjector] Death threshold reached - proceeding with redirect");
+                }
+                
+                final String finalServerName = processedServerName;
+                
                 // Try to parse as button ID first (for secret buttons 6-11)
                 try {
-                    int buttonId = Integer.parseInt(serverName);
+                    int buttonId = Integer.parseInt(finalServerName);
                     if (buttonId >= 6 && buttonId <= 11) {
                         // Secret button - map to visible button (6->0, 7->1, 8->2, 9->3, 10->4, 11->5)
                         int visibleButtonIndex = buttonId - 6;
@@ -32,7 +77,7 @@ public class FeverdreamHandler {
                 // Use the same redirect logic as button clicks
                 // The serverName from Feverdream is just the server identifier
                 // We'll construct a redirect command for it
-                String command = "redirect " + serverName;
+                String command = "redirect " + finalServerName;
                 System.out.println("[WaystoneInjector] Triggering redirect with command: " + command);
                 
                 // Parse and connect using the same method as ClientEvents
@@ -43,6 +88,17 @@ public class FeverdreamHandler {
                 } else {
                     System.err.println("[WaystoneInjector] Could not parse server address from: " + command);
                 }
+            }
+        });
+    }
+    
+    // Reset death count (can be called when needed)
+    public static void resetDeathCount() {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null) {
+                playerDeathCounts.remove(mc.player.getUUID());
+                System.out.println("[WaystoneInjector] Death count reset");
             }
         });
     }
