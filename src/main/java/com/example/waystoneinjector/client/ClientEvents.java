@@ -3,15 +3,17 @@ package com.example.waystoneinjector.client;
 import com.example.waystoneinjector.client.gui.EnhancedWaystoneSelectionScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector")
+@SuppressWarnings("null")
 public class ClientEvents {
 
-    @SuppressWarnings("null")
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         Screen screen = event.getScreen();
@@ -31,5 +33,34 @@ public class ClientEvents {
         Minecraft mc = Minecraft.getInstance();
         mc.setScreen(new EnhancedWaystoneSelectionScreen(screen));
         return; // Don't add buttons to the old screen since we're replacing it
+    }
+
+    /**
+     * Connect to a server by IP address
+     * Used by DeathSleepEvents for death/sleep redirects
+     */
+    public static void connectToServer(String serverAddress) {
+        Minecraft mc = Minecraft.getInstance();
+        System.out.println("[WaystoneInjector] Connecting to server: " + serverAddress);
+        
+        // Disconnect from current server first
+        if (mc.level != null) {
+            mc.level.disconnect();
+        }
+        
+        // Parse server address
+        ServerAddress address = ServerAddress.parseString(serverAddress);
+        
+        // Create ServerData object (1.20.1 API)
+        ServerData serverData = new ServerData(serverAddress, serverAddress, false);
+        
+        // Connect to the server (1.20.1 API)
+        net.minecraft.client.gui.screens.ConnectScreen.startConnecting(
+            mc.screen,
+            mc,
+            address,
+            serverData,
+            false
+        );
     }
 }
