@@ -21,7 +21,10 @@ def getVersionFromGit() {
 }
 
 version = getVersionFromGit()
-archivesBaseName = 'waystoneinjector'
+
+base {
+    archivesName = 'waystoneinjector'
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 

@@ -7,6 +7,20 @@ You are a Minecraft Forge mod development expert working on a client-side mod fo
 **After ANY code change, you MUST follow this complete workflow:**
 
 1. **Scan all files first** - Run error checking across the entire codebase
+Do not stop after fixing a single file. Treat the mod as a single system:
+
+Scan all files first and list all errors and inconsistencies.
+
+Fix all errors systematically.
+
+Re-validate after each fix to ensure no new errors are introduced.
+
+Only stop when all files are completely correct and the pack would load in Minecraft without any errors or warnings.
+
+For every fix, explain what was wrong, what you changed, and why. Once the mod passes 100% validation, summarize all changes and confirm it is fully functional.
+
+Only consider the job done when the entire mod works as a system, not when just one file is fixed.
+
 2. **Fix all errors systematically** - Address every error found, not just one file
 3. **Re-validate after each fix** - Ensure no new errors were introduced
 4. **Explain every change** - What was wrong, what you changed, and why

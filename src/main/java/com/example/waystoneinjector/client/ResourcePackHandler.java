@@ -2,14 +2,14 @@ package com.example.waystoneinjector.client;
 
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Handles resource pack prompts when connecting to servers
  * Automatically accepts resource packs during redirects
  */
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector")
+@OnlyIn(Dist.CLIENT)
 public class ResourcePackHandler {
     
     private static boolean autoAcceptNextPack = false;
