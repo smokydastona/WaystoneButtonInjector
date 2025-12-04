@@ -6,8 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -544,24 +542,32 @@ public class ClientEvents {
     
     private static void addCustomButtons(Screen screen) {
         try {
-            // Get renderables and listeners lists via reflection
-            Field renderablesField = findField(screen.getClass(), "renderables");
-            Field narratablesField = findField(screen.getClass(), "narratables");
-            Field childrenField = findField(screen.getClass(), "children");
+            System.out.println("[WaystoneInjector] >>> Starting addCustomButtons <<<");
             
-            if (renderablesField == null || childrenField == null) {
-                System.out.println("[WaystoneInjector] Could not find required fields to add buttons");
+            // Find the addRenderableWidget method to properly add buttons
+            Method addRenderableWidgetMethod = null;
+            try {
+                Class<?> screenClass = screen.getClass();
+                while (screenClass != null && addRenderableWidgetMethod == null) {
+                    try {
+                        addRenderableWidgetMethod = screenClass.getDeclaredMethod("addRenderableWidget", net.minecraft.client.gui.components.events.GuiEventListener.class);
+                        addRenderableWidgetMethod.setAccessible(true);
+                        System.out.println("[WaystoneInjector] ✓ Found addRenderableWidget in " + screenClass.getSimpleName());
+                        break;
+                    } catch (NoSuchMethodException e) {
+                        screenClass = screenClass.getSuperclass();
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("[WaystoneInjector] ✗ Error finding addRenderableWidget: " + e.getMessage());
+            }
+            
+            if (addRenderableWidgetMethod == null) {
+                System.err.println("[WaystoneInjector] ✗ Could not find addRenderableWidget method!");
                 return;
             }
             
-            renderablesField.setAccessible(true);
-            childrenField.setAccessible(true);
-            if (narratablesField != null) narratablesField.setAccessible(true);
-            
-            @SuppressWarnings("unchecked")
-            List<Renderable> renderables = (List<Renderable>) renderablesField.get(screen);
-            @SuppressWarnings("unchecked")
-            List<GuiEventListener> children = (List<GuiEventListener>) childrenField.get(screen);
+            final Method finalAddMethod = addRenderableWidgetMethod;
         
         // Build list of enabled button configs
         java.util.List<ButtonConfig> buttonConfigs = new java.util.ArrayList<>();
@@ -708,8 +714,13 @@ public class ClientEvents {
                 leftButtons.size()
             );
             
-            renderables.add(button);
-            children.add(button);
+            // Add button using the screen's method
+            try {
+                finalAddMethod.invoke(screen, button);
+                System.out.println("[WaystoneInjector] ✓ Added LEFT button " + (i+1));
+            } catch (Exception e) {
+                System.err.println("[WaystoneInjector] ✗ Failed to add LEFT button: " + e.getMessage());
+            }
         }
         
         // Add right side buttons
@@ -738,8 +749,13 @@ public class ClientEvents {
                 rightButtons.size()
             );
             
-            renderables.add(button);
-            children.add(button);
+            // Add button using the screen's method
+            try {
+                finalAddMethod.invoke(screen, button);
+                System.out.println("[WaystoneInjector] ✓ Added RIGHT button " + (i+1));
+            } catch (Exception e) {
+                System.err.println("[WaystoneInjector] ✗ Failed to add RIGHT button: " + e.getMessage());
+            }
         }
         
         System.out.println("[WaystoneInjector] ✓✓✓ Successfully added " + (leftButtons.size() + rightButtons.size()) + " buttons! ✓✓✓");
