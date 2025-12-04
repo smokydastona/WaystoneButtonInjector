@@ -5,19 +5,27 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+
 /**
  * Enhanced Waystone Selection Screen with Better Waystones Menu features
- * Phase 1: Basic screen replacement - just displays a title for now
+ * Phase 2: Display actual waystone data extracted from original screen
  */
 @SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends Screen {
     
     @SuppressWarnings("unused")
     private final Screen originalScreen;
+    private final List<WaystoneData> waystones;
     
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
+        
+        // Extract waystone data from original screen
+        this.waystones = WaystoneExtractor.extractWaystones(originalScreen);
+        
+        System.out.println("[WaystoneInjector] Enhanced screen created with " + waystones.size() + " waystones");
     }
     
     @Override
@@ -26,14 +34,48 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         System.out.println("[WaystoneInjector] Enhanced Waystone Selection Screen initialized");
         
-        // Add a close button for now
-        @SuppressWarnings("null")
+        // Add waystone buttons (simple list for now, no scrolling yet)
+        int startY = 40;
+        int buttonHeight = 20;
+        int spacing = 5;
+        int maxVisible = Math.min(waystones.size(), 10); // Show max 10 for now
+        
+        for (int i = 0; i < maxVisible; i++) {
+            final WaystoneData waystone = waystones.get(i);
+            
+            Button waystoneButton = Button.builder(
+                Component.literal(waystone.getName() + " - " + waystone.getDimensionName()),
+                btn -> onWaystoneSelected(waystone)
+            ).bounds(
+                this.width / 2 - 150,
+                startY + (i * (buttonHeight + spacing)),
+                300,
+                buttonHeight
+            ).build();
+            
+            this.addRenderableWidget(waystoneButton);
+        }
+        
+        // Add close button at bottom
         Button closeButton = Button.builder(
             Component.literal("Close"),
             btn -> this.onClose()
         ).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build();
         
         this.addRenderableWidget(closeButton);
+    }
+    
+    private void onWaystoneSelected(WaystoneData waystone) {
+        System.out.println("[WaystoneInjector] Waystone selected: " + waystone.getName());
+        System.out.println("[WaystoneInjector] Location: " + waystone.getX() + ", " + waystone.getY() + ", " + waystone.getZ());
+        System.out.println("[WaystoneInjector] Dimension: " + waystone.getDimensionName());
+        
+        // Phase 2: For now just log the selection
+        // Phase 3: Will implement actual teleportation
+        
+        // TODO: Implement teleportation via original waystone object or packets
+        // For now, close the screen
+        this.onClose();
     }
     
     @Override
@@ -50,20 +92,12 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
             0xFFFFFF
         );
         
-        // Render info text
+        // Show waystone count
         graphics.drawCenteredString(
             this.font,
-            Component.literal("Phase 1: Basic Screen Replacement"),
+            Component.literal("Waystones: " + waystones.size()),
             this.width / 2,
-            this.height / 2 - 10,
-            0xAAAAAA
-        );
-        
-        graphics.drawCenteredString(
-            this.font,
-            Component.literal("Enhanced features coming soon!"),
-            this.width / 2,
-            this.height / 2 + 10,
+            this.height - 45,
             0xAAAAAA
         );
         
