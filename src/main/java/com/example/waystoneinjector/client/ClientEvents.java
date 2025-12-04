@@ -73,7 +73,7 @@ public class ClientEvents {
             
             // Add custom server transfer buttons
             System.out.println("[WaystoneInjector] ✓ Adding custom buttons...");
-            addCustomButtons(screen);
+            addCustomButtons(screen, event);
             
             // Add search box enhancement
             addSearchBoxEnhancement(screen);
@@ -540,34 +540,9 @@ public class ClientEvents {
         }
     }
     
-    private static void addCustomButtons(Screen screen) {
+    private static void addCustomButtons(Screen screen, ScreenEvent.Init.Post event) {
         try {
             System.out.println("[WaystoneInjector] >>> Starting addCustomButtons <<<");
-            
-            // Find the addRenderableWidget method to properly add buttons
-            Method addRenderableWidgetMethod = null;
-            try {
-                Class<?> screenClass = screen.getClass();
-                while (screenClass != null && addRenderableWidgetMethod == null) {
-                    try {
-                        addRenderableWidgetMethod = screenClass.getDeclaredMethod("addRenderableWidget", net.minecraft.client.gui.components.events.GuiEventListener.class);
-                        addRenderableWidgetMethod.setAccessible(true);
-                        System.out.println("[WaystoneInjector] ✓ Found addRenderableWidget in " + screenClass.getSimpleName());
-                        break;
-                    } catch (NoSuchMethodException e) {
-                        screenClass = screenClass.getSuperclass();
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("[WaystoneInjector] ✗ Error finding addRenderableWidget: " + e.getMessage());
-            }
-            
-            if (addRenderableWidgetMethod == null) {
-                System.err.println("[WaystoneInjector] ✗ Could not find addRenderableWidget method!");
-                return;
-            }
-            
-            final Method finalAddMethod = addRenderableWidgetMethod;
         
         // Build list of enabled button configs
         java.util.List<ButtonConfig> buttonConfigs = new java.util.ArrayList<>();
@@ -716,7 +691,7 @@ public class ClientEvents {
             
             // Add button using the screen's method
             try {
-                finalAddMethod.invoke(screen, button);
+                event.addListener(button);
                 System.out.println("[WaystoneInjector] ✓ Added LEFT button " + (i+1));
             } catch (Exception e) {
                 System.err.println("[WaystoneInjector] ✗ Failed to add LEFT button: " + e.getMessage());
@@ -751,7 +726,7 @@ public class ClientEvents {
             
             // Add button using the screen's method
             try {
-                finalAddMethod.invoke(screen, button);
+                event.addListener(button);
                 System.out.println("[WaystoneInjector] ✓ Added RIGHT button " + (i+1));
             } catch (Exception e) {
                 System.err.println("[WaystoneInjector] ✗ Failed to add RIGHT button: " + e.getMessage());
