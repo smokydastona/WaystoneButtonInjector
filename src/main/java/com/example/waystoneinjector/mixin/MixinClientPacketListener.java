@@ -4,7 +4,7 @@ import net.minecraftforge.network.NetworkHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Mixin to disable the "Incompatible FML Modded Server" error
@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = NetworkHooks.class, remap = false)
 public class MixinClientPacketListener {
     
-    @Inject(method = "handleClientLoginSuccess", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void onHandleClientLoginSuccess(CallbackInfo ci) {
-        // Allow connection to proceed regardless of mod compatibility
-        // This effectively disables the "Incompatible FML Modded Server" check
-        System.out.println("[WaystoneInjector] Server compatibility check bypassed - allowing connection");
+    @Inject(method = "isVanillaConnection", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void forceVanillaConnection(CallbackInfoReturnable<Boolean> cir) {
+        // Always return true to bypass mod compatibility checks
+        System.out.println("[WaystoneInjector] Forcing vanilla connection - bypassing mod compatibility check");
+        cir.setReturnValue(true);
     }
 }
