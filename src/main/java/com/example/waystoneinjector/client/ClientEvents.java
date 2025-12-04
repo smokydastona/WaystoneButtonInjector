@@ -12,10 +12,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector", bus = Mod.EventBusSubscriber.Bus.FORGE)
 @SuppressWarnings("null")
@@ -24,6 +26,8 @@ public class ClientEvents {
     static {
         System.out.println("[WaystoneInjector] ClientEvents class loaded!");
     }
+    
+    private static final AtomicReference<EditBox> currentSearchBox = new AtomicReference<>(null);
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -58,16 +62,56 @@ public class ClientEvents {
                 if (searchBox instanceof EditBox) {
                     EditBox box = (EditBox) searchBox;
                     
-                    // Enhance the search box with right-click to clear
-                    System.out.println("[WaystoneInjector] Found search box, adding right-click clear feature");
+                    // Store reference for event handlers
+                    currentSearchBox.set(box);
                     
-                    // The search box already exists, we just log that we found it
-                    // Right-click clear will be added via screen event in next phase
-                    System.out.println("[WaystoneInjector] Search box position: x=" + box.getX() + ", y=" + box.getY());
+                    System.out.println("[WaystoneInjector] Found search box at x=" + box.getX() + ", y=" + box.getY());
+                    System.out.println("[WaystoneInjector] Search box enhancements active:");
+                    System.out.println("[WaystoneInjector] - Right-click to clear");
+                    System.out.println("[WaystoneInjector] - ESC to clear and unfocus");
                 }
             }
         } catch (Exception e) {
             System.out.println("[WaystoneInjector] Could not enhance search box: " + e.getMessage());
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
+        EditBox searchBox = currentSearchBox.get();
+        if (searchBox == null) return;
+        
+        // Right-click to clear
+        if (event.getButton() == 1) { // Right mouse button
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
+            
+            // Check if click is within search box bounds
+            if (mouseX >= searchBox.getX() && mouseX <= searchBox.getX() + searchBox.getWidth() &&
+                mouseY >= searchBox.getY() && mouseY <= searchBox.getY() + searchBox.getHeight()) {
+                
+                if (!searchBox.getValue().isEmpty()) {
+                    searchBox.setValue("");
+                    System.out.println("[WaystoneInjector] Search box cleared via right-click");
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+        EditBox searchBox = currentSearchBox.get();
+        if (searchBox == null) return;
+        
+        // ESC key to clear and unfocus
+        if (event.getKeyCode() == GLFW.GLFW_KEY_ESCAPE && searchBox.isFocused()) {
+            if (!searchBox.getValue().isEmpty()) {
+                searchBox.setValue("");
+                searchBox.setFocused(false);
+                System.out.println("[WaystoneInjector] Search box cleared via ESC");
+                event.setCanceled(true);
+            }
         }
     }
     
