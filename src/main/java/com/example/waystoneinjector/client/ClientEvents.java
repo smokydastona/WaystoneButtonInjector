@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -41,10 +43,10 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
 
     @SubscribeEvent
-    public static void onScreenInit(ScreenEvent.Init.Post event) {
+    public static void onScreenInit(ScreenEvent.Opening event) {
         try {
             System.out.println("[WaystoneInjector] *** onScreenInit EVENT FIRED ***");
-            Screen screen = event.getScreen();
+            Screen screen = event.getNewScreen();
             if (screen == null) {
                 System.out.println("[WaystoneInjector] Screen is null, returning");
                 return;
@@ -183,7 +185,7 @@ public class ClientEvents {
         }
     }
     
-    private static void addSearchBoxEnhancement(ScreenEvent.Init.Post event, Screen screen) {
+    private static void addSearchBoxEnhancement(ScreenEvent.Opening event, Screen screen) {
         try {
             // Find the existing search box in the waystone screen
             Field searchBoxField = findField(screen.getClass(), "searchBox");
@@ -538,7 +540,26 @@ public class ClientEvents {
         }
     }
     
-    private static void addCustomButtons(ScreenEvent.Init.Post event, Screen screen) {
+    private static void addCustomButtons(ScreenEvent.Opening event, Screen screen) {
+        try {
+            // Get renderables and listeners lists via reflection
+            Field renderablesField = findField(screen.getClass(), "renderables");
+            Field narratablesField = findField(screen.getClass(), "narratables");
+            Field childrenField = findField(screen.getClass(), "children");
+            
+            if (renderablesField == null || childrenField == null) {
+                System.out.println("[WaystoneInjector] Could not find required fields to add buttons");
+                return;
+            }
+            
+            renderablesField.setAccessible(true);
+            childrenField.setAccessible(true);
+            if (narratablesField != null) narratablesField.setAccessible(true);
+            
+            @SuppressWarnings("unchecked")
+            List<Renderable> renderables = (List<Renderable>) renderablesField.get(screen);
+            @SuppressWarnings("unchecked")
+            List<GuiEventListener> children = (List<GuiEventListener>) childrenField.get(screen);
         
         // Build list of enabled button configs
         java.util.List<ButtonConfig> buttonConfigs = new java.util.ArrayList<>();
@@ -675,7 +696,8 @@ public class ClientEvents {
                 btn -> handleServerTransfer(command)
             ).bounds(x, y, config.width, config.height).build();
             
-            event.addListener(button);
+            renderables.add(button);
+            children.add(button);
         }
         
         // Add right side buttons
@@ -696,7 +718,12 @@ public class ClientEvents {
                 btn -> handleServerTransfer(command)
             ).bounds(x, y, config.width, config.height).build();
             
-            event.addListener(button);
+            renderables.add(button);
+            children.add(button);
+        }
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] Could not add custom buttons: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
