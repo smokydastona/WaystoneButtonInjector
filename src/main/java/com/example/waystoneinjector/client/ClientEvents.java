@@ -469,61 +469,198 @@ public class ClientEvents {
         return null;
     }
     
+    // Helper class to store button configuration
+    private static class ButtonConfig {
+        String label;
+        String command;
+        int width;
+        int height;
+        int xOffset;
+        int yOffset;
+        int textColor;
+        String side; // "auto", "left", or "right"
+        
+        ButtonConfig(String label, String command, int width, int height, int xOffset, int yOffset, String textColorHex, String side) {
+            this.label = label;
+            this.command = command;
+            this.width = width;
+            this.height = height;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+            this.side = side;
+            
+            // Parse hex color
+            try {
+                String colorStr = textColorHex.trim();
+                if (colorStr.startsWith("0x") || colorStr.startsWith("0X")) {
+                    this.textColor = Integer.parseInt(colorStr.substring(2), 16);
+                } else {
+                    this.textColor = Integer.parseInt(colorStr, 16);
+                }
+            } catch (NumberFormatException e) {
+                this.textColor = 0xFFFFFF; // Default to white
+            }
+        }
+    }
+    
     private static void addCustomButtons(ScreenEvent.Init.Post event, Screen screen) {
         
-        // Get config values
-        List<String> labels = WaystoneConfig.getEnabledLabels();
-        List<String> commands = WaystoneConfig.getEnabledCommands();
-
-        System.out.println("[WaystoneInjector] Enabled buttons: " + labels.size());
-
-        int numButtons = Math.min(labels.size(), 6); // Max 6 buttons
-        if (numButtons == 0) {
+        // Build list of enabled button configs
+        java.util.List<ButtonConfig> buttonConfigs = new java.util.ArrayList<>();
+        
+        if (WaystoneConfig.BUTTON1_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON1_LABEL.get(),
+                WaystoneConfig.BUTTON1_COMMAND.get(),
+                WaystoneConfig.BUTTON1_WIDTH.get(),
+                WaystoneConfig.BUTTON1_HEIGHT.get(),
+                WaystoneConfig.BUTTON1_X_OFFSET.get(),
+                WaystoneConfig.BUTTON1_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON1_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON1_SIDE.get()
+            ));
+        }
+        if (WaystoneConfig.BUTTON2_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON2_LABEL.get(),
+                WaystoneConfig.BUTTON2_COMMAND.get(),
+                WaystoneConfig.BUTTON2_WIDTH.get(),
+                WaystoneConfig.BUTTON2_HEIGHT.get(),
+                WaystoneConfig.BUTTON2_X_OFFSET.get(),
+                WaystoneConfig.BUTTON2_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON2_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON2_SIDE.get()
+            ));
+        }
+        if (WaystoneConfig.BUTTON3_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON3_LABEL.get(),
+                WaystoneConfig.BUTTON3_COMMAND.get(),
+                WaystoneConfig.BUTTON3_WIDTH.get(),
+                WaystoneConfig.BUTTON3_HEIGHT.get(),
+                WaystoneConfig.BUTTON3_X_OFFSET.get(),
+                WaystoneConfig.BUTTON3_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON3_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON3_SIDE.get()
+            ));
+        }
+        if (WaystoneConfig.BUTTON4_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON4_LABEL.get(),
+                WaystoneConfig.BUTTON4_COMMAND.get(),
+                WaystoneConfig.BUTTON4_WIDTH.get(),
+                WaystoneConfig.BUTTON4_HEIGHT.get(),
+                WaystoneConfig.BUTTON4_X_OFFSET.get(),
+                WaystoneConfig.BUTTON4_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON4_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON4_SIDE.get()
+            ));
+        }
+        if (WaystoneConfig.BUTTON5_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON5_LABEL.get(),
+                WaystoneConfig.BUTTON5_COMMAND.get(),
+                WaystoneConfig.BUTTON5_WIDTH.get(),
+                WaystoneConfig.BUTTON5_HEIGHT.get(),
+                WaystoneConfig.BUTTON5_X_OFFSET.get(),
+                WaystoneConfig.BUTTON5_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON5_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON5_SIDE.get()
+            ));
+        }
+        if (WaystoneConfig.BUTTON6_ENABLED.get()) {
+            buttonConfigs.add(new ButtonConfig(
+                WaystoneConfig.BUTTON6_LABEL.get(),
+                WaystoneConfig.BUTTON6_COMMAND.get(),
+                WaystoneConfig.BUTTON6_WIDTH.get(),
+                WaystoneConfig.BUTTON6_HEIGHT.get(),
+                WaystoneConfig.BUTTON6_X_OFFSET.get(),
+                WaystoneConfig.BUTTON6_Y_OFFSET.get(),
+                WaystoneConfig.BUTTON6_TEXT_COLOR.get(),
+                WaystoneConfig.BUTTON6_SIDE.get()
+            ));
+        }
+        
+        System.out.println("[WaystoneInjector] Enabled buttons: " + buttonConfigs.size());
+        
+        if (buttonConfigs.isEmpty()) {
             System.out.println("[WaystoneInjector] No enabled buttons found!");
             return;
         }
-
-        // Calculate button dimensions based on number of buttons
-        int leftButtons = (numButtons + 1) / 2;
-        int rightButtons = numButtons / 2;
-
-        int buttonWidth = 60;
-        int buttonHeight = 30;
+        
+        // Separate buttons by side
+        java.util.List<ButtonConfig> leftButtons = new java.util.ArrayList<>();
+        java.util.List<ButtonConfig> rightButtons = new java.util.ArrayList<>();
+        
+        // First pass: assign explicit left/right
+        for (ButtonConfig config : buttonConfigs) {
+            if ("left".equalsIgnoreCase(config.side)) {
+                leftButtons.add(config);
+            } else if ("right".equalsIgnoreCase(config.side)) {
+                rightButtons.add(config);
+            }
+        }
+        
+        // Second pass: distribute "auto" buttons evenly
+        java.util.List<ButtonConfig> autoButtons = new java.util.ArrayList<>();
+        for (ButtonConfig config : buttonConfigs) {
+            if ("auto".equalsIgnoreCase(config.side)) {
+                autoButtons.add(config);
+            }
+        }
+        
+        // Distribute auto buttons to balance left/right
+        for (ButtonConfig config : autoButtons) {
+            if (leftButtons.size() <= rightButtons.size()) {
+                leftButtons.add(config);
+            } else {
+                rightButtons.add(config);
+            }
+        }
+        
+        int centerY = screen.height / 2;
         int verticalSpacing = 5;
         int sideMargin = 10;
-
-        int centerY = screen.height / 2;
-
+        
         // Add left side buttons
-        for (int i = 0; i < leftButtons; i++) {
-            final int buttonIndex = i;
-            String label = labels.get(buttonIndex);
-            final String command = commands.get(buttonIndex);
-
-            int y = centerY - ((leftButtons * buttonHeight + (leftButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
-
+        for (int i = 0; i < leftButtons.size(); i++) {
+            ButtonConfig config = leftButtons.get(i);
+            
+            // Calculate Y position (centered vertically)
+            int totalHeight = leftButtons.size() * config.height + (leftButtons.size() - 1) * verticalSpacing;
+            int startY = centerY - totalHeight / 2;
+            int y = startY + (i * (config.height + verticalSpacing)) + config.yOffset;
+            int x = sideMargin + config.xOffset;
+            
+            final String command = config.command;
+            Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
+            
             Button button = Button.builder(
-                Component.literal(label),
+                labelComponent,
                 btn -> handleServerTransfer(command)
-            ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
-
+            ).bounds(x, y, config.width, config.height).build();
+            
             event.addListener(button);
         }
-
+        
         // Add right side buttons
-        for (int i = 0; i < rightButtons; i++) {
-            final int buttonIndex = leftButtons + i;
-            String label = labels.get(buttonIndex);
-            final String command = commands.get(buttonIndex);
-
-            int y = centerY - ((rightButtons * buttonHeight + (rightButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
-            int x = screen.width - buttonWidth - sideMargin;
-
+        for (int i = 0; i < rightButtons.size(); i++) {
+            ButtonConfig config = rightButtons.get(i);
+            
+            // Calculate Y position (centered vertically)
+            int totalHeight = rightButtons.size() * config.height + (rightButtons.size() - 1) * verticalSpacing;
+            int startY = centerY - totalHeight / 2;
+            int y = startY + (i * (config.height + verticalSpacing)) + config.yOffset;
+            int x = screen.width - config.width - sideMargin + config.xOffset;
+            
+            final String command = config.command;
+            Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
+            
             Button button = Button.builder(
-                Component.literal(label),
+                labelComponent,
                 btn -> handleServerTransfer(command)
-            ).bounds(x, y, buttonWidth, buttonHeight).build();
-
+            ).bounds(x, y, config.width, config.height).build();
+            
             event.addListener(button);
         }
     }

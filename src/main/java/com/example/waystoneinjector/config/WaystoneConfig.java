@@ -14,6 +14,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON1_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON1_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON1_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON1_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON1_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON1_SLEEP_CHANCE;
@@ -21,6 +27,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON2_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON2_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON2_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON2_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON2_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON2_SLEEP_CHANCE;
@@ -28,6 +40,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON3_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON3_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON3_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON3_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON3_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON3_SLEEP_CHANCE;
@@ -35,6 +53,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON4_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON4_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON4_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON4_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON4_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON4_SLEEP_CHANCE;
@@ -42,6 +66,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON5_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON5_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON5_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON5_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON5_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON5_SLEEP_CHANCE;
@@ -49,6 +79,12 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON6_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
+    public static final ForgeConfigSpec.IntValue BUTTON6_WIDTH;
+    public static final ForgeConfigSpec.IntValue BUTTON6_HEIGHT;
+    public static final ForgeConfigSpec.IntValue BUTTON6_X_OFFSET;
+    public static final ForgeConfigSpec.IntValue BUTTON6_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_TEXT_COLOR;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SIDE;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON6_SLEEP_CHANCE;
@@ -89,6 +125,24 @@ public class WaystoneConfig {
         BUTTON1_COMMAND = builder
                 .comment("Server to connect to (format: 'redirect @s server.address.com:25565')")
                 .define("command", "");
+        BUTTON1_WIDTH = builder
+                .comment("Button width in pixels (default: 60)")
+                .defineInRange("width", 60, 20, 200);
+        BUTTON1_HEIGHT = builder
+                .comment("Button height in pixels (default: 30)")
+                .defineInRange("height", 30, 15, 100);
+        BUTTON1_X_OFFSET = builder
+                .comment("X position offset from auto-calculated position (-500 to 500)")
+                .defineInRange("xOffset", 0, -500, 500);
+        BUTTON1_Y_OFFSET = builder
+                .comment("Y position offset from auto-calculated position (-500 to 500)")
+                .defineInRange("yOffset", 0, -500, 500);
+        BUTTON1_TEXT_COLOR = builder
+                .comment("Button text color in hex format (e.g., 0xFFFFFF for white, 0xFF0000 for red)")
+                .define("textColor", "0xFFFFFF");
+        BUTTON1_SIDE = builder
+                .comment("Which side to place button: 'auto' (distribute evenly), 'left', or 'right'")
+                .define("side", "auto");
         
         builder.comment("",
                         "Automatic Redirect Settings",
@@ -120,6 +174,12 @@ public class WaystoneConfig {
         BUTTON2_COMMAND = builder
                 .comment("Server to connect to")
                 .define("command", "");
+        BUTTON2_WIDTH = builder.defineInRange("width", 60, 20, 200);
+        BUTTON2_HEIGHT = builder.defineInRange("height", 30, 15, 100);
+        BUTTON2_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON2_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON2_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
+        BUTTON2_SIDE = builder.define("side", "auto");
         
         builder.comment("",
                         "Automatic Redirect Settings",
@@ -142,6 +202,12 @@ public class WaystoneConfig {
         BUTTON3_ENABLED = builder.define("enabled", false);
         BUTTON3_LABEL = builder.define("label", "Button 3");
         BUTTON3_COMMAND = builder.define("command", "");
+        BUTTON3_WIDTH = builder.defineInRange("width", 60, 20, 200);
+        BUTTON3_HEIGHT = builder.defineInRange("height", 30, 15, 100);
+        BUTTON3_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON3_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON3_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
+        BUTTON3_SIDE = builder.define("side", "auto");
         BUTTON3_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON3_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON3_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -154,6 +220,12 @@ public class WaystoneConfig {
         BUTTON4_ENABLED = builder.define("enabled", false);
         BUTTON4_LABEL = builder.define("label", "Button 4");
         BUTTON4_COMMAND = builder.define("command", "");
+        BUTTON4_WIDTH = builder.defineInRange("width", 60, 20, 200);
+        BUTTON4_HEIGHT = builder.defineInRange("height", 30, 15, 100);
+        BUTTON4_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON4_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON4_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
+        BUTTON4_SIDE = builder.define("side", "auto");
         BUTTON4_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON4_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON4_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -166,6 +238,12 @@ public class WaystoneConfig {
         BUTTON5_ENABLED = builder.define("enabled", false);
         BUTTON5_LABEL = builder.define("label", "Button 5");
         BUTTON5_COMMAND = builder.define("command", "");
+        BUTTON5_WIDTH = builder.defineInRange("width", 60, 20, 200);
+        BUTTON5_HEIGHT = builder.defineInRange("height", 30, 15, 100);
+        BUTTON5_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON5_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON5_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
+        BUTTON5_SIDE = builder.define("side", "auto");
         BUTTON5_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON5_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON5_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
@@ -178,6 +256,12 @@ public class WaystoneConfig {
         BUTTON6_ENABLED = builder.define("enabled", false);
         BUTTON6_LABEL = builder.define("label", "Button 6");
         BUTTON6_COMMAND = builder.define("command", "");
+        BUTTON6_WIDTH = builder.defineInRange("width", 60, 20, 200);
+        BUTTON6_HEIGHT = builder.defineInRange("height", 30, 15, 100);
+        BUTTON6_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
+        BUTTON6_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
+        BUTTON6_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
+        BUTTON6_SIDE = builder.define("side", "auto");
         BUTTON6_DEATH_REDIRECT = builder.define("deathRedirect", "");
         BUTTON6_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
         BUTTON6_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
