@@ -2,6 +2,7 @@ package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,6 +29,8 @@ public class ClientEvents {
     }
     
     private static final AtomicReference<EditBox> currentSearchBox = new AtomicReference<>(null);
+    private static final AtomicReference<Screen> currentWaystoneScreen = new AtomicReference<>(null);
+    private static final AtomicReference<Object> currentWaystoneList = new AtomicReference<>(null);
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -44,11 +47,17 @@ public class ClientEvents {
 
         System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
         
+        // Store screen reference
+        currentWaystoneScreen.set(screen);
+        
         // Add custom server transfer buttons
         addCustomButtons(event, screen);
         
         // Add search box enhancement
         addSearchBoxEnhancement(event, screen);
+        
+        // Find and store waystone list for tooltip rendering
+        findWaystoneList(screen);
     }
     
     private static void addSearchBoxEnhancement(ScreenEvent.Init.Post event, Screen screen) {
@@ -113,6 +122,100 @@ public class ClientEvents {
                 event.setCanceled(true);
             }
         }
+    }
+    
+    private static void findWaystoneList(Screen screen) {
+        try {
+            // Try to find the waystone list widget for tooltip rendering
+            Field listField = findField(screen.getClass(), "waystoneList", "list");
+            if (listField != null) {
+                listField.setAccessible(true);
+                Object list = listField.get(screen);
+                currentWaystoneList.set(list);
+                System.out.println("[WaystoneInjector] Found waystone list widget for enhanced tooltips");
+            }
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] Could not find waystone list: " + e.getMessage());
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onRenderScreen(ScreenEvent.Render.Post event) {
+        Screen screen = currentWaystoneScreen.get();
+        if (screen == null || event.getScreen() != screen) return;
+        
+        // Check if CTRL is held
+        if (!Screen.hasControlDown()) return;
+        
+        GuiGraphics graphics = event.getGuiGraphics();
+        int mouseX = (int) event.getMouseX();
+        int mouseY = (int) event.getMouseY();
+        
+        // Try to get waystone information under cursor
+        try {
+            Object waystoneList = currentWaystoneList.get();
+            if (waystoneList == null) return;
+            
+            // Get the hovered waystone using reflection
+            Field hoveredField = findField(waystoneList.getClass(), "hovered", "hoveredSlot");
+            if (hoveredField != null) {
+                hoveredField.setAccessible(true);
+                Object hovered = hoveredField.get(waystoneList);
+                
+                if (hovered != null) {
+                    // Extract waystone information
+                    List<Component> tooltip = getWaystoneTooltip(hovered);
+                    if (!tooltip.isEmpty()) {
+                        graphics.renderComponentTooltip(Minecraft.getInstance().font, tooltip, mouseX, mouseY);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Silently fail - tooltip is optional
+        }
+    }
+    
+    private static List<Component> getWaystoneTooltip(Object waystone) {
+        List<Component> tooltip = new ArrayList<>();
+        
+        try {
+            // Try to extract waystone name
+            Field nameField = findField(waystone.getClass(), "name", "waystoneData");
+            if (nameField != null) {
+                nameField.setAccessible(true);
+                Object name = nameField.get(waystone);
+                if (name != null) {
+                    tooltip.add(Component.literal("§6Waystone Details"));
+                    tooltip.add(Component.literal("§7Name: §f" + name.toString()));
+                }
+            }
+            
+            // Try to extract global flag
+            Field globalField = findField(waystone.getClass(), "isGlobal", "global");
+            if (globalField != null) {
+                globalField.setAccessible(true);
+                Object isGlobal = globalField.get(waystone);
+                if (isGlobal instanceof Boolean && (Boolean) isGlobal) {
+                    tooltip.add(Component.literal("§9Global Waystone"));
+                }
+            }
+            
+            // Try to extract dimension
+            Field dimensionField = findField(waystone.getClass(), "dimension", "level");
+            if (dimensionField != null) {
+                dimensionField.setAccessible(true);
+                Object dimension = dimensionField.get(waystone);
+                if (dimension != null) {
+                    tooltip.add(Component.literal("§7Dimension: §f" + dimension.toString()));
+                }
+            }
+            
+        } catch (Exception e) {
+            // Return empty tooltip on error
+            tooltip.clear();
+        }
+        
+        return tooltip;
     }
     
     private static Field findField(Class<?> clazz, String... fieldNames) {
