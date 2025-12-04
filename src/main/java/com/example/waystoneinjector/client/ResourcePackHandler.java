@@ -51,14 +51,16 @@ public class ResourcePackHandler {
             new Thread(() -> {
                 try {
                     Thread.sleep(1000); // Wait 1 second for world to load
-                    mc.execute(() -> {
+                    @SuppressWarnings("null")
+                    Runnable task = () -> {
                         if (mc.player != null && mc.getConnection() != null) {
                             // Execute /spawn command to go to spawn point
                             mc.player.connection.sendCommand("spawn");
                             System.out.println("[WaystoneInjector] Executed spawn command");
                         }
                         DeathSleepEvents.clearDeathRedirectFlag();
-                    });
+                    };
+                    mc.execute(task);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

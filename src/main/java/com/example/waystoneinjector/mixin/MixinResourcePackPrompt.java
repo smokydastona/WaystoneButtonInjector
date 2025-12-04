@@ -25,14 +25,16 @@ public class MixinResourcePackPrompt {
             
             // Auto-accept the resource pack
             Minecraft mc = Minecraft.getInstance();
-            mc.execute(() -> {
+            @SuppressWarnings("null")
+            Runnable task = () -> {
                 if (mc.getConnection() != null) {
                     // Send acceptance to server
                     mc.getConnection().send(new ServerboundResourcePackPacket(
                         ServerboundResourcePackPacket.Action.ACCEPTED
                     ));
                 }
-            });
+            };
+            mc.execute(task);
         }
     }
 }

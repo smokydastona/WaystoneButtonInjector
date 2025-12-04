@@ -18,24 +18,13 @@ Forge 1.20.1 **client-side mod** that adds custom configurable buttons to the Wa
 2. **Client directly connects to the new server** (no commands, no OP needed!)
 3. Player is seamlessly transferred to the new server
 
-### Automatic Redirection (Feverdream Integration)
-1. Server-side Feverdream mod sends a redirect packet when player respawns
-2. WaystoneButtonInjector receives the packet on channel `feverdreamrespawn:main`
-3. Packet can contain either:
-   - A server address (e.g., "feverdream" or "hub.example.com")
-   - A secret button ID (6-11) to trigger one of the configured buttons
-4. Client automatically connects to the specified server
-5. Perfect for death-based server transfers!
+### Automatic Redirection (Built-in Death/Sleep Detection)
+1. Mod detects when player dies or sleeps
+2. Checks config for matching server redirect mapping
+3. Client automatically connects to the configured destination server
+4. Perfect for death-based server transfers!
 
-**Secret Buttons (IDs 6-11):**
-- Button 6 mirrors the command from visible Button 1
-- Button 7 mirrors the command from visible Button 2
-- Button 8 mirrors the command from visible Button 3
-- Button 9 mirrors the command from visible Button 4
-- Button 10 mirrors the command from visible Button 5
-- Button 11 mirrors the command from visible Button 6
-
-The Feverdream mod can send packet with value "6" through "11" to trigger the corresponding configured button without the player needing to open the Waystone menu.
+No server-side mod required - all detection happens client-side!
 
 This approach means:
 - **No OP permissions required** - Everything happens client-side
@@ -81,5 +70,14 @@ Add as many buttons as needed - just ensure labels and commands arrays have the 
 3. Configure buttons in `config/waystoneinjector-client.toml`
 4. **That's it!** No server-side installation of WaystoneButtonInjector needed
 
-## Feverdream Respawn Integration
-This mod is compatible with the [FeverDream_WSBI-Compat](https://github.com/smokydastona/FeverDream_WSBI-Compat) server-side mod, which automatically redirects players to another server when they respawn after death. No additional configuration needed - just install both mods!
+## Death/Sleep Redirection
+Configure automatic server redirects when you die or sleep using the `feverdream.redirects` config option. Each server can have separate death and sleep destinations. Example:
+
+```toml
+[feverdream]
+    redirects = [
+        "death:survival.example.com->hub.example.com",
+        "sleep:creative.example.com->lobby.example.com"
+    ]
+    deathCount = 1
+```

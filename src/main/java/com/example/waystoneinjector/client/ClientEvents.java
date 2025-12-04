@@ -15,6 +15,7 @@ import java.util.List;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector")
 public class ClientEvents {
 
+    @SuppressWarnings("null")
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         Screen screen = event.getScreen();
@@ -125,6 +126,7 @@ public class ClientEvents {
     }
     
     // Make this public static so other classes can use it
+    @SuppressWarnings("null")
     public static void connectToServer(String serverAddress) {
         Minecraft mc = Minecraft.getInstance();
         
@@ -176,8 +178,9 @@ public class ClientEvents {
                             }
                             
                             // If screen is null or not a connecting screen, connection failed
-                            if (mc.screen == null || 
-                                !mc.screen.getClass().getName().contains("ConnectScreen")) {
+                            var screen = mc.screen;
+                            if (screen == null || 
+                                !screen.getClass().getName().contains("ConnectScreen")) {
                                 System.out.println("[WaystoneInjector] Connection failed - ensuring multiplayer screen");
                                 // Make sure we're on the multiplayer screen, not stuck on blank screen
                                 if (mc.screen == null || mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen) {

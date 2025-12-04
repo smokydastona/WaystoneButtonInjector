@@ -96,8 +96,6 @@ public class DeathSleepEvents {
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         // Only handle on client side and only for the local player
         if (event.getEntity().level().isClientSide() && event.getEntity() instanceof LocalPlayer) {
-            LocalPlayer player = (LocalPlayer) event.getEntity();
-            
             System.out.println("[WaystoneInjector] Player wake up detected");
             
             // Get current server address
@@ -133,8 +131,9 @@ public class DeathSleepEvents {
     
     // Helper method to get current server address
     private static String getCurrentServerAddress(Minecraft mc) {
-        if (mc.getCurrentServer() != null) {
-            return mc.getCurrentServer().ip;
+        var server = mc.getCurrentServer();
+        if (server != null) {
+            return server.ip;
         }
         return null;
     }

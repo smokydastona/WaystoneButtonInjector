@@ -14,9 +14,6 @@ public class WaystoneInjectorMod {
             // Register config
             WaystoneConfig.register();
             
-            // Register Feverdream packet listener (for external Feverdream mod compatibility)
-            com.example.waystoneinjector.network.FeverdreamNetworking.register();
-            
             // Register client-only event handlers
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new com.example.waystoneinjector.client.ClientEvents());
             

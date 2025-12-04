@@ -2,19 +2,23 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
-## [Unreleased] - 2025-12-03
+## [Unreleased] - 2025-12-04
 
 ### Added
-- **Secret Buttons (IDs 6-11)**: Hidden buttons that mirror the 6 visible buttons for Feverdream integration
-- Feverdream mod can now send button IDs (6-11) to trigger configured buttons programmatically
-- Secret button 6 executes the same command as visible button 1, button 7 = button 2, etc.
+- **Built-in Death/Sleep Detection**: Client-side death and sleep event detection
+- **Per-Server Redirect Mappings**: Configure different death/sleep destinations for each server
+- **Death Count Threshold**: Configurable number of deaths before auto-redirect triggers
 - Improved connection monitoring - checks every 2 seconds instead of just at 60 second timeout
 - Better error handling - returns to multiplayer screen instead of blank screen on connection failure
 
 ### Changed
 - Connection failure now returns players to multiplayer server list instead of title screen
-- FeverdreamHandler now supports both server names and button IDs (6-11)
 - Enhanced connection monitoring with active checks for faster failure detection
+
+### Removed
+- External Feverdream packet integration (replaced with built-in detection)
+- Secret buttons (6-11) - no longer needed with built-in system
+- Individual button configs - simplified to per-server redirect mappings
 
 ### Fixed
 - Players no longer get stuck on blank screen when connection fails
