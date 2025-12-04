@@ -43,10 +43,10 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
 
     @SubscribeEvent
-    public static void onScreenInit(ScreenEvent.Opening event) {
+    public static void onScreenInit(ScreenEvent.Init.Post event) {
         try {
             System.out.println("[WaystoneInjector] *** onScreenInit EVENT FIRED ***");
-            Screen screen = event.getNewScreen();
+            Screen screen = event.getScreen();
             if (screen == null) {
                 System.out.println("[WaystoneInjector] Screen is null, returning");
                 return;
@@ -75,10 +75,10 @@ public class ClientEvents {
             
             // Add custom server transfer buttons
             System.out.println("[WaystoneInjector] ✓ Adding custom buttons...");
-            addCustomButtons(event, screen);
+            addCustomButtons(screen);
             
             // Add search box enhancement
-            addSearchBoxEnhancement(event, screen);
+            addSearchBoxEnhancement(screen);
             
             // Find and store waystone list for keyboard navigation
             findWaystoneList(screen);
@@ -187,7 +187,7 @@ public class ClientEvents {
         }
     }
     
-    private static void addSearchBoxEnhancement(ScreenEvent.Opening event, Screen screen) {
+    private static void addSearchBoxEnhancement(Screen screen) {
         try {
             // Find the existing search box in the waystone screen
             Field searchBoxField = findField(screen.getClass(), "searchBox");
@@ -542,7 +542,7 @@ public class ClientEvents {
         }
     }
     
-    private static void addCustomButtons(ScreenEvent.Opening event, Screen screen) {
+    private static void addCustomButtons(Screen screen) {
         try {
             // Get renderables and listeners lists via reflection
             Field renderablesField = findField(screen.getClass(), "renderables");
