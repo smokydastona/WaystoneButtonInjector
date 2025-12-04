@@ -538,7 +538,7 @@ public class ClientEvents {
         }
     }
     
-    private static String parseRedirectAddress(String command) {
+    public static String parseRedirectAddress(String command) {
         String[] parts = command.trim().split("\\s+");
         if (parts.length >= 2 && parts[0].equalsIgnoreCase("redirect")) {
             if (parts[1].equals("@s") && parts.length >= 3) {

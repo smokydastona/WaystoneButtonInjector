@@ -16,7 +16,7 @@ import java.util.UUID;
 
 /**
  * Client-side event handler for death and sleep events
- * Replaces the need for server-side Feverdream mod
+ * Executes commands on death/sleep
  */
 @OnlyIn(Dist.CLIENT)
 public class DeathSleepEvents {
@@ -24,19 +24,8 @@ public class DeathSleepEvents {
     // Track death counts per player (client-side)
     private static final Map<UUID, Integer> playerDeathCounts = new HashMap<>();
     
-    // Flag to indicate a death redirect is in progress
-    private static boolean deathRedirectActive = false;
-    
     // Track if we've already handled this death (prevent duplicate triggers)
     private static boolean deathHandled = false;
-    
-    public static boolean isDeathRedirectActive() {
-        return deathRedirectActive;
-    }
-    
-    public static void clearDeathRedirectFlag() {
-        deathRedirectActive = false;
-    }
     
     @SubscribeEvent
     public static void onDeathScreenOpen(ScreenEvent.Opening event) {
@@ -51,6 +40,10 @@ public class DeathSleepEvents {
             }
             
             LocalPlayer player = mc.player;
+            if (player == null) {
+                deathHandled = false;
+                return;
+            }
             
             System.out.println("[WaystoneInjector] Player death screen detected");
             
@@ -64,10 +57,10 @@ public class DeathSleepEvents {
             
             System.out.println("[WaystoneInjector] Current server: " + currentServer);
             
-            // Get the configured death server for this current server
-            String deathServer = WaystoneConfig.getDeathRedirectServer(currentServer);
-            if (deathServer == null || deathServer.isEmpty()) {
-                System.out.println("[WaystoneInjector] No death redirect mapping found for server: " + currentServer);
+            // Get the configured death command for this current server
+            String deathCommand = WaystoneConfig.getDeathRedirectServer(currentServer);
+            if (deathCommand == null || deathCommand.isEmpty()) {
+                System.out.println("[WaystoneInjector] No death command found for server: " + currentServer);
                 deathHandled = false;
                 return;
             }
@@ -82,25 +75,22 @@ public class DeathSleepEvents {
             System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
             
             if (currentDeaths < requiredDeaths) {
-                System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
+                System.out.println("[WaystoneInjector] Not enough deaths yet - command cancelled");
                 deathHandled = false;
                 return;
             }
             
-            // Reset death count after triggering redirect
+            // Reset death count after triggering command
             playerDeathCounts.remove(playerId);
-            System.out.println("[WaystoneInjector] Death threshold reached - triggering redirect to: " + deathServer);
+            System.out.println("[WaystoneInjector] Death threshold reached - executing command: " + deathCommand);
             
-            // Set death redirect flag so we can teleport to spawn after connection
-            deathRedirectActive = true;
-            
-            // Trigger redirect after a short delay (wait for death screen to fully load)
+            // Execute command after a short delay
             new Thread(() -> {
                 try {
                     Thread.sleep(1000); // Wait 1 second for death screen
                     mc.execute(() -> {
-                        System.out.println("[WaystoneInjector] Executing death redirect");
-                        com.example.waystoneinjector.client.ClientEvents.connectToServer(deathServer);
+                        System.out.println("[WaystoneInjector] Executing death command");
+                        executeCommand(mc, deathCommand);
                         deathHandled = false; // Reset for next death
                     });
                 } catch (InterruptedException e) {
@@ -110,10 +100,6 @@ public class DeathSleepEvents {
         }
     }
     
-    /**
-     * Backup detection for instant respawn (when death screen doesn't appear)
-     * Detects when player respawns and checks if they just died
-     */
     @SubscribeEvent
     public static void onPlayerRespawn(net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent event) {
         // Only handle on client side
@@ -137,10 +123,10 @@ public class DeathSleepEvents {
             
             System.out.println("[WaystoneInjector] Current server: " + currentServer);
             
-            // Get the configured death server for this current server
-            String deathServer = WaystoneConfig.getDeathRedirectServer(currentServer);
-            if (deathServer == null || deathServer.isEmpty()) {
-                System.out.println("[WaystoneInjector] No death redirect mapping found for server: " + currentServer);
+            // Get the configured death command for this current server
+            String deathCommand = WaystoneConfig.getDeathRedirectServer(currentServer);
+            if (deathCommand == null || deathCommand.isEmpty()) {
+                System.out.println("[WaystoneInjector] No death command found for server: " + currentServer);
                 return;
             }
             
@@ -154,21 +140,18 @@ public class DeathSleepEvents {
             System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
             
             if (currentDeaths < requiredDeaths) {
-                System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
+                System.out.println("[WaystoneInjector] Not enough deaths yet - command cancelled");
                 return;
             }
             
-            // Reset death count after triggering redirect
+            // Reset death count after triggering command
             playerDeathCounts.remove(playerId);
-            System.out.println("[WaystoneInjector] Death threshold reached - triggering redirect to: " + deathServer);
+            System.out.println("[WaystoneInjector] Death threshold reached - executing command: " + deathCommand);
             
-            // Set death redirect flag
-            deathRedirectActive = true;
-            
-            // Trigger redirect immediately (player is already respawned)
+            // Execute command immediately
             mc.execute(() -> {
-                System.out.println("[WaystoneInjector] Executing death redirect from instant respawn");
-                com.example.waystoneinjector.client.ClientEvents.connectToServer(deathServer);
+                System.out.println("[WaystoneInjector] Executing death command from instant respawn");
+                executeCommand(mc, deathCommand);
             });
         }
     }
@@ -189,10 +172,10 @@ public class DeathSleepEvents {
             
             System.out.println("[WaystoneInjector] Current server: " + currentServer);
             
-            // Get the configured sleep server for this current server
-            String sleepServer = WaystoneConfig.getSleepRedirectServer(currentServer);
-            if (sleepServer == null || sleepServer.isEmpty()) {
-                System.out.println("[WaystoneInjector] No sleep redirect mapping found for server: " + currentServer);
+            // Get the configured sleep command for this current server
+            String sleepCommand = WaystoneConfig.getSleepRedirectServer(currentServer);
+            if (sleepCommand == null || sleepCommand.isEmpty()) {
+                System.out.println("[WaystoneInjector] No sleep command found for server: " + currentServer);
                 return;
             }
             
@@ -202,16 +185,38 @@ public class DeathSleepEvents {
             System.out.println("[WaystoneInjector] Sleep chance: " + sleepChance + "%, rolled: " + roll);
             
             if (roll >= sleepChance) {
-                System.out.println("[WaystoneInjector] Sleep redirect chance failed - not redirecting");
+                System.out.println("[WaystoneInjector] Sleep command chance failed - not executing");
                 return;
             }
             
-            System.out.println("[WaystoneInjector] Sleep redirect triggered! Redirecting to: " + sleepServer);
+            System.out.println("[WaystoneInjector] Sleep command triggered! Executing: " + sleepCommand);
             
-            // Trigger redirect
+            // Execute command
             mc.execute(() -> {
-                com.example.waystoneinjector.client.ClientEvents.connectToServer(sleepServer);
+                executeCommand(mc, sleepCommand);
             });
+        }
+    }
+    
+    /**
+     * Execute a command (either client command or server command)
+     */
+    @SuppressWarnings("null")
+    private static void executeCommand(Minecraft mc, String command) {
+        if (command.startsWith("redirect ")) {
+            // Legacy support for redirect commands
+            String serverAddress = ClientEvents.parseRedirectAddress(command);
+            if (serverAddress != null && !serverAddress.isEmpty()) {
+                ClientEvents.connectToServer(serverAddress);
+            }
+        } else if (mc.player != null && mc.player.connection != null) {
+            // Execute as chat command (will be sent to server)
+            if (!command.startsWith("/")) {
+                command = "/" + command;
+            }
+            System.out.println("[WaystoneInjector] Sending command: " + command);
+            String finalCommand = command.substring(1); // Remove leading /
+            mc.player.connection.sendCommand(finalCommand);
         }
     }
     
