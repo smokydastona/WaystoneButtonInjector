@@ -132,12 +132,14 @@ public class WaystoneConfig {
                         "    xOffset = 0         # Move left/right from default position (-500 to 500)",
                         "    yOffset = -10       # Move up/down from default position (-500 to 500)",
                         "",
-                        "    # AUTOMATIC REDIRECTS (optional - leave empty to disable)",
-                        "    # When you DIE on this server, run this command:",
+                        "    # AUTOMATIC EVENTS - These trigger when you're ON hub.example.com:25565",
+                        "    # (The mod detects which server you're connected to automatically)",
+                        "",
+                        "    # When you DIE while playing on hub.example.com, run this command:",
                         "    deathRedirect = \"spawn\"",
                         "",
-                        "    # When you SLEEP on this server, run this command:",
-                        "    sleepRedirect = \"\"",
+                        "    # When you SLEEP while playing on hub.example.com, run this command:",
+                        "    sleepRedirect = \"warp dream\"",
                         "",
                         "    # Sleep redirect chance (0-100%, only applies if sleepRedirect is set)",
                         "    sleepChance = 100",
@@ -223,15 +225,17 @@ public class WaystoneConfig {
         
         builder.comment("",
                         "────────────────────────────────────────────────────────────────────────────────",
-                        "  Automatic Events (Optional - leave empty to disable)",
+                        "  Automatic Events - Triggered when you're ON this button's server",
+                        "  (The mod auto-detects which server matches this button's 'command')",
                         "────────────────────────────────────────────────────────────────────────────────");
         
         BUTTON1_DEATH_REDIRECT = builder
-                .comment("When you DIE on this server, run this command (e.g., 'spawn', 'warp hub')")
+                .comment("When you DIE while connected to THIS button's server, run this command",
+                        "Examples: 'spawn', 'warp hub', 'waystone teleport Home', 'redirect @s another.server.com'")
                 .define("deathRedirect", "");
         
         BUTTON1_SLEEP_REDIRECT = builder
-                .comment("When you SLEEP on this server, run this command")
+                .comment("When you SLEEP while connected to THIS button's server, run this command")
                 .define("sleepRedirect", "");
         
         BUTTON1_SLEEP_CHANCE = builder
