@@ -9,9 +9,14 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
@@ -39,6 +44,43 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (!event.getLevel().isClientSide()) return;
+        
+        BlockPos pos = event.getPos();
+        Level level = event.getLevel();
+        BlockState state = level.getBlockState(pos);
+        Block block = state.getBlock();
+        
+        // Get block's registry key
+        ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+        if (blockId == null) return;
+        
+        // Check if it's a waystone block
+        if (!blockId.getNamespace().equals("waystones")) return;
+        
+        String path = blockId.getPath();
+        System.out.println("[WaystoneInjector] Right-clicked waystone block: " + path);
+        
+        // Detect type from block registry path
+        String detectedType = "regular";
+        if (path.contains("sharestone")) {
+            detectedType = "sharestone";
+        } else if (path.contains("mossy")) {
+            detectedType = "mossy";
+        } else if (path.contains("blackstone")) {
+            detectedType = "blackstone";
+        } else if (path.contains("deepslate")) {
+            detectedType = "deepslate";
+        } else if (path.contains("end_stone") || path.contains("endstone")) {
+            detectedType = "endstone";
+        }
+        
+        currentWaystoneType.set(detectedType);
+        System.out.println("[WaystoneInjector] Pre-set waystone type to: " + detectedType);
+    }
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
