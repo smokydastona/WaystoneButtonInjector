@@ -14,8 +14,8 @@ public class WaystoneInjectorMod {
             // Register config
             WaystoneConfig.register();
             
-            // Register client-only event handlers
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new com.example.waystoneinjector.client.ClientEvents());
+            // Register client-only event handlers (static methods require class registration)
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(com.example.waystoneinjector.client.ClientEvents.class);
             
             // Register built-in death and sleep event handlers (client-side detection)
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(com.example.waystoneinjector.client.DeathSleepEvents.class);
