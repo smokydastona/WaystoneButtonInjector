@@ -1,33 +1,40 @@
 package com.example.waystoneinjector.client.gui;
 
 import com.example.waystoneinjector.client.gui.widget.ScrollableWaystoneList;
+import com.example.waystoneinjector.client.gui.widget.WaystoneSearchField;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Enhanced Waystone Selection Screen with Better Waystones Menu features
- * Phase 3: Scrollable waystone list with mouse wheel and drag support
+ * Phase 4: Search box with real-time filtering
  */
 @SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends Screen {
     
     @SuppressWarnings("unused")
     private final Screen originalScreen;
-    private final List<WaystoneData> waystones;
+    private final List<WaystoneData> allWaystones;
+    private List<WaystoneData> filteredWaystones;
+    
     private ScrollableWaystoneList waystoneList;
+    private WaystoneSearchField searchField;
     
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
         
         // Extract waystone data from original screen
-        this.waystones = WaystoneExtractor.extractWaystones(originalScreen);
+        this.allWaystones = WaystoneExtractor.extractWaystones(originalScreen);
+        this.filteredWaystones = new ArrayList<>(allWaystones);
         
-        System.out.println("[WaystoneInjector] Enhanced screen created with " + waystones.size() + " waystones");
+        System.out.println("[WaystoneInjector] Enhanced screen created with " + allWaystones.size() + " waystones");
     }
     
     @Override
@@ -36,16 +43,28 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         System.out.println("[WaystoneInjector] Enhanced Waystone Selection Screen initialized");
         
-        // Create scrollable waystone list
+        // Create search field at top
+        int searchWidth = 300;
+        this.searchField = new WaystoneSearchField(
+            this.font,
+            this.width / 2 - searchWidth / 2,
+            20,
+            searchWidth,
+            20
+        );
+        this.searchField.setOnSearchChanged(this::onSearchChanged);
+        this.addRenderableWidget(searchField);
+        
+        // Create scrollable waystone list below search
         int listWidth = 300;
-        int listHeight = this.height - 80; // Leave space for title and close button
+        int listHeight = this.height - 110; // Leave space for search, title, and close button
         
         this.waystoneList = new ScrollableWaystoneList(
             this.width / 2 - listWidth / 2,
-            40,
+            45,
             listWidth,
             listHeight,
-            this.waystones,
+            this.filteredWaystones,
             this::onWaystoneSelected
         );
         
@@ -58,6 +77,22 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         ).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build();
         
         this.addRenderableWidget(closeButton);
+    }
+    
+    private void onSearchChanged(String query) {
+        if (query.isEmpty()) {
+            filteredWaystones = new ArrayList<>(allWaystones);
+        } else {
+            String lowerQuery = query.toLowerCase();
+            filteredWaystones = allWaystones.stream()
+                .filter(ws -> ws.getName().toLowerCase().contains(lowerQuery) ||
+                             ws.getDimensionName().toLowerCase().contains(lowerQuery))
+                .collect(Collectors.toList());
+        }
+        
+        waystoneList.updateWaystones(filteredWaystones);
+        
+        System.out.println("[WaystoneInjector] Search: '" + query + "' - " + filteredWaystones.size() + " results");
     }
     
     private void onWaystoneSelected(WaystoneData waystone) {
@@ -90,7 +125,7 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         // Show waystone count
         graphics.drawCenteredString(
             this.font,
-            Component.literal("Waystones: " + waystones.size()),
+            Component.literal("Waystones: " + filteredWaystones.size() + " / " + allWaystones.size()),
             this.width / 2,
             this.height - 45,
             0xAAAAAA
