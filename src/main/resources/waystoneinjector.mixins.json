@@ -6,8 +6,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [],
   "client": [
-    "MixinClientPacketListener",
-    "MixinResourcePackPrompt"
+    "MixinClientPacketListener"
   ],
   "injectors": {
     "defaultRequire": 1
