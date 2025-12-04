@@ -7,10 +7,14 @@ license="MIT"
 modId="waystoneinjector"
 version="${file.jarVersion}"
 displayName="Waystone Button Injector"
-description="Client-side mod that adds server transfer buttons to Waystones GUI. Handles server connections directly without requiring server-side installation."
+description="Client-side mod that adds server transfer buttons to Waystones GUI. Includes built-in death/sleep redirects and server compatibility bypass. Handles server connections directly without requiring server-side installation."
 authors=["RunawayStone"]
 # This mod is CLIENT ONLY and does not need to be installed on the server
 displayURL="https://github.com/smokydastona/WaystoneButtonInjector"
+
+# Mixin config for server compatibility bypass
+[[mixins]]
+config = "waystoneinjector.mixins.json"
 
 [[dependencies.waystoneinjector]]
     modId="forge"

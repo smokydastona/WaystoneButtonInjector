@@ -124,8 +124,12 @@ public class ClientEvents {
         return null;
     }
     
-    private static void connectToServer(String serverAddress) {
+    // Make this public static so other classes can use it
+    public static void connectToServer(String serverAddress) {
         Minecraft mc = Minecraft.getInstance();
+        
+        // Enable auto-accept for resource packs on the destination server
+        ResourcePackHandler.enableAutoAccept();
         
         // Parse address and port
         String[] parts = serverAddress.split(":");

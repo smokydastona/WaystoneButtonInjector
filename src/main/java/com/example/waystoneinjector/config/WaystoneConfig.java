@@ -35,10 +35,9 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
     
-    // Feverdream integration settings
-    public static final ForgeConfigSpec.BooleanValue FEVERDREAM_DEATH_REDIRECT_ENABLED;
+    // Feverdream integration settings (built-in client-side death/sleep detection)
+    public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> FEVERDREAM_REDIRECTS;
     public static final ForgeConfigSpec.IntValue FEVERDREAM_DEATH_COUNT;
-    public static final ForgeConfigSpec.BooleanValue FEVERDREAM_SLEEP_TP_ENABLED;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -123,13 +122,24 @@ public class WaystoneConfig {
                 .define("command", "");
         builder.pop();
         
-        // Feverdream Integration Settings
+        // Feverdream Integration Settings (Built-in Death/Sleep Detection)
         builder.push("feverdream");
-        FEVERDREAM_DEATH_REDIRECT_ENABLED = builder
-                .comment("Enable death-based redirects",
-                        "When enabled, death packets from Feverdream will trigger server redirects",
-                        "When disabled, all death packets are ignored")
-                .define("deathRedirectEnabled", true);
+        builder.comment("Client-side death and sleep detection - no server-side mod required!",
+                        "Each server can have its own death and sleep redirect settings");
+        FEVERDREAM_REDIRECTS = builder
+                .comment("Redirect mappings - each line configures one server's behavior",
+                        "Format: 'type:currentServer->destinationServer'",
+                        "Types:",
+                        "  'death:' - Redirects when you die on this server",
+                        "  'sleep:' - Redirects when you wake up from sleep on this server",
+                        "Examples:",
+                        "  'death:survival.example.com->hub.example.com'  (die on survival, go to hub)",
+                        "  'sleep:192.168.1.100:25565->192.168.1.101:25565'  (sleep on server 1, wake on server 2)",
+                        "  'death:localhost:25565->localhost:25566'  (die on port 25565, respawn on 25566)",
+                        "Each server can have both death and sleep redirects - just add separate entries")
+                .defineList("redirects", java.util.Arrays.asList(), 
+                           obj -> obj instanceof String && ((String)obj).contains("->") && 
+                                  (((String)obj).startsWith("death:") || ((String)obj).startsWith("sleep:")));
         FEVERDREAM_DEATH_COUNT = builder
                 .comment("Number of deaths before auto-redirect activates (1-10)",
                         "Set to 1 to redirect on first death",
@@ -137,11 +147,6 @@ public class WaystoneConfig {
                         "Set to 10 to require 10 deaths before redirecting",
                         "Only applies if deathRedirectEnabled is true")
                 .defineInRange("deathCount", 1, 1, 10);
-        FEVERDREAM_SLEEP_TP_ENABLED = builder
-                .comment("Enable sleep-based teleportation",
-                        "When enabled, sleeping in a bed can trigger server redirects",
-                        "When disabled, only death-based redirects will work")
-                .define("sleepTpEnabled", true);
         builder.pop();
 
         SPEC = builder.build();
@@ -171,16 +176,50 @@ public class WaystoneConfig {
     }
     
     // Feverdream config getters
-    public static boolean isFeverdreamDeathRedirectEnabled() {
-        return FEVERDREAM_DEATH_REDIRECT_ENABLED.get();
+    public static String getDeathRedirectServer(String currentServer) {
+        // Parse redirect mappings to find death destination for current server
+        for (String mapping : FEVERDREAM_REDIRECTS.get()) {
+            if (!mapping.startsWith("death:")) continue;
+            
+            // Remove "death:" prefix
+            String cleanMapping = mapping.substring(6);
+            String[] parts = cleanMapping.split("->");
+            if (parts.length == 2) {
+                String source = parts[0].trim();
+                String destination = parts[1].trim();
+                // Match current server (case-insensitive, partial match)
+                if (currentServer.toLowerCase().contains(source.toLowerCase()) ||
+                    source.toLowerCase().contains(currentServer.toLowerCase())) {
+                    return destination;
+                }
+            }
+        }
+        return null; // No mapping found
     }
     
     public static int getFeverdreamDeathCount() {
         return FEVERDREAM_DEATH_COUNT.get();
     }
     
-    public static boolean isFeverdreamSleepTpEnabled() {
-        return FEVERDREAM_SLEEP_TP_ENABLED.get();
+    public static String getSleepRedirectServer(String currentServer) {
+        // Parse redirect mappings to find sleep destination for current server
+        for (String mapping : FEVERDREAM_REDIRECTS.get()) {
+            if (!mapping.startsWith("sleep:")) continue;
+            
+            // Remove "sleep:" prefix
+            String cleanMapping = mapping.substring(6);
+            String[] parts = cleanMapping.split("->");
+            if (parts.length == 2) {
+                String source = parts[0].trim();
+                String destination = parts[1].trim();
+                // Match current server (case-insensitive, partial match)
+                if (currentServer.toLowerCase().contains(source.toLowerCase()) ||
+                    source.toLowerCase().contains(currentServer.toLowerCase())) {
+                    return destination;
+                }
+            }
+        }
+        return null; // No mapping found
     }
 
     public static void register() {
