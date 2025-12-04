@@ -16,36 +16,42 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON1_SLEEP_CHANCE;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON2_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON2_SLEEP_CHANCE;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON3_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON3_SLEEP_CHANCE;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON4_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON4_SLEEP_CHANCE;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON5_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON5_SLEEP_CHANCE;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON6_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SLEEP_REDIRECT;
+    public static final ForgeConfigSpec.IntValue BUTTON6_SLEEP_CHANCE;
     
     // Feverdream integration settings (built-in client-side death/sleep detection)
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> FEVERDREAM_REDIRECTS;
@@ -73,6 +79,9 @@ public class WaystoneConfig {
         BUTTON1_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON1_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Button 2
@@ -92,6 +101,9 @@ public class WaystoneConfig {
         BUTTON2_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON2_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Button 3
@@ -111,6 +123,9 @@ public class WaystoneConfig {
         BUTTON3_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON3_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Button 4
@@ -130,6 +145,9 @@ public class WaystoneConfig {
         BUTTON4_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON4_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Button 5
@@ -149,6 +167,9 @@ public class WaystoneConfig {
         BUTTON5_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON5_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Button 6
@@ -168,6 +189,9 @@ public class WaystoneConfig {
         BUTTON6_SLEEP_REDIRECT = builder
                 .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
                 .define("sleepRedirect", "");
+        BUTTON6_SLEEP_CHANCE = builder
+                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Feverdream Integration Settings (Built-in Death/Sleep Detection)
@@ -320,6 +344,29 @@ public class WaystoneConfig {
             }
         }
         return null; // No mapping found
+    }
+    
+    // Get sleep chance percentage for current server
+    public static int getSleepChance(String currentServer) {
+        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+            return BUTTON1_SLEEP_CHANCE.get();
+        }
+        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+            return BUTTON2_SLEEP_CHANCE.get();
+        }
+        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+            return BUTTON3_SLEEP_CHANCE.get();
+        }
+        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+            return BUTTON4_SLEEP_CHANCE.get();
+        }
+        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+            return BUTTON5_SLEEP_CHANCE.get();
+        }
+        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+            return BUTTON6_SLEEP_CHANCE.get();
+        }
+        return 100; // Default 100% if no button matches
     }
     
     // Helper method to check if current server matches a button's command

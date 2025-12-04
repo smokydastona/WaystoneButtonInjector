@@ -115,7 +115,17 @@ public class DeathSleepEvents {
                 return;
             }
             
-            System.out.println("[WaystoneInjector] Triggering redirect to: " + sleepServer);
+            // Check sleep chance (0-100%)
+            int sleepChance = WaystoneConfig.getSleepChance(currentServer);
+            int roll = (int) (Math.random() * 100);
+            System.out.println("[WaystoneInjector] Sleep chance: " + sleepChance + "%, rolled: " + roll);
+            
+            if (roll >= sleepChance) {
+                System.out.println("[WaystoneInjector] Sleep redirect chance failed - not redirecting");
+                return;
+            }
+            
+            System.out.println("[WaystoneInjector] Sleep redirect triggered! Redirecting to: " + sleepServer);
             
             // Trigger redirect
             mc.execute(() -> {
