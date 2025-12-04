@@ -1,13 +1,16 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,6 +33,15 @@ public class ClientEvents {
     private static final AtomicReference<EditBox> currentSearchBox = new AtomicReference<>(null);
     private static final AtomicReference<Screen> currentWaystoneScreen = new AtomicReference<>(null);
     private static final AtomicReference<Object> currentWaystoneList = new AtomicReference<>(null);
+    private static final AtomicReference<String> currentWaystoneType = new AtomicReference<>("regular");
+    
+    // Custom GUI texture locations
+    private static final ResourceLocation TEXTURE_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/waystone_regular.png");
+    private static final ResourceLocation TEXTURE_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/waystone_mossy.png");
+    private static final ResourceLocation TEXTURE_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_blackstone.png");
+    private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
+    private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
+    private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -88,19 +100,25 @@ public class ClientEvents {
                                     String blockName = block.toString();
                                     System.out.println("[WaystoneInjector] Waystone type detected: " + blockName);
                                     
-                                    // Log different types for reference
+                                    // Detect and store waystone type
                                     if (blockName.contains("sharestone")) {
-                                        System.out.println("[WaystoneInjector] This is a SHARESTONE");
+                                        currentWaystoneType.set("sharestone");
+                                        System.out.println("[WaystoneInjector] This is a SHARESTONE - Using purple texture");
                                     } else if (blockName.contains("mossy")) {
-                                        System.out.println("[WaystoneInjector] This is a MOSSY WAYSTONE");
+                                        currentWaystoneType.set("mossy");
+                                        System.out.println("[WaystoneInjector] This is a MOSSY WAYSTONE - Using green texture");
                                     } else if (blockName.contains("blackstone")) {
-                                        System.out.println("[WaystoneInjector] This is a BLACKSTONE WAYSTONE");
+                                        currentWaystoneType.set("blackstone");
+                                        System.out.println("[WaystoneInjector] This is a BLACKSTONE WAYSTONE - Using dark texture");
                                     } else if (blockName.contains("deepslate")) {
-                                        System.out.println("[WaystoneInjector] This is a DEEPSLATE WAYSTONE");
+                                        currentWaystoneType.set("deepslate");
+                                        System.out.println("[WaystoneInjector] This is a DEEPSLATE WAYSTONE - Using gray texture");
                                     } else if (blockName.contains("end_stone")) {
-                                        System.out.println("[WaystoneInjector] This is an END STONE WAYSTONE");
+                                        currentWaystoneType.set("endstone");
+                                        System.out.println("[WaystoneInjector] This is an END STONE WAYSTONE - Using yellow texture");
                                     } else {
-                                        System.out.println("[WaystoneInjector] This is a REGULAR WAYSTONE");
+                                        currentWaystoneType.set("regular");
+                                        System.out.println("[WaystoneInjector] This is a REGULAR WAYSTONE - Using brown texture");
                                     }
                                 }
                             }
@@ -259,6 +277,39 @@ public class ClientEvents {
         } catch (Exception e) {
             System.out.println("[WaystoneInjector] Could not find waystone list: " + e.getMessage());
         }
+    }
+    
+    @SubscribeEvent
+    public static void onRenderBackground(ScreenEvent.BackgroundRendered event) {
+        Screen screen = currentWaystoneScreen.get();
+        if (screen == null || event.getScreen() != screen) return;
+        
+        // Get the appropriate texture based on waystone type
+        ResourceLocation texture = getTextureForType(currentWaystoneType.get());
+        
+        GuiGraphics graphics = event.getGuiGraphics();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        
+        // Render custom background texture
+        int screenWidth = screen.width;
+        int screenHeight = screen.height;
+        
+        // Center the 256x256 texture on screen
+        int x = (screenWidth - 256) / 2;
+        int y = (screenHeight - 256) / 2;
+        
+        graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+    }
+    
+    private static ResourceLocation getTextureForType(String type) {
+        return switch (type) {
+            case "sharestone" -> TEXTURE_SHARESTONE;
+            case "mossy" -> TEXTURE_MOSSY;
+            case "blackstone" -> TEXTURE_BLACKSTONE;
+            case "deepslate" -> TEXTURE_DEEPSLATE;
+            case "endstone" -> TEXTURE_ENDSTONE;
+            default -> TEXTURE_REGULAR;
+        };
     }
     
     private static Field findField(Class<?> clazz, String... fieldNames) {
