@@ -60,9 +60,18 @@ Add your own server buttons:
 Add as many buttons as needed - just ensure labels and commands arrays have the same length.
 
 ## Build
-1. Install Java 17
-2. Run `gradlew.bat build` (Windows) or `./gradlew build` (Linux/Mac)
-3. Find jar in `build/libs/`
+
+**DO NOT build locally!** This project uses GitHub Actions for automated builds.
+
+### To get the latest build:
+1. Push your changes to GitHub
+2. GitHub Actions will automatically build the mod
+3. Download the JAR from:
+   - GitHub Actions artifacts (for development builds)
+   - GitHub Releases page (for stable releases)
+
+### Manual local builds are NOT supported
+Local builds may fail or produce inconsistent results. Always use GitHub Actions.
 
 ## Installation
 1. **Client:** Install WaystoneButtonInjector in your client's `mods/` folder
