@@ -57,7 +57,7 @@ public class WaystoneExtractor {
     
     /**
      * Extract waystones using reflection
-     * Attempts to find and access the waystone list field in WaystoneSelectionScreen
+     * Attempts to find and access the waystone list from the menu/container
      */
     private static List<WaystoneData> extractViaReflection(Screen screen) {
         List<WaystoneData> waystones = new ArrayList<>();
@@ -65,8 +65,34 @@ public class WaystoneExtractor {
         try {
             Class<?> screenClass = screen.getClass();
             
-            // Try to find the waystone list field
-            // Common field names to try: waystones, entries, buttons, etc.
+            // FIRST: Try to get the menu/container from the screen (AbstractContainerScreen)
+            System.out.println("[WaystoneInjector] Looking for menu field...");
+            Field menuField = findField(screenClass, "menu", "container");
+            if (menuField != null) {
+                menuField.setAccessible(true);
+                Object menu = menuField.get(screen);
+                System.out.println("[WaystoneInjector] Found menu: " + menu.getClass().getName());
+                
+                // Try to call getWaystones() on the menu
+                try {
+                    Method getWaystonesMethod = menu.getClass().getMethod("getWaystones");
+                    getWaystonesMethod.setAccessible(true);
+                    Object result = getWaystonesMethod.invoke(menu);
+                    if (result instanceof java.util.Collection) {
+                        java.util.Collection<?> waystoneCollection = (java.util.Collection<?>) result;
+                        System.out.println("[WaystoneInjector] getWaystones() returned " + waystoneCollection.size() + " waystones!");
+                        waystones = extractFromList(new ArrayList<>(waystoneCollection));
+                        if (!waystones.isEmpty()) {
+                            return waystones;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("[WaystoneInjector] getWaystones() method not found or failed: " + e.getMessage());
+                }
+            }
+            
+            // FALLBACK: Try to find the waystone list field directly in the screen
+            System.out.println("[WaystoneInjector] Trying to find waystone list in screen fields...");
             Field[] fields = screenClass.getDeclaredFields();
             
             for (Field field : fields) {
@@ -75,15 +101,15 @@ public class WaystoneExtractor {
                 
                 System.out.println("[WaystoneInjector] Found field: " + field.getName() + " of type " + field.getType().getName());
                 
-                // Check if it's a List
-                if (value instanceof List) {
-                    List<?> list = (List<?>) value;
-                    if (!list.isEmpty()) {
-                        Object firstItem = list.get(0);
-                        System.out.println("[WaystoneInjector] Found list field '" + field.getName() + "' with " + list.size() + " items of type " + firstItem.getClass().getName());
+                // Check if it's a List or Collection
+                if (value instanceof java.util.Collection) {
+                    java.util.Collection<?> collection = (java.util.Collection<?>) value;
+                    if (!collection.isEmpty()) {
+                        Object firstItem = collection.iterator().next();
+                        System.out.println("[WaystoneInjector] Found collection field '" + field.getName() + "' with " + collection.size() + " items of type " + firstItem.getClass().getName());
                         
                         // Try to extract waystone data from each item
-                        waystones = extractFromList(list);
+                        waystones = extractFromList(new ArrayList<>(collection));
                         if (!waystones.isEmpty()) {
                             return waystones;
                         }
@@ -100,6 +126,28 @@ public class WaystoneExtractor {
             e.printStackTrace();
             return getDummyWaystones();
         }
+    }
+    
+    /**
+     * Helper: Find a field by trying multiple possible names
+     */
+    private static Field findField(Class<?> clazz, String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            try {
+                return clazz.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException e) {
+                // Try parent class
+                Class<?> superClass = clazz.getSuperclass();
+                if (superClass != null) {
+                    try {
+                        return superClass.getDeclaredField(fieldName);
+                    } catch (NoSuchFieldException e2) {
+                        // Continue to next name
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     /**
