@@ -42,37 +42,46 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
-        Screen screen = event.getScreen();
-        if (screen == null) return;
+        try {
+            System.out.println("[WaystoneInjector] *** onScreenInit EVENT FIRED ***");
+            Screen screen = event.getScreen();
+            if (screen == null) {
+                System.out.println("[WaystoneInjector] Screen is null, returning");
+                return;
+            }
 
-        // Detect Waystones selection screen specifically
-        String className = screen.getClass().getName();
-        System.out.println("[WaystoneInjector] Screen detected: " + className);
+            // Detect Waystones selection screen specifically
+            String className = screen.getClass().getName();
+            System.out.println("[WaystoneInjector] Screen detected: " + className);
         
-        if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
-            return;
+            if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
+                return;
+            }
+
+            System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
+            
+            // Reset to default before detection
+            currentWaystoneType.set("regular");
+            
+            // Detect waystone type from the screen
+            detectWaystoneType(screen);
+            System.out.println("[WaystoneInjector] Final detected type: " + currentWaystoneType.get());
+            
+            // Store screen reference
+            currentWaystoneScreen.set(screen);
+            
+            // Add custom server transfer buttons
+            addCustomButtons(event, screen);
+            
+            // Add search box enhancement
+            addSearchBoxEnhancement(event, screen);
+            
+            // Find and store waystone list for keyboard navigation
+            findWaystoneList(screen);
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] ERROR in onScreenInit: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
-        
-        // Reset to default before detection
-        currentWaystoneType.set("regular");
-        
-        // Detect waystone type from the screen
-        detectWaystoneType(screen);
-        System.out.println("[WaystoneInjector] Final detected type: " + currentWaystoneType.get());
-        
-        // Store screen reference
-        currentWaystoneScreen.set(screen);
-        
-        // Add custom server transfer buttons
-        addCustomButtons(event, screen);
-        
-        // Add search box enhancement
-        addSearchBoxEnhancement(event, screen);
-        
-        // Find and store waystone list for keyboard navigation
-        findWaystoneList(screen);
     }
     
     private static void detectWaystoneType(Screen screen) {
