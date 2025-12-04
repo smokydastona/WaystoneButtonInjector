@@ -2,6 +2,22 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [Unreleased] - 2025-12-03
+
+### Added
+- **Feverdream Respawn Integration**: Added packet listener for automatic server redirects
+- New network channel `feverdreamrespawn:main` to receive redirect packets from server-side Feverdream mod
+- `FeverdreamRedirectPacket` class to handle incoming redirect requests
+- `FeverdreamHandler` class to process redirect packets and trigger server transfers
+- Automatic server redirection when player respawns (when used with Feverdream server mod)
+
+### Technical
+- Added `FeverdreamNetworking` to register packet listener on client
+- Reused existing connection logic with timeout failsafe for Feverdream redirects
+- Maintains full client-side only architecture - no server installation required
+
+---
+
 ## [2.0.0] - 2025-11-30
 
 ### Changed

@@ -1,28 +1,33 @@
 # Waystone Button Injector
 
-Forge 1.20.1 mod that adds custom configurable buttons to the Waystones selection screen.
+Forge 1.20.1 **client-side mod** that adds custom configurable buttons to the Waystones selection screen and listens for server redirect packets.
 
 ## Features
 - Adds custom buttons to the Waystones menu
 - Fully configurable via config file
 - Supports unlimited buttons
 - Works alongside normal Waystone functionality
-- **Client-side command execution** - No OP permissions required!
-- Compatible with ServerRedirect mod for server transfers
+- **Client-side only** - No server installation required!
+- **Built-in server redirection** - No OP permissions needed
+- **Feverdream Respawn compatibility** - Listens for automatic redirect packets from server
 
 ## How It Works
 
-This mod uses a client-server packet system with **built-in server redirection**:
+### Manual Redirection (Waystone Buttons)
 1. Player clicks a button in the Waystones GUI
-2. Client sends a packet to the server indicating which button was pressed
-3. Server validates the request and sends the command back to the client
-4. **Client directly connects to the new server** (no commands, no OP needed!)
-5. Player is seamlessly transferred to the new server
+2. **Client directly connects to the new server** (no commands, no OP needed!)
+3. Player is seamlessly transferred to the new server
+
+### Automatic Redirection (Feverdream Integration)
+1. Server-side Feverdream mod sends a redirect packet when player respawns
+2. WaystoneButtonInjector receives the packet on channel `feverdreamrespawn:main`
+3. Client automatically connects to the specified server
+4. Perfect for death-based server transfers!
 
 This approach means:
 - **No OP permissions required** - Everything happens client-side
-- **No dependency on ServerRedirect mod** - Built-in redirection functionality
-- **Works with any Minecraft server** - No special server-side setup needed (besides having this mod installed)
+- **No server-side installation needed** - Purely client-side mod
+- **Works with any Minecraft server** - No special setup needed
 
 ## Configuration
 
@@ -58,7 +63,10 @@ Add as many buttons as needed - just ensure labels and commands arrays have the 
 3. Find jar in `build/libs/`
 
 ## Installation
-1. Install on both client and server
-2. Requires Waystones mod installed
-3. Configure buttons in `config/waystoneinjector-common.toml` on both client and server (configs should match)
-4. **No other dependencies needed!** ServerRedirect is NOT required - this mod handles server transfers directly
+1. **Client:** Install WaystoneButtonInjector in your client's `mods/` folder
+2. **Server (optional):** If using Feverdream auto-redirect, install the Feverdream server mod
+3. Configure buttons in `config/waystoneinjector-client.toml`
+4. **That's it!** No server-side installation of WaystoneButtonInjector needed
+
+## Feverdream Respawn Integration
+This mod is compatible with the [FeverDream_WSBI-Compat](https://github.com/smokydastona/FeverDream_WSBI-Compat) server-side mod, which automatically redirects players to another server when they respawn after death. No additional configuration needed - just install both mods!
