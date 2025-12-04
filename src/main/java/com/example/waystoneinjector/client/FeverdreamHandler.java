@@ -26,10 +26,6 @@ public class FeverdreamHandler {
                 
                 // Check if this is a sleep-based redirect (will be prefixed with "sleep:")
                 if (processedServerName.startsWith("sleep:")) {
-                    if (!WaystoneConfig.isFeverdreamSleepTpEnabled()) {
-                        System.out.println("[WaystoneInjector] Sleep TP is disabled in config - ignoring sleep redirect");
-                        return;
-                    }
                     // Remove the "sleep:" prefix and continue with redirect
                     processedServerName = processedServerName.substring(6);
                     System.out.println("[WaystoneInjector] Sleep-based redirect detected");
@@ -39,12 +35,6 @@ public class FeverdreamHandler {
                 if (processedServerName.startsWith("death:")) {
                     processedServerName = processedServerName.substring(6);
                     System.out.println("[WaystoneInjector] Death-based redirect detected");
-                    
-                    // Check if death redirects are enabled
-                    if (!WaystoneConfig.isFeverdreamDeathRedirectEnabled()) {
-                        System.out.println("[WaystoneInjector] Death redirects are disabled in config - ignoring death redirect");
-                        return;
-                    }
                     
                     // Track death count
                     UUID playerId = mc.player.getUUID();
