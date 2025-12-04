@@ -1,5 +1,6 @@
 package com.example.waystoneinjector.client.gui;
 
+import com.example.waystoneinjector.client.gui.widget.ScrollableWaystoneList;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -9,7 +10,7 @@ import java.util.List;
 
 /**
  * Enhanced Waystone Selection Screen with Better Waystones Menu features
- * Phase 2: Display actual waystone data extracted from original screen
+ * Phase 3: Scrollable waystone list with mouse wheel and drag support
  */
 @SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends Screen {
@@ -17,6 +18,7 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     @SuppressWarnings("unused")
     private final Screen originalScreen;
     private final List<WaystoneData> waystones;
+    private ScrollableWaystoneList waystoneList;
     
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
@@ -34,27 +36,20 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         System.out.println("[WaystoneInjector] Enhanced Waystone Selection Screen initialized");
         
-        // Add waystone buttons (simple list for now, no scrolling yet)
-        int startY = 40;
-        int buttonHeight = 20;
-        int spacing = 5;
-        int maxVisible = Math.min(waystones.size(), 10); // Show max 10 for now
+        // Create scrollable waystone list
+        int listWidth = 300;
+        int listHeight = this.height - 80; // Leave space for title and close button
         
-        for (int i = 0; i < maxVisible; i++) {
-            final WaystoneData waystone = waystones.get(i);
-            
-            Button waystoneButton = Button.builder(
-                Component.literal(waystone.getName() + " - " + waystone.getDimensionName()),
-                btn -> onWaystoneSelected(waystone)
-            ).bounds(
-                this.width / 2 - 150,
-                startY + (i * (buttonHeight + spacing)),
-                300,
-                buttonHeight
-            ).build();
-            
-            this.addRenderableWidget(waystoneButton);
-        }
+        this.waystoneList = new ScrollableWaystoneList(
+            this.width / 2 - listWidth / 2,
+            40,
+            listWidth,
+            listHeight,
+            this.waystones,
+            this::onWaystoneSelected
+        );
+        
+        this.addRenderableWidget(waystoneList);
         
         // Add close button at bottom
         Button closeButton = Button.builder(
