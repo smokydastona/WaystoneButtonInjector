@@ -46,6 +46,9 @@ public class ClientEvents {
 
         System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
         
+        // Detect waystone type from the screen
+        detectWaystoneType(screen);
+        
         // Store screen reference
         currentWaystoneScreen.set(screen);
         
@@ -57,6 +60,57 @@ public class ClientEvents {
         
         // Find and store waystone list for keyboard navigation
         findWaystoneList(screen);
+    }
+    
+    private static void detectWaystoneType(Screen screen) {
+        try {
+            // Try to access the menu to get waystone data
+            Field menuField = findField(screen.getClass(), "menu", "container");
+            if (menuField != null) {
+                menuField.setAccessible(true);
+                Object menu = menuField.get(screen);
+                
+                if (menu != null) {
+                    // Try to get the waystone data from the menu
+                    Field waystoneField = findField(menu.getClass(), "waystone", "waystoneData", "blockEntity");
+                    if (waystoneField != null) {
+                        waystoneField.setAccessible(true);
+                        Object waystone = waystoneField.get(menu);
+                        
+                        if (waystone != null) {
+                            // Try to get the block/type information
+                            Field blockField = findField(waystone.getClass(), "block", "blockState", "type");
+                            if (blockField != null) {
+                                blockField.setAccessible(true);
+                                Object block = blockField.get(waystone);
+                                
+                                if (block != null) {
+                                    String blockName = block.toString();
+                                    System.out.println("[WaystoneInjector] Waystone type detected: " + blockName);
+                                    
+                                    // Log different types for reference
+                                    if (blockName.contains("sharestone")) {
+                                        System.out.println("[WaystoneInjector] This is a SHARESTONE");
+                                    } else if (blockName.contains("mossy")) {
+                                        System.out.println("[WaystoneInjector] This is a MOSSY WAYSTONE");
+                                    } else if (blockName.contains("blackstone")) {
+                                        System.out.println("[WaystoneInjector] This is a BLACKSTONE WAYSTONE");
+                                    } else if (blockName.contains("deepslate")) {
+                                        System.out.println("[WaystoneInjector] This is a DEEPSLATE WAYSTONE");
+                                    } else if (blockName.contains("end_stone")) {
+                                        System.out.println("[WaystoneInjector] This is an END STONE WAYSTONE");
+                                    } else {
+                                        System.out.println("[WaystoneInjector] This is a REGULAR WAYSTONE");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] Could not detect waystone type: " + e.getMessage());
+        }
     }
     
     private static void addSearchBoxEnhancement(ScreenEvent.Init.Post event, Screen screen) {
