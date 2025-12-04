@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -110,18 +111,118 @@ public class ClientEvents {
     
     @SubscribeEvent
     public static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+        Screen screen = currentWaystoneScreen.get();
         EditBox searchBox = currentSearchBox.get();
-        if (searchBox == null) return;
         
-        // ESC key to clear and unfocus
-        if (event.getKeyCode() == GLFW.GLFW_KEY_ESCAPE && searchBox.isFocused()) {
+        // Handle search box ESC key
+        if (searchBox != null && event.getKeyCode() == GLFW.GLFW_KEY_ESCAPE && searchBox.isFocused()) {
             if (!searchBox.getValue().isEmpty()) {
                 searchBox.setValue("");
                 searchBox.setFocused(false);
                 System.out.println("[WaystoneInjector] Search box cleared via ESC");
                 event.setCanceled(true);
+                return;
             }
         }
+        
+        // Handle keyboard navigation for waystone list
+        if (screen == null) return;
+        
+        // Number keys 1-9 for quick selection (only if search box not focused)
+        if (searchBox == null || !searchBox.isFocused()) {
+            int keyCode = event.getKeyCode();
+            
+            // Keys 1-9 (GLFW key codes)
+            if (keyCode >= GLFW.GLFW_KEY_1 && keyCode <= GLFW.GLFW_KEY_9) {
+                int slotIndex = keyCode - GLFW.GLFW_KEY_1; // 0-8 for keys 1-9
+                if (selectWaystoneAtIndex(screen, slotIndex)) {
+                    System.out.println("[WaystoneInjector] Quick-selected waystone " + (slotIndex + 1) + " via keyboard");
+                    event.setCanceled(true);
+                }
+            }
+            
+            // Enhanced scroll support with Page Up/Down
+            if (keyCode == GLFW.GLFW_KEY_PAGE_UP) {
+                scrollWaystoneList(screen, -5);
+                event.setCanceled(true);
+            } else if (keyCode == GLFW.GLFW_KEY_PAGE_DOWN) {
+                scrollWaystoneList(screen, 5);
+                event.setCanceled(true);
+            }
+        }
+    }
+    
+    private static boolean selectWaystoneAtIndex(Screen screen, int index) {
+        try {
+            Object waystoneList = currentWaystoneList.get();
+            if (waystoneList == null) return false;
+            
+            // Get the children/entries from the list
+            Field childrenField = findField(waystoneList.getClass(), "children", "entries");
+            if (childrenField != null) {
+                childrenField.setAccessible(true);
+                Object children = childrenField.get(waystoneList);
+                
+                if (children instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> entries = (List<Object>) children;
+                    
+                    if (index >= 0 && index < entries.size()) {
+                        Object entry = entries.get(index);
+                        
+                        // Try to trigger the click on this entry
+                        Method clickMethod = findMethod(entry.getClass(), "mouseClicked", "onClick");
+                        if (clickMethod != null) {
+                            clickMethod.setAccessible(true);
+                            clickMethod.invoke(entry, 0.0, 0.0, 0);
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] Could not select waystone at index " + index + ": " + e.getMessage());
+        }
+        return false;
+    }
+    
+    private static void scrollWaystoneList(Screen screen, int amount) {
+        try {
+            Object waystoneList = currentWaystoneList.get();
+            if (waystoneList == null) return;
+            
+            // Try to access and modify scroll amount
+            Field scrollField = findField(waystoneList.getClass(), "scrollAmount", "scroll");
+            if (scrollField != null) {
+                scrollField.setAccessible(true);
+                Object currentScroll = scrollField.get(waystoneList);
+                
+                if (currentScroll instanceof Double) {
+                    double newScroll = Math.max(0, (Double) currentScroll + amount);
+                    scrollField.set(waystoneList, newScroll);
+                    System.out.println("[WaystoneInjector] Scrolled waystone list by " + amount);
+                }
+            }
+        } catch (Exception e) {
+            // Silently fail
+        }
+    }
+    
+    private static Method findMethod(Class<?> clazz, String... methodNames) {
+        for (String methodName : methodNames) {
+            try {
+                // Try to find method with common signatures
+                Method[] methods = clazz.getDeclaredMethods();
+                for (Method method : methods) {
+                    if (method.getName().equals(methodName)) {
+                        return method;
+                    }
+                }
+            } catch (Exception e) {
+                // Continue
+            }
+        }
+        return null;
     }
     
     private static void findWaystoneList(Screen screen) {
