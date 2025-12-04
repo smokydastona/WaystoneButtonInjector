@@ -60,138 +60,127 @@ public class WaystoneConfig {
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-        builder.comment("Waystone Button Injector Configuration");
+        builder.comment("═══════════════════════════════════════════════════════════════════════════════",
+                        "  Waystone Button Injector - Client Configuration",
+                        "═══════════════════════════════════════════════════════════════════════════════",
+                        "",
+                        "Configure up to 6 buttons that appear in the Waystone menu.",
+                        "Each button can redirect you to a different server when clicked.",
+                        "",
+                        "AUTOMATIC REDIRECTS:",
+                        "  - deathRedirect: Where to go when you DIE on this button's server",
+                        "  - sleepRedirect: Where to go when you SLEEP on this button's server",
+                        "  - sleepChance: Probability (0-100%) that sleep redirect triggers",
+                        "");
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 1
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button1");
+        builder.comment("",
+                        "BUTTON 1 - Manual Redirect",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         BUTTON1_ENABLED = builder
-                .comment("Enable Button 1")
+                .comment("Enable this button?")
                 .define("enabled", false);
         BUTTON1_LABEL = builder
-                .comment("Button label (use & for color codes, e.g., &aGreen Text)")
+                .comment("Button text (supports color codes with &, e.g., &aGreen &bBlue)")
                 .define("label", "Button 1");
         BUTTON1_COMMAND = builder
-                .comment("Command to execute (without leading /)")
+                .comment("Server to connect to (format: 'redirect @s server.address.com:25565')")
                 .define("command", "");
+        
+        builder.comment("",
+                        "Automatic Redirect Settings",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         BUTTON1_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .comment("When you DIE on this server, redirect to: (leave empty to disable)")
                 .define("deathRedirect", "");
         BUTTON1_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .comment("When you SLEEP on this server, redirect to: (leave empty to disable)")
                 .define("sleepRedirect", "");
         BUTTON1_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .comment("Sleep redirect probability: 100=always, 50=half the time, 0=never")
                 .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 2
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button2");
+        builder.comment("",
+                        "BUTTON 2 - Manual Redirect",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         BUTTON2_ENABLED = builder
-                .comment("Enable Button 2")
+                .comment("Enable this button?")
                 .define("enabled", false);
         BUTTON2_LABEL = builder
-                .comment("Button label (use & for color codes)")
+                .comment("Button text (supports color codes with &)")
                 .define("label", "Button 2");
         BUTTON2_COMMAND = builder
-                .comment("Command to execute (without leading /)")
+                .comment("Server to connect to")
                 .define("command", "");
+        
+        builder.comment("",
+                        "Automatic Redirect Settings",
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         BUTTON2_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .comment("When you DIE on this server, redirect to:")
                 .define("deathRedirect", "");
         BUTTON2_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .comment("When you SLEEP on this server, redirect to:")
                 .define("sleepRedirect", "");
         BUTTON2_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
+                .comment("Sleep redirect probability (0-100%)")
                 .defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 3
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button3");
-        BUTTON3_ENABLED = builder
-                .comment("Enable Button 3")
-                .define("enabled", false);
-        BUTTON3_LABEL = builder
-                .comment("Button label (use & for color codes)")
-                .define("label", "Button 3");
-        BUTTON3_COMMAND = builder
-                .comment("Command to execute (without leading /)")
-                .define("command", "");
-        BUTTON3_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
-                .define("deathRedirect", "");
-        BUTTON3_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
-                .define("sleepRedirect", "");
-        BUTTON3_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
-                .defineInRange("sleepChance", 100, 0, 100);
+        BUTTON3_ENABLED = builder.define("enabled", false);
+        BUTTON3_LABEL = builder.define("label", "Button 3");
+        BUTTON3_COMMAND = builder.define("command", "");
+        BUTTON3_DEATH_REDIRECT = builder.define("deathRedirect", "");
+        BUTTON3_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
+        BUTTON3_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 4
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button4");
-        BUTTON4_ENABLED = builder
-                .comment("Enable Button 4")
-                .define("enabled", false);
-        BUTTON4_LABEL = builder
-                .comment("Button label (use & for color codes)")
-                .define("label", "Button 4");
-        BUTTON4_COMMAND = builder
-                .comment("Command to execute (without leading /)")
-                .define("command", "");
-        BUTTON4_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
-                .define("deathRedirect", "");
-        BUTTON4_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
-                .define("sleepRedirect", "");
-        BUTTON4_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
-                .defineInRange("sleepChance", 100, 0, 100);
+        BUTTON4_ENABLED = builder.define("enabled", false);
+        BUTTON4_LABEL = builder.define("label", "Button 4");
+        BUTTON4_COMMAND = builder.define("command", "");
+        BUTTON4_DEATH_REDIRECT = builder.define("deathRedirect", "");
+        BUTTON4_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
+        BUTTON4_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 5
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button5");
-        BUTTON5_ENABLED = builder
-                .comment("Enable Button 5")
-                .define("enabled", false);
-        BUTTON5_LABEL = builder
-                .comment("Button label (use & for color codes)")
-                .define("label", "Button 5");
-        BUTTON5_COMMAND = builder
-                .comment("Command to execute (without leading /)")
-                .define("command", "");
-        BUTTON5_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
-                .define("deathRedirect", "");
-        BUTTON5_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
-                .define("sleepRedirect", "");
-        BUTTON5_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
-                .defineInRange("sleepChance", 100, 0, 100);
+        BUTTON5_ENABLED = builder.define("enabled", false);
+        BUTTON5_LABEL = builder.define("label", "Button 5");
+        BUTTON5_COMMAND = builder.define("command", "");
+        BUTTON5_DEATH_REDIRECT = builder.define("deathRedirect", "");
+        BUTTON5_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
+        BUTTON5_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
+        // ═══════════════════════════════════════════════════════════════════════════════
         // Button 6
+        // ═══════════════════════════════════════════════════════════════════════════════
         builder.push("button6");
-        BUTTON6_ENABLED = builder
-                .comment("Enable Button 6")
-                .define("enabled", false);
-        BUTTON6_LABEL = builder
-                .comment("Button label (use & for color codes)")
-                .define("label", "Button 6");
-        BUTTON6_COMMAND = builder
-                .comment("Command to execute (without leading /)")
-                .define("command", "");
-        BUTTON6_DEATH_REDIRECT = builder
-                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
-                .define("deathRedirect", "");
-        BUTTON6_SLEEP_REDIRECT = builder
-                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
-                .define("sleepRedirect", "");
-        BUTTON6_SLEEP_CHANCE = builder
-                .comment("Chance (0-100%) that sleep redirect will trigger. 100 = always, 50 = 50% chance, 0 = never")
-                .defineInRange("sleepChance", 100, 0, 100);
+        BUTTON6_ENABLED = builder.define("enabled", false);
+        BUTTON6_LABEL = builder.define("label", "Button 6");
+        BUTTON6_COMMAND = builder.define("command", "");
+        BUTTON6_DEATH_REDIRECT = builder.define("deathRedirect", "");
+        BUTTON6_SLEEP_REDIRECT = builder.define("sleepRedirect", "");
+        BUTTON6_SLEEP_CHANCE = builder.defineInRange("sleepChance", 100, 0, 100);
         builder.pop();
         
         // Feverdream Integration Settings (Built-in Death/Sleep Detection)
