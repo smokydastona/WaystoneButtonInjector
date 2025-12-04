@@ -110,6 +110,69 @@ public class DeathSleepEvents {
         }
     }
     
+    /**
+     * Backup detection for instant respawn (when death screen doesn't appear)
+     * Detects when player respawns and checks if they just died
+     */
+    @SubscribeEvent
+    public static void onPlayerRespawn(net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent event) {
+        // Only handle on client side
+        if (event.getEntity().level().isClientSide() && event.getEntity() instanceof LocalPlayer) {
+            LocalPlayer player = (LocalPlayer) event.getEntity();
+            
+            // If death screen handler already triggered, skip this
+            if (deathHandled) {
+                deathHandled = false; // Reset flag
+                return;
+            }
+            
+            System.out.println("[WaystoneInjector] Player respawn detected (instant respawn enabled)");
+            
+            Minecraft mc = Minecraft.getInstance();
+            String currentServer = getCurrentServerAddress(mc);
+            if (currentServer == null) {
+                System.out.println("[WaystoneInjector] Not connected to a server - ignoring respawn event");
+                return;
+            }
+            
+            System.out.println("[WaystoneInjector] Current server: " + currentServer);
+            
+            // Get the configured death server for this current server
+            String deathServer = WaystoneConfig.getDeathRedirectServer(currentServer);
+            if (deathServer == null || deathServer.isEmpty()) {
+                System.out.println("[WaystoneInjector] No death redirect mapping found for server: " + currentServer);
+                return;
+            }
+            
+            // Track death count
+            UUID playerId = player.getUUID();
+            int currentDeaths = playerDeathCounts.getOrDefault(playerId, 0);
+            currentDeaths++;
+            playerDeathCounts.put(playerId, currentDeaths);
+            
+            int requiredDeaths = WaystoneConfig.getFeverdreamDeathCount();
+            System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
+            
+            if (currentDeaths < requiredDeaths) {
+                System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
+                return;
+            }
+            
+            // Reset death count after triggering redirect
+            playerDeathCounts.remove(playerId);
+            System.out.println("[WaystoneInjector] Death threshold reached - triggering redirect to: " + deathServer);
+            
+            // Set death redirect flag
+            deathRedirectActive = true;
+            
+            // Trigger redirect immediately (player is already respawned)
+            mc.execute(() -> {
+                System.out.println("[WaystoneInjector] Executing death redirect from instant respawn");
+                com.example.waystoneinjector.client.ClientEvents.connectToServer(deathServer);
+            });
+        }
+    }
+    
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         // Only handle on client side and only for the local player
