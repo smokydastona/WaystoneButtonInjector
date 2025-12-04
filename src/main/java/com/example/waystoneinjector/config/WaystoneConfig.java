@@ -14,26 +14,38 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.BooleanValue BUTTON1_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SLEEP_REDIRECT;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON2_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SLEEP_REDIRECT;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON3_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SLEEP_REDIRECT;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON4_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SLEEP_REDIRECT;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON5_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SLEEP_REDIRECT;
     
     public static final ForgeConfigSpec.BooleanValue BUTTON6_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_LABEL;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_COMMAND;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_DEATH_REDIRECT;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SLEEP_REDIRECT;
     
     // Feverdream integration settings (built-in client-side death/sleep detection)
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> FEVERDREAM_REDIRECTS;
@@ -55,6 +67,12 @@ public class WaystoneConfig {
         BUTTON1_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON1_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON1_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Button 2
@@ -68,6 +86,12 @@ public class WaystoneConfig {
         BUTTON2_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON2_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON2_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Button 3
@@ -81,6 +105,12 @@ public class WaystoneConfig {
         BUTTON3_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON3_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON3_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Button 4
@@ -94,6 +124,12 @@ public class WaystoneConfig {
         BUTTON4_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON4_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON4_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Button 5
@@ -107,6 +143,12 @@ public class WaystoneConfig {
         BUTTON5_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON5_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON5_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Button 6
@@ -120,6 +162,12 @@ public class WaystoneConfig {
         BUTTON6_COMMAND = builder
                 .comment("Command to execute (without leading /)")
                 .define("command", "");
+        BUTTON6_DEATH_REDIRECT = builder
+                .comment("Server to redirect to when you die (leave empty to disable death redirect for this button's server)")
+                .define("deathRedirect", "");
+        BUTTON6_SLEEP_REDIRECT = builder
+                .comment("Server to redirect to when you sleep (leave empty to disable sleep redirect for this button's server)")
+                .define("sleepRedirect", "");
         builder.pop();
         
         // Feverdream Integration Settings (Built-in Death/Sleep Detection)
@@ -177,24 +225,49 @@ public class WaystoneConfig {
     
     // Feverdream config getters
     public static String getDeathRedirectServer(String currentServer) {
-        // Parse redirect mappings to find death destination for current server
+        // Check each button's command to see if it matches the current server
+        // If it does, return that button's death redirect setting
+        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+            String redirect = BUTTON1_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+            String redirect = BUTTON2_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+            String redirect = BUTTON3_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+            String redirect = BUTTON4_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+            String redirect = BUTTON5_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+            String redirect = BUTTON6_DEATH_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        
+        // Fall back to old feverdream.redirects format for backwards compatibility
         for (String mapping : FEVERDREAM_REDIRECTS.get()) {
             if (!mapping.startsWith("death:")) continue;
             
-            // Remove "death:" prefix
             String cleanMapping = mapping.substring(6);
             String[] parts = cleanMapping.split("->");
             if (parts.length == 2) {
                 String source = parts[0].trim();
                 String destination = parts[1].trim();
-                // Match current server (case-insensitive, partial match)
                 if (currentServer.toLowerCase().contains(source.toLowerCase()) ||
                     source.toLowerCase().contains(currentServer.toLowerCase())) {
                     return destination;
                 }
             }
         }
-        return null; // No mapping found
+        return null;
     }
     
     public static int getFeverdreamDeathCount() {
@@ -202,7 +275,34 @@ public class WaystoneConfig {
     }
     
     public static String getSleepRedirectServer(String currentServer) {
-        // Parse redirect mappings to find sleep destination for current server
+        // Check each button's command to see if it matches the current server
+        // If it does, return that button's sleep redirect setting
+        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+            String redirect = BUTTON1_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+            String redirect = BUTTON2_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+            String redirect = BUTTON3_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+            String redirect = BUTTON4_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+            String redirect = BUTTON5_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+            String redirect = BUTTON6_SLEEP_REDIRECT.get();
+            return redirect.isEmpty() ? null : redirect;
+        }
+        
+        // Fall back to old feverdream.redirects format for backwards compatibility
         for (String mapping : FEVERDREAM_REDIRECTS.get()) {
             if (!mapping.startsWith("sleep:")) continue;
             
@@ -220,6 +320,24 @@ public class WaystoneConfig {
             }
         }
         return null; // No mapping found
+    }
+    
+    // Helper method to check if current server matches a button's command
+    private static boolean serverMatchesCommand(String currentServer, String command) {
+        // Parse "redirect server.address.com" or "redirect @s server.address.com"
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length >= 2 && parts[0].equalsIgnoreCase("redirect")) {
+            String serverAddress;
+            if (parts[1].equals("@s") && parts.length >= 3) {
+                serverAddress = parts[2];
+            } else {
+                serverAddress = parts[1];
+            }
+            // Match current server (case-insensitive, partial match)
+            return currentServer.toLowerCase().contains(serverAddress.toLowerCase()) ||
+                   serverAddress.toLowerCase().contains(currentServer.toLowerCase());
+        }
+        return false;
     }
 
     public static void register() {
