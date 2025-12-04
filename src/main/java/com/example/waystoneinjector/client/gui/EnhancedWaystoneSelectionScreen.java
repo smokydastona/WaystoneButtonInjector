@@ -35,26 +35,41 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
         
+        System.out.println("[WaystoneInjector] ========== CREATING ENHANCED SCREEN ==========");
+        
         // Set up order manager file path
         Path configDir = Path.of("config");
         Path orderFile = configDir.resolve("waystoneinjector-order.json");
         WaystoneOrderManager.setOrderFilePath(orderFile);
         
         // Extract waystone data from original screen
+        System.out.println("[WaystoneInjector] Calling WaystoneExtractor...");
         List<WaystoneData> extractedWaystones = WaystoneExtractor.extractWaystones(originalScreen);
+        System.out.println("[WaystoneInjector] WaystoneExtractor returned: " + extractedWaystones.size() + " waystones");
         
         // Apply saved order
         this.allWaystones = WaystoneOrderManager.applyOrder(extractedWaystones);
         this.filteredWaystones = new ArrayList<>(allWaystones);
         
-        System.out.println("[WaystoneInjector] Enhanced screen created with " + allWaystones.size() + " waystones");
+        System.out.println("[WaystoneInjector] After applyOrder: " + allWaystones.size() + " waystones");
+        System.out.println("[WaystoneInjector] Filtered waystones: " + filteredWaystones.size());
+        
+        // Print each waystone for debugging
+        for (int i = 0; i < allWaystones.size(); i++) {
+            WaystoneData ws = allWaystones.get(i);
+            System.out.println("[WaystoneInjector]   " + i + ": " + ws.getName() + " at " + ws.getX() + "," + ws.getY() + "," + ws.getZ());
+        }
+        
+        System.out.println("[WaystoneInjector] ===============================================");
     }
     
     @Override
     protected void init() {
         super.init();
         
-        System.out.println("[WaystoneInjector] Enhanced Waystone Selection Screen initialized");
+        System.out.println("[WaystoneInjector] ========== INITIALIZING SCREEN ==========");
+        System.out.println("[WaystoneInjector] allWaystones size: " + allWaystones.size());
+        System.out.println("[WaystoneInjector] filteredWaystones size: " + filteredWaystones.size());
         
         // Create search field at top
         int searchWidth = 300;
@@ -68,10 +83,13 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         this.searchField.setOnSearchChanged(this::onSearchChanged);
         this.addRenderableWidget(searchField);
         
+        System.out.println("[WaystoneInjector] Search field created");
+        
         // Create scrollable waystone list below search
         int listWidth = 300;
         int listHeight = this.height - 110; // Leave space for search, title, and close button
         
+        System.out.println("[WaystoneInjector] Creating ScrollableWaystoneList with " + filteredWaystones.size() + " waystones");
         this.waystoneList = new ScrollableWaystoneList(
             this.width / 2 - listWidth / 2,
             45,
@@ -82,6 +100,7 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         );
         
         this.addRenderableWidget(waystoneList);
+        System.out.println("[WaystoneInjector] ScrollableWaystoneList added to screen");
         
         // Add close button at bottom
         Button closeButton = Button.builder(
@@ -93,6 +112,9 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         // Add custom buttons from config
         addCustomButtons();
+        
+        System.out.println("[WaystoneInjector] Screen initialization complete");
+        System.out.println("[WaystoneInjector] =======================================");
     }
     
     private void addCustomButtons() {

@@ -28,20 +28,28 @@ public class WaystoneExtractor {
         List<WaystoneData> waystones = new ArrayList<>();
         
         try {
-            System.out.println("[WaystoneInjector] Attempting to extract waystones from screen: " + originalScreen.getClass().getName());
+            System.out.println("[WaystoneInjector] ========== EXTRACTING WAYSTONES ==========");
+            System.out.println("[WaystoneInjector] Screen class: " + originalScreen.getClass().getName());
             
-            // Phase 1: Return dummy data for testing
-            // Phase 2: Implement actual reflection-based extraction
+            // Try reflection-based extraction first
             waystones = extractViaReflection(originalScreen);
             
-            System.out.println("[WaystoneInjector] Extracted " + waystones.size() + " waystones");
+            // If extraction failed or returned empty, use dummy data
+            if (waystones.isEmpty()) {
+                System.out.println("[WaystoneInjector] WARNING: Extraction returned empty list, using dummy data");
+                waystones = getDummyWaystones();
+            }
+            
+            System.out.println("[WaystoneInjector] Final waystone count: " + waystones.size());
+            System.out.println("[WaystoneInjector] ==========================================");
             
         } catch (Exception e) {
-            System.err.println("[WaystoneInjector] Failed to extract waystones: " + e.getMessage());
+            System.err.println("[WaystoneInjector] EXCEPTION during extraction: " + e.getMessage());
             e.printStackTrace();
             
             // Fallback to dummy data
             waystones = getDummyWaystones();
+            System.out.println("[WaystoneInjector] Using " + waystones.size() + " dummy waystones after exception");
         }
         
         return waystones;
@@ -154,7 +162,9 @@ public class WaystoneExtractor {
             if (getDimMethod != null) {
                 Object dim = getDimMethod.invoke(obj);
                 if (dim instanceof ResourceKey) {
-                    dimension = (ResourceKey<Level>) dim;
+                    @SuppressWarnings("unchecked")
+                    ResourceKey<Level> dimKey = (ResourceKey<Level>) dim;
+                    dimension = dimKey;
                 }
             }
         } catch (Exception e) {
