@@ -90,6 +90,17 @@ public class ClientEvents {
                         Object waystone = waystoneField.get(menu);
                         
                         if (waystone != null) {
+                            // Get waystone name for registry
+                            String waystoneName = null;
+                            Field nameField = findField(waystone.getClass(), "name", "waystoneData");
+                            if (nameField != null) {
+                                nameField.setAccessible(true);
+                                Object name = nameField.get(waystone);
+                                if (name != null) {
+                                    waystoneName = name.toString();
+                                }
+                            }
+                            
                             // Try to get the block/type information
                             Field blockField = findField(waystone.getClass(), "block", "blockState", "type");
                             if (blockField != null) {
@@ -100,25 +111,33 @@ public class ClientEvents {
                                     String blockName = block.toString();
                                     System.out.println("[WaystoneInjector] Waystone type detected: " + blockName);
                                     
-                                    // Detect and store waystone type
+                                    String detectedType;
+                                    // Detect waystone type
                                     if (blockName.contains("sharestone")) {
-                                        currentWaystoneType.set("sharestone");
+                                        detectedType = "sharestone";
                                         System.out.println("[WaystoneInjector] This is a SHARESTONE - Using purple texture");
                                     } else if (blockName.contains("mossy")) {
-                                        currentWaystoneType.set("mossy");
+                                        detectedType = "mossy";
                                         System.out.println("[WaystoneInjector] This is a MOSSY WAYSTONE - Using green texture");
                                     } else if (blockName.contains("blackstone")) {
-                                        currentWaystoneType.set("blackstone");
+                                        detectedType = "blackstone";
                                         System.out.println("[WaystoneInjector] This is a BLACKSTONE WAYSTONE - Using dark texture");
                                     } else if (blockName.contains("deepslate")) {
-                                        currentWaystoneType.set("deepslate");
+                                        detectedType = "deepslate";
                                         System.out.println("[WaystoneInjector] This is a DEEPSLATE WAYSTONE - Using gray texture");
                                     } else if (blockName.contains("end_stone")) {
-                                        currentWaystoneType.set("endstone");
+                                        detectedType = "endstone";
                                         System.out.println("[WaystoneInjector] This is an END STONE WAYSTONE - Using yellow texture");
                                     } else {
-                                        currentWaystoneType.set("regular");
+                                        detectedType = "regular";
                                         System.out.println("[WaystoneInjector] This is a REGULAR WAYSTONE - Using brown texture");
+                                    }
+                                    
+                                    currentWaystoneType.set(detectedType);
+                                    
+                                    // Register this waystone in the persistent registry
+                                    if (waystoneName != null) {
+                                        WaystoneTypeRegistry.registerWaystone(waystoneName, detectedType);
                                     }
                                 }
                             }
@@ -299,6 +318,80 @@ public class ClientEvents {
         int y = (screenHeight - 256) / 2;
         
         graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+    }
+    
+    @SubscribeEvent
+    public static void onRenderWaystoneList(ScreenEvent.Render.Post event) {
+        Screen screen = currentWaystoneScreen.get();
+        if (screen == null || event.getScreen() != screen) return;
+        
+        Object waystoneList = currentWaystoneList.get();
+        if (waystoneList == null) return;
+        
+        GuiGraphics graphics = event.getGuiGraphics();
+        
+        try {
+            // Get the waystone entries from the list
+            Field childrenField = findField(waystoneList.getClass(), "children", "entries");
+            if (childrenField != null) {
+                childrenField.setAccessible(true);
+                Object children = childrenField.get(waystoneList);
+                
+                if (children instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> entries = (List<Object>) children;
+                    
+                    // Try to get list position
+                    Field yField = findField(waystoneList.getClass(), "y0", "top");
+                    Field xField = findField(waystoneList.getClass(), "x0", "left");
+                    
+                    if (yField != null && xField != null) {
+                        yField.setAccessible(true);
+                        xField.setAccessible(true);
+                        
+                        int listY = yField.getInt(waystoneList);
+                        int listX = xField.getInt(waystoneList);
+                        
+                        // Render colored overlay for each waystone entry
+                        for (int i = 0; i < entries.size(); i++) {
+                            Object entry = entries.get(i);
+                            
+                            // Try to get waystone name from entry
+                            Field waystoneField = findField(entry.getClass(), "waystone", "data");
+                            if (waystoneField != null) {
+                                waystoneField.setAccessible(true);
+                                Object waystone = waystoneField.get(entry);
+                                
+                                if (waystone != null) {
+                                    Field nameField = findField(waystone.getClass(), "name", "waystoneData");
+                                    if (nameField != null) {
+                                        nameField.setAccessible(true);
+                                        Object name = nameField.get(waystone);
+                                        
+                                        if (name != null) {
+                                            String waystoneName = name.toString();
+                                            String type = WaystoneTypeRegistry.getWaystoneType(waystoneName);
+                                            
+                                            if (!type.equals("unknown")) {
+                                                int color = WaystoneTypeRegistry.getColorForType(type);
+                                                int entryY = listY + (i * 36); // Approximate entry height
+                                                
+                                                // Draw semi-transparent colored background
+                                                int alpha = 40; // Low opacity
+                                                int colorWithAlpha = (alpha << 24) | (color & 0xFFFFFF);
+                                                graphics.fill(listX, entryY, listX + 220, entryY + 36, colorWithAlpha);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Silently fail - rendering is optional
+        }
     }
     
     private static ResourceLocation getTextureForType(String type) {
