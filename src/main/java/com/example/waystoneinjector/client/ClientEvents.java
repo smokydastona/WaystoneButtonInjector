@@ -10,9 +10,13 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector")
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector", bus = Mod.EventBusSubscriber.Bus.FORGE)
 @SuppressWarnings("null")
 public class ClientEvents {
+
+    static {
+        System.out.println("[WaystoneInjector] ClientEvents class loaded!");
+    }
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
