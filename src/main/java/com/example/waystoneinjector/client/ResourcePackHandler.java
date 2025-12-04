@@ -26,6 +26,7 @@ public class ResourcePackHandler {
     
     /**
      * Disable auto-accept after connection is established
+     * Also handle spawn teleport for death redirects
      */
     @SubscribeEvent
     public static void onPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
@@ -37,6 +38,27 @@ public class ResourcePackHandler {
                     Thread.sleep(5000); // Wait 5 seconds for resource pack prompt
                     autoAcceptNextPack = false;
                     System.out.println("[WaystoneInjector] Auto-accept disabled");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+        
+        // Check if this is a death redirect - if so, teleport to spawn
+        if (DeathSleepEvents.isDeathRedirectActive()) {
+            System.out.println("[WaystoneInjector] Death redirect completed - will teleport to spawn point");
+            Minecraft mc = Minecraft.getInstance();
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000); // Wait 1 second for world to load
+                    mc.execute(() -> {
+                        if (mc.player != null && mc.getConnection() != null) {
+                            // Execute /spawn command to go to spawn point
+                            mc.player.connection.sendCommand("spawn");
+                            System.out.println("[WaystoneInjector] Executed spawn command");
+                        }
+                        DeathSleepEvents.clearDeathRedirectFlag();
+                    });
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

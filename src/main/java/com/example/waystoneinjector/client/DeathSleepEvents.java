@@ -20,6 +20,17 @@ public class DeathSleepEvents {
     // Track death counts per player (client-side)
     private static final Map<UUID, Integer> playerDeathCounts = new HashMap<>();
     
+    // Flag to indicate a death redirect is in progress
+    private static boolean deathRedirectActive = false;
+    
+    public static boolean isDeathRedirectActive() {
+        return deathRedirectActive;
+    }
+    
+    public static void clearDeathRedirectFlag() {
+        deathRedirectActive = false;
+    }
+    
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
         // Only handle on client side and only for the local player
@@ -63,11 +74,15 @@ public class DeathSleepEvents {
             playerDeathCounts.remove(playerId);
             System.out.println("[WaystoneInjector] Death threshold reached - triggering redirect to: " + deathServer);
             
+            // Set death redirect flag so we can teleport to spawn after connection
+            deathRedirectActive = true;
+            
             // Trigger redirect after a short delay (wait for death screen)
             new Thread(() -> {
                 try {
                     Thread.sleep(2000); // Wait 2 seconds for death screen
                     mc.execute(() -> {
+                        System.out.println("[WaystoneInjector] Executing death redirect");
                         com.example.waystoneinjector.client.ClientEvents.connectToServer(deathServer);
                     });
                 } catch (InterruptedException e) {
