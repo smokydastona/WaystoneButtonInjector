@@ -21,6 +21,8 @@ public class ServerSettingsManager {
     
     private static boolean hasProcessedServers = false;
     private static final Set<String> configuredServers = new HashSet<>();
+    private static int tickCount = 0;
+    private static final int DELAY_TICKS = 100; // Wait 5 seconds (20 ticks/second)
     
     /**
      * Called once on client tick to process server settings
@@ -30,22 +32,29 @@ public class ServerSettingsManager {
         if (event.phase != TickEvent.Phase.END) return;
         if (hasProcessedServers) return;
         
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return; // Wait until world is loaded
+        // Delay processing to ensure everything is initialized
+        tickCount++;
+        if (tickCount < DELAY_TICKS) return;
         
         hasProcessedServers = true;
         System.out.println("[WaystoneInjector] Processing server settings for resource pack auto-accept...");
         
-        // Collect all server addresses from button configs
-        collectConfiguredServers();
-        
-        if (configuredServers.isEmpty()) {
-            System.out.println("[WaystoneInjector] No servers configured in buttons, skipping server settings update");
-            return;
+        try {
+            // Collect all server addresses from button configs
+            collectConfiguredServers();
+            
+            if (configuredServers.isEmpty()) {
+                System.out.println("[WaystoneInjector] No servers configured in buttons, skipping server settings update");
+                return;
+            }
+            
+            // Update server list
+            Minecraft mc = Minecraft.getInstance();
+            updateServerSettings(mc);
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Error in server settings processing: " + e.getMessage());
+            e.printStackTrace();
         }
-        
-        // Update server list
-        updateServerSettings(mc);
     }
     
     /**
