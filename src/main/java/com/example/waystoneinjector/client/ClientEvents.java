@@ -330,6 +330,9 @@ public class ClientEvents {
         
         GuiGraphics graphics = event.getGuiGraphics();
         
+        // Get current waystone type color for custom buttons
+        int buttonColor = WaystoneTypeRegistry.getColorForType(currentWaystoneType.get());
+        
         try {
             // Get the waystone entries from the list
             Field childrenField = findField(waystoneList.getClass(), "children", "entries");
@@ -389,8 +392,49 @@ public class ClientEvents {
                     }
                 }
             }
+            
+            // Render colored overlays on custom server transfer buttons
+            renderCustomButtonOverlays(graphics, screen, buttonColor);
+            
         } catch (Exception e) {
             // Silently fail - rendering is optional
+        }
+    }
+    
+    private static void renderCustomButtonOverlays(GuiGraphics graphics, Screen screen, int color) {
+        try {
+            // Get config values to know which buttons exist
+            List<String> labels = WaystoneConfig.getEnabledLabels();
+            int numButtons = Math.min(labels.size(), 6);
+            if (numButtons == 0) return;
+            
+            int leftButtons = (numButtons + 1) / 2;
+            int rightButtons = numButtons / 2;
+            
+            int buttonWidth = 60;
+            int buttonHeight = 30;
+            int verticalSpacing = 5;
+            int sideMargin = 10;
+            int centerY = screen.height / 2;
+            
+            // Semi-transparent color overlay
+            int alpha = 60; // Slightly higher opacity for buttons
+            int colorWithAlpha = (alpha << 24) | (color & 0xFFFFFF);
+            
+            // Render left side button overlays
+            for (int i = 0; i < leftButtons; i++) {
+                int y = centerY - ((leftButtons * buttonHeight + (leftButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
+                graphics.fill(sideMargin, y, sideMargin + buttonWidth, y + buttonHeight, colorWithAlpha);
+            }
+            
+            // Render right side button overlays
+            for (int i = 0; i < rightButtons; i++) {
+                int y = centerY - ((rightButtons * buttonHeight + (rightButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
+                int x = screen.width - buttonWidth - sideMargin;
+                graphics.fill(x, y, x + buttonWidth, y + buttonHeight, colorWithAlpha);
+            }
+        } catch (Exception e) {
+            // Silently fail
         }
     }
     
