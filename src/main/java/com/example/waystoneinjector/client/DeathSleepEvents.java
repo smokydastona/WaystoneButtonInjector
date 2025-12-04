@@ -2,10 +2,13 @@ package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +18,7 @@ import java.util.UUID;
  * Client-side event handler for death and sleep events
  * Replaces the need for server-side Feverdream mod
  */
+@OnlyIn(Dist.CLIENT)
 public class DeathSleepEvents {
     
     // Track death counts per player (client-side)
@@ -22,6 +26,9 @@ public class DeathSleepEvents {
     
     // Flag to indicate a death redirect is in progress
     private static boolean deathRedirectActive = false;
+    
+    // Track if we've already handled this death (prevent duplicate triggers)
+    private static boolean deathHandled = false;
     
     public static boolean isDeathRedirectActive() {
         return deathRedirectActive;
@@ -32,18 +39,26 @@ public class DeathSleepEvents {
     }
     
     @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
-        // Only handle on client side and only for the local player
-        if (event.getEntity().level().isClientSide() && event.getEntity() instanceof LocalPlayer) {
-            LocalPlayer player = (LocalPlayer) event.getEntity();
+    public static void onDeathScreenOpen(ScreenEvent.Opening event) {
+        // Detect when death screen opens
+        if (event.getNewScreen() instanceof DeathScreen && !deathHandled) {
+            deathHandled = true; // Prevent duplicate handling
             
-            System.out.println("[WaystoneInjector] Player death detected");
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player == null) {
+                deathHandled = false;
+                return;
+            }
+            
+            LocalPlayer player = mc.player;
+            
+            System.out.println("[WaystoneInjector] Player death screen detected");
             
             // Get current server address
-            Minecraft mc = Minecraft.getInstance();
             String currentServer = getCurrentServerAddress(mc);
             if (currentServer == null) {
                 System.out.println("[WaystoneInjector] Not connected to a server - ignoring death event");
+                deathHandled = false;
                 return;
             }
             
@@ -53,6 +68,7 @@ public class DeathSleepEvents {
             String deathServer = WaystoneConfig.getDeathRedirectServer(currentServer);
             if (deathServer == null || deathServer.isEmpty()) {
                 System.out.println("[WaystoneInjector] No death redirect mapping found for server: " + currentServer);
+                deathHandled = false;
                 return;
             }
             
@@ -67,6 +83,7 @@ public class DeathSleepEvents {
             
             if (currentDeaths < requiredDeaths) {
                 System.out.println("[WaystoneInjector] Not enough deaths yet - redirect cancelled");
+                deathHandled = false;
                 return;
             }
             
@@ -77,13 +94,14 @@ public class DeathSleepEvents {
             // Set death redirect flag so we can teleport to spawn after connection
             deathRedirectActive = true;
             
-            // Trigger redirect after a short delay (wait for death screen)
+            // Trigger redirect after a short delay (wait for death screen to fully load)
             new Thread(() -> {
                 try {
-                    Thread.sleep(2000); // Wait 2 seconds for death screen
+                    Thread.sleep(1000); // Wait 1 second for death screen
                     mc.execute(() -> {
                         System.out.println("[WaystoneInjector] Executing death redirect");
                         com.example.waystoneinjector.client.ClientEvents.connectToServer(deathServer);
+                        deathHandled = false; // Reset for next death
                     });
                 } catch (InterruptedException e) {
                     e.printStackTrace();
