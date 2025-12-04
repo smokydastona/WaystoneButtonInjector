@@ -21,16 +21,11 @@ public class ClientEvents {
         Screen screen = event.getScreen();
         if (screen == null) return;
 
-        // Detect Waystones selection screen (vanilla Waystones or Better Waystones Menu)
+        // Detect Waystones selection screen specifically
         String className = screen.getClass().getName();
         System.out.println("[WaystoneInjector] Screen detected: " + className);
         
-        // Support both vanilla Waystones and Better Waystones Menu addon
-        boolean isWaystoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen") ||
-                                   className.contains("betterwaystonesmenu") ||
-                                   className.contains("BetterWaystonesMenu");
-        
-        if (!isWaystoneScreen) {
+        if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
             return;
         }
 
