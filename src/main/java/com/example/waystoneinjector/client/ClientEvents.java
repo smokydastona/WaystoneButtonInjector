@@ -1,14 +1,18 @@
 package com.example.waystoneinjector.client;
 
-import com.example.waystoneinjector.client.gui.EnhancedWaystoneSelectionScreen;
+import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.List;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = "waystoneinjector", bus = Mod.EventBusSubscriber.Bus.FORGE)
 @SuppressWarnings("null")
@@ -31,12 +35,85 @@ public class ClientEvents {
             return;
         }
 
-        System.out.println("[WaystoneInjector] Waystone screen detected! Replacing with enhanced screen...");
+        System.out.println("[WaystoneInjector] Waystone screen detected! Adding custom buttons...");
         
-        // Phase 1: Replace the screen with our enhanced version
-        Minecraft mc = Minecraft.getInstance();
-        mc.setScreen(new EnhancedWaystoneSelectionScreen(screen));
-        return; // Don't add buttons to the old screen since we're replacing it
+        // Get config values
+        List<String> labels = WaystoneConfig.getEnabledLabels();
+        List<String> commands = WaystoneConfig.getEnabledCommands();
+
+        System.out.println("[WaystoneInjector] Enabled buttons: " + labels.size());
+
+        int numButtons = Math.min(labels.size(), 6); // Max 6 buttons
+        if (numButtons == 0) {
+            System.out.println("[WaystoneInjector] No enabled buttons found!");
+            return;
+        }
+
+        // Calculate button dimensions based on number of buttons
+        int leftButtons = (numButtons + 1) / 2;
+        int rightButtons = numButtons / 2;
+
+        int buttonWidth = 60;
+        int buttonHeight = 30;
+        int verticalSpacing = 5;
+        int sideMargin = 10;
+
+        int centerY = screen.height / 2;
+
+        // Add left side buttons
+        for (int i = 0; i < leftButtons; i++) {
+            final int buttonIndex = i;
+            String label = labels.get(buttonIndex);
+            final String command = commands.get(buttonIndex);
+
+            int y = centerY - ((leftButtons * buttonHeight + (leftButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
+
+            Button button = Button.builder(
+                Component.literal(label),
+                btn -> handleServerTransfer(command)
+            ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
+
+            event.addListener(button);
+        }
+
+        // Add right side buttons
+        for (int i = 0; i < rightButtons; i++) {
+            final int buttonIndex = leftButtons + i;
+            String label = labels.get(buttonIndex);
+            final String command = commands.get(buttonIndex);
+
+            int y = centerY - ((rightButtons * buttonHeight + (rightButtons - 1) * verticalSpacing) / 2) + (i * (buttonHeight + verticalSpacing));
+            int x = screen.width - buttonWidth - sideMargin;
+
+            Button button = Button.builder(
+                Component.literal(label),
+                btn -> handleServerTransfer(command)
+            ).bounds(x, y, buttonWidth, buttonHeight).build();
+
+            event.addListener(button);
+        }
+    }
+    
+    private static void handleServerTransfer(String command) {
+        System.out.println("[WaystoneInjector] Handling server transfer: " + command);
+        String serverAddress = parseRedirectAddress(command);
+        if (serverAddress != null && !serverAddress.isEmpty()) {
+            connectToServer(serverAddress);
+        } else {
+            System.err.println("[WaystoneInjector] Could not parse server address from: " + command);
+        }
+    }
+    
+    private static String parseRedirectAddress(String command) {
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length >= 2 && parts[0].equalsIgnoreCase("redirect")) {
+            if (parts[1].equals("@s") && parts.length >= 3) {
+                return parts[2];
+            } else {
+                return parts[1];
+            }
+        }
+        return null;
     }
 
     /**
