@@ -35,7 +35,16 @@ public class ClientEvents {
             return;
         }
 
-        System.out.println("[WaystoneInjector] Waystone screen detected! Adding custom buttons...");
+        System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
+        
+        // Add custom server transfer buttons
+        addCustomButtons(event, screen);
+        
+        // TODO: Add search box, scrollbar improvements, etc.
+        // For now, just get the buttons working again
+    }
+    
+    private static void addCustomButtons(ScreenEvent.Init.Post event, Screen screen) {
         
         // Get config values
         List<String> labels = WaystoneConfig.getEnabledLabels();
