@@ -38,6 +38,11 @@ public class WaystoneInjectorMod {
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(com.example.waystoneinjector.client.ResourcePackHandler.class);
             System.out.println("[WaystoneInjector] ResourcePackHandler registered!");
             
+            // Register server settings manager (auto-configure resource packs)
+            System.out.println("[WaystoneInjector] Registering ServerSettingsManager...");
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(com.example.waystoneinjector.client.ServerSettingsManager.class);
+            System.out.println("[WaystoneInjector] ServerSettingsManager registered!");
+            
             System.out.println("[WaystoneInjector] ========================================");
             System.out.println("[WaystoneInjector] MOD INITIALIZATION COMPLETE");
             System.out.println("[WaystoneInjector] ========================================");

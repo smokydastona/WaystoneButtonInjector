@@ -530,6 +530,56 @@ public class WaystoneConfig {
         }
         return false;
     }
+    
+    // Get all unique death redirect servers
+    public static java.util.Set<String> getAllDeathRedirects() {
+        java.util.Set<String> servers = new java.util.HashSet<>();
+        
+        addDeathRedirectServer(servers, BUTTON1_DEATH_REDIRECT.get());
+        addDeathRedirectServer(servers, BUTTON2_DEATH_REDIRECT.get());
+        addDeathRedirectServer(servers, BUTTON3_DEATH_REDIRECT.get());
+        addDeathRedirectServer(servers, BUTTON4_DEATH_REDIRECT.get());
+        addDeathRedirectServer(servers, BUTTON5_DEATH_REDIRECT.get());
+        addDeathRedirectServer(servers, BUTTON6_DEATH_REDIRECT.get());
+        
+        return servers;
+    }
+    
+    // Get all unique sleep redirect servers
+    public static java.util.Set<String> getAllSleepRedirects() {
+        java.util.Set<String> servers = new java.util.HashSet<>();
+        
+        addSleepRedirectServer(servers, BUTTON1_SLEEP_REDIRECT.get());
+        addSleepRedirectServer(servers, BUTTON2_SLEEP_REDIRECT.get());
+        addSleepRedirectServer(servers, BUTTON3_SLEEP_REDIRECT.get());
+        addSleepRedirectServer(servers, BUTTON4_SLEEP_REDIRECT.get());
+        addSleepRedirectServer(servers, BUTTON5_SLEEP_REDIRECT.get());
+        addSleepRedirectServer(servers, BUTTON6_SLEEP_REDIRECT.get());
+        
+        return servers;
+    }
+    
+    private static void addDeathRedirectServer(java.util.Set<String> servers, String mapping) {
+        if (mapping == null || mapping.isEmpty()) return;
+        String[] parts = mapping.split("->");
+        if (parts.length == 2) {
+            String destination = parts[1].trim();
+            if (!destination.isEmpty()) {
+                servers.add(destination);
+            }
+        }
+    }
+    
+    private static void addSleepRedirectServer(java.util.Set<String> servers, String mapping) {
+        if (mapping == null || mapping.isEmpty()) return;
+        String[] parts = mapping.split("->");
+        if (parts.length == 2) {
+            String destination = parts[1].trim();
+            if (!destination.isEmpty()) {
+                servers.add(destination);
+            }
+        }
+    }
 
     public static void register() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, SPEC, "waystoneinjector-client.toml");
