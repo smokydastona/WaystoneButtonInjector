@@ -58,8 +58,12 @@ public class ClientEvents {
 
         System.out.println("[WaystoneInjector] Waystone screen detected! Adding enhancements...");
         
+        // Reset to default before detection
+        currentWaystoneType.set("regular");
+        
         // Detect waystone type from the screen
         detectWaystoneType(screen);
+        System.out.println("[WaystoneInjector] Final detected type: " + currentWaystoneType.get());
         
         // Store screen reference
         currentWaystoneScreen.set(screen);
@@ -341,7 +345,9 @@ public class ClientEvents {
         if (screen == null || event.getScreen() != screen) return;
         
         // Get the appropriate texture based on waystone type
-        ResourceLocation texture = getTextureForType(currentWaystoneType.get());
+        String waystoneType = currentWaystoneType.get();
+        ResourceLocation texture = getTextureForType(waystoneType);
+        System.out.println("[WaystoneInjector] Rendering background - Type: " + waystoneType + ", Texture: " + texture);
         
         GuiGraphics graphics = event.getGuiGraphics();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
