@@ -144,9 +144,10 @@ public class ClientEvents {
             net.minecraft.client.multiplayer.ServerData serverData = 
                 new net.minecraft.client.multiplayer.ServerData("", serverAddress, false);
             
-            // Connect to the new server using a title screen as parent
+            // Use multiplayer screen as parent so failed connections return to server list
             net.minecraft.client.gui.screens.Screen parentScreen = 
-                mc.screen != null ? mc.screen : new net.minecraft.client.gui.screens.TitleScreen();
+                new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(
+                    new net.minecraft.client.gui.screens.TitleScreen());
             
             net.minecraft.client.gui.screens.ConnectScreen.startConnecting(
                 parentScreen,
@@ -156,24 +157,49 @@ public class ClientEvents {
                 false
             );
             
-            // Failsafe: If connection takes longer than 60 seconds, return to main menu
-            // This prevents players from getting stuck on timeout
+            // Failsafe: Monitor connection status and return to multiplayer screen on failure/timeout
             new Thread(() -> {
                 try {
-                    Thread.sleep(60000); // Wait 60 seconds
-                    
-                    // Check if we're still on a connecting screen (not in-game and not at title screen)
-                    mc.execute(() -> {
-                        if (mc.level == null && mc.screen != null && 
-                            mc.screen.getClass().getName().contains("ConnectScreen")) {
-                            System.out.println("[WaystoneInjector] Connection timeout - returning to main menu");
-                            mc.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+                    // Check every 2 seconds for up to 60 seconds
+                    for (int i = 0; i < 30; i++) {
+                        Thread.sleep(2000);
+                        
+                        final int iteration = i;
+                        mc.execute(() -> {
+                            // If we're in game, connection succeeded - stop monitoring
+                            if (mc.level != null) {
+                                return;
+                            }
+                            
+                            // If screen is null or not a connecting screen, connection failed
+                            if (mc.screen == null || 
+                                !mc.screen.getClass().getName().contains("ConnectScreen")) {
+                                System.out.println("[WaystoneInjector] Connection failed - ensuring multiplayer screen");
+                                // Make sure we're on the multiplayer screen, not stuck on blank screen
+                                if (mc.screen == null || mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen) {
+                                    mc.setScreen(new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(
+                                        new net.minecraft.client.gui.screens.TitleScreen()));
+                                }
+                                return;
+                            }
+                            
+                            // After 60 seconds (30 iterations), force return to multiplayer screen
+                            if (iteration >= 29) {
+                                System.out.println("[WaystoneInjector] Connection timeout - returning to multiplayer screen");
+                                mc.setScreen(new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(
+                                    new net.minecraft.client.gui.screens.TitleScreen()));
+                            }
+                        });
+                        
+                        // If we're in game, stop the monitoring thread
+                        if (mc.level != null) {
+                            break;
                         }
-                    });
+                    }
                 } catch (InterruptedException e) {
                     // Thread was interrupted, ignore
                 }
-            }, "WaystoneInjector-ConnectionTimeout").start();
+            }, "WaystoneInjector-ConnectionMonitor").start();
         });
     }
 }
