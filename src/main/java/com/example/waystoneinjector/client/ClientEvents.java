@@ -76,11 +76,14 @@ public class ClientEvents {
     
     private static void detectWaystoneType(Screen screen) {
         try {
+            System.out.println("[WaystoneInjector] Attempting to detect waystone type...");
+            
             // Try to access the menu to get waystone data
             Field menuField = findField(screen.getClass(), "menu", "container");
             if (menuField != null) {
                 menuField.setAccessible(true);
                 Object menu = menuField.get(screen);
+                System.out.println("[WaystoneInjector] Found menu: " + (menu != null ? menu.getClass().getName() : "null"));
                 
                 if (menu != null) {
                     // Try to get the waystone data from the menu
@@ -88,65 +91,99 @@ public class ClientEvents {
                     if (waystoneField != null) {
                         waystoneField.setAccessible(true);
                         Object waystone = waystoneField.get(menu);
+                        System.out.println("[WaystoneInjector] Found waystone object: " + (waystone != null ? waystone.getClass().getName() : "null"));
                         
                         if (waystone != null) {
                             // Get waystone name for registry
                             String waystoneName = null;
-                            Field nameField = findField(waystone.getClass(), "name", "waystoneData");
+                            Field nameField = findField(waystone.getClass(), "name", "waystoneData", "waystoneUid");
                             if (nameField != null) {
                                 nameField.setAccessible(true);
                                 Object name = nameField.get(waystone);
                                 if (name != null) {
                                     waystoneName = name.toString();
+                                    System.out.println("[WaystoneInjector] Found waystone name: " + waystoneName);
                                 }
                             }
                             
-                            // Try to get the block/type information
-                            Field blockField = findField(waystone.getClass(), "block", "blockState", "type");
-                            if (blockField != null) {
-                                blockField.setAccessible(true);
-                                Object block = blockField.get(waystone);
-                                
-                                if (block != null) {
-                                    String blockName = block.toString();
-                                    System.out.println("[WaystoneInjector] Waystone type detected: " + blockName);
-                                    
-                                    String detectedType;
-                                    // Detect waystone type
-                                    if (blockName.contains("sharestone")) {
-                                        detectedType = "sharestone";
-                                        System.out.println("[WaystoneInjector] This is a SHARESTONE - Using purple texture");
-                                    } else if (blockName.contains("mossy")) {
-                                        detectedType = "mossy";
-                                        System.out.println("[WaystoneInjector] This is a MOSSY WAYSTONE - Using green texture");
-                                    } else if (blockName.contains("blackstone")) {
-                                        detectedType = "blackstone";
-                                        System.out.println("[WaystoneInjector] This is a BLACKSTONE WAYSTONE - Using dark texture");
-                                    } else if (blockName.contains("deepslate")) {
-                                        detectedType = "deepslate";
-                                        System.out.println("[WaystoneInjector] This is a DEEPSLATE WAYSTONE - Using gray texture");
-                                    } else if (blockName.contains("end_stone")) {
-                                        detectedType = "endstone";
-                                        System.out.println("[WaystoneInjector] This is an END STONE WAYSTONE - Using yellow texture");
-                                    } else {
-                                        detectedType = "regular";
-                                        System.out.println("[WaystoneInjector] This is a REGULAR WAYSTONE - Using brown texture");
+                            // Try multiple approaches to get block type
+                            String detectedType = null;
+                            String blockName = null;
+                            
+                            // Approach 1: Try getBlock() method
+                            try {
+                                Method getBlockMethod = findMethod(waystone.getClass(), "getBlock");
+                                if (getBlockMethod != null) {
+                                    getBlockMethod.setAccessible(true);
+                                    Object block = getBlockMethod.invoke(waystone);
+                                    if (block != null) {
+                                        blockName = block.toString();
+                                        System.out.println("[WaystoneInjector] Block from getBlock(): " + blockName);
                                     }
+                                }
+                            } catch (Exception e) {
+                                System.out.println("[WaystoneInjector] getBlock() method failed: " + e.getMessage());
+                            }
+                            
+                            // Approach 2: Try block field
+                            if (blockName == null) {
+                                Field blockField = findField(waystone.getClass(), "block", "blockState", "type", "waystoneType");
+                                if (blockField != null) {
+                                    blockField.setAccessible(true);
+                                    Object block = blockField.get(waystone);
                                     
-                                    currentWaystoneType.set(detectedType);
-                                    
-                                    // Register this waystone in the persistent registry
-                                    if (waystoneName != null) {
-                                        WaystoneTypeRegistry.registerWaystone(waystoneName, detectedType);
+                                    if (block != null) {
+                                        blockName = block.toString();
+                                        System.out.println("[WaystoneInjector] Block from field: " + blockName);
                                     }
                                 }
                             }
+                            
+                            // Detect waystone type from block name
+                            if (blockName != null) {
+                                String lowerBlockName = blockName.toLowerCase();
+                                
+                                if (lowerBlockName.contains("sharestone")) {
+                                    detectedType = "sharestone";
+                                    System.out.println("[WaystoneInjector] ✓ Detected SHARESTONE");
+                                } else if (lowerBlockName.contains("mossy")) {
+                                    detectedType = "mossy";
+                                    System.out.println("[WaystoneInjector] ✓ Detected MOSSY WAYSTONE");
+                                } else if (lowerBlockName.contains("blackstone")) {
+                                    detectedType = "blackstone";
+                                    System.out.println("[WaystoneInjector] ✓ Detected BLACKSTONE WAYSTONE");
+                                } else if (lowerBlockName.contains("deepslate")) {
+                                    detectedType = "deepslate";
+                                    System.out.println("[WaystoneInjector] ✓ Detected DEEPSLATE WAYSTONE");
+                                } else if (lowerBlockName.contains("end_stone") || lowerBlockName.contains("endstone")) {
+                                    detectedType = "endstone";
+                                    System.out.println("[WaystoneInjector] ✓ Detected END STONE WAYSTONE");
+                                } else {
+                                    detectedType = "regular";
+                                    System.out.println("[WaystoneInjector] ✓ Detected REGULAR WAYSTONE");
+                                }
+                                
+                                currentWaystoneType.set(detectedType);
+                                
+                                // Register this waystone in the persistent registry
+                                if (waystoneName != null && detectedType != null) {
+                                    WaystoneTypeRegistry.registerWaystone(waystoneName, detectedType);
+                                }
+                            } else {
+                                System.out.println("[WaystoneInjector] ⚠ Could not determine block type - using default");
+                                currentWaystoneType.set("regular");
+                            }
                         }
+                    } else {
+                        System.out.println("[WaystoneInjector] ⚠ Could not find waystone field in menu");
                     }
                 }
+            } else {
+                System.out.println("[WaystoneInjector] ⚠ Could not find menu field in screen");
             }
         } catch (Exception e) {
-            System.out.println("[WaystoneInjector] Could not detect waystone type: " + e.getMessage());
+            System.err.println("[WaystoneInjector] Error detecting waystone type: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
