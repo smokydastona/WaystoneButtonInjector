@@ -1,20 +1,27 @@
 package com.example.waystoneinjector.client.gui.widget;
 
 import com.example.waystoneinjector.client.gui.WaystoneData;
+import com.example.waystoneinjector.client.gui.WaystoneOrderManager;
+import com.example.waystoneinjector.client.gui.tooltip.WaystoneTooltipRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * Scrollable container widget for displaying waystone list
- * Phase 3: Basic scrollbar with mouse wheel and drag support
+ * Phase 5: Drag-and-drop reordering support
+ * Phase 6: CTRL+hover tooltip support
  */
 @SuppressWarnings("null")
 public class ScrollableWaystoneList extends AbstractWidget {
@@ -34,6 +41,14 @@ public class ScrollableWaystoneList extends AbstractWidget {
     private boolean isDraggingScrollbar = false;
     private double dragStartY = 0;
     private double scrollStartOffset = 0;
+    
+    // Drag-and-drop state (Phase 5)
+    private int draggedIndex = -1;
+    private double draggedButtonY = 0;
+    private int dropTargetIndex = -1;
+    
+    // Tooltip state (Phase 6)
+    private int hoveredIndex = -1;
     
     public ScrollableWaystoneList(int x, int y, int width, int height, List<WaystoneData> waystones, Consumer<WaystoneData> onWaystoneSelected) {
         super(x, y, width, height, Component.literal("Waystone List"));
@@ -78,6 +93,9 @@ public class ScrollableWaystoneList extends AbstractWidget {
         // Draw background
         graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0xCC000000);
         
+        // Track hovered waystone for tooltips
+        hoveredIndex = -1;
+        
         // Enable scissor (viewport clipping)
         enableScissor(graphics, this.getX(), this.getY(), this.width - SCROLLBAR_WIDTH - 2, this.height);
         
@@ -85,15 +103,52 @@ public class ScrollableWaystoneList extends AbstractWidget {
         int currentY = this.getY() - (int) scrollOffset;
         
         for (int i = 0; i < waystoneButtons.size(); i++) {
+            if (i == draggedIndex) {
+                continue; // Skip dragged button (render it last on top)
+            }
+            
             Button button = waystoneButtons.get(i);
             int buttonY = currentY + i * (BUTTON_HEIGHT + BUTTON_SPACING);
+            
+            // Show drop indicator
+            if (dropTargetIndex == i && draggedIndex >= 0) {
+                graphics.fill(
+                    this.getX() + 2,
+                    buttonY - 1,
+                    this.getX() + this.width - SCROLLBAR_WIDTH - 2,
+                    buttonY + 1,
+                    0xFF00FF00
+                );
+            }
             
             // Only render if visible in viewport
             if (buttonY + BUTTON_HEIGHT >= this.getY() && buttonY < this.getY() + this.height) {
                 button.setX(this.getX() + 2);
                 button.setY(buttonY);
                 button.render(graphics, mouseX, mouseY, partialTick);
+                
+                // Track if hovering this button
+                if (button.isMouseOver(mouseX, mouseY)) {
+                    hoveredIndex = i;
+                }
             }
+        }
+        
+        // Render dragged button on top with transparency
+        if (draggedIndex >= 0 && draggedIndex < waystoneButtons.size()) {
+            graphics.pose().pushPose();
+            graphics.pose().translate(0, 0, 100); // Higher Z-index
+            
+            Button draggedButton = waystoneButtons.get(draggedIndex);
+            draggedButton.setX(this.getX() + 2);
+            draggedButton.setY((int) draggedButtonY);
+            
+            // Render with slight transparency
+            draggedButton.setAlpha(0.7f);
+            draggedButton.render(graphics, mouseX, mouseY, partialTick);
+            draggedButton.setAlpha(1.0f);
+            
+            graphics.pose().popPose();
         }
         
         // Disable scissor
@@ -102,6 +157,22 @@ public class ScrollableWaystoneList extends AbstractWidget {
         // Render scrollbar if needed
         if (maxScroll > 0) {
             renderScrollbar(graphics, mouseX, mouseY);
+        }
+        
+        // Render tooltip if hovering and CTRL held (Phase 6)
+        if (hoveredIndex >= 0 && hoveredIndex < waystones.size() && Screen.hasControlDown()) {
+            WaystoneData waystone = waystones.get(hoveredIndex);
+            Minecraft mc = Minecraft.getInstance();
+            
+            if (mc.player != null) {
+                double playerX = mc.player.getX();
+                double playerZ = mc.player.getZ();
+                ResourceKey<Level> playerDim = mc.player.level().dimension();
+                
+                WaystoneTooltipRenderer.renderDetailedTooltip(
+                    graphics, waystone, mouseX, mouseY, playerX, playerZ, playerDim
+                );
+            }
         }
     }
     
@@ -154,8 +225,20 @@ public class ScrollableWaystoneList extends AbstractWidget {
                 btn.setX(this.getX() + 2);
                 btn.setY(buttonY);
                 
-                if (btn.mouseClicked(mouseX, mouseY, button)) {
-                    return true;
+                if (btn.isMouseOver(mouseX, mouseY)) {
+                    // Left click + SHIFT = start drag (Phase 5)
+                    if (button == 0 && Screen.hasShiftDown()) {
+                        draggedIndex = i;
+                        draggedButtonY = buttonY;
+                        dragStartY = mouseY;
+                        System.out.println("[WaystoneInjector] Started dragging waystone: " + waystones.get(i).getName());
+                        return true;
+                    }
+                    
+                    // Normal click = select waystone
+                    if (btn.mouseClicked(mouseX, mouseY, button)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -169,6 +252,29 @@ public class ScrollableWaystoneList extends AbstractWidget {
             isDraggingScrollbar = false;
             return true;
         }
+        
+        // Handle drag-and-drop release (Phase 5)
+        if (draggedIndex >= 0) {
+            if (dropTargetIndex >= 0 && dropTargetIndex != draggedIndex) {
+                // Swap waystones
+                WaystoneData draggedWaystone = waystones.remove(draggedIndex);
+                waystones.add(dropTargetIndex, draggedWaystone);
+                
+                System.out.println("[WaystoneInjector] Reordered: " + draggedWaystone.getName() + 
+                                   " from index " + draggedIndex + " to " + dropTargetIndex);
+                
+                // Save new order
+                WaystoneOrderManager.saveWaystoneOrder(waystones);
+                
+                // Update buttons
+                updateButtons();
+            }
+            
+            draggedIndex = -1;
+            dropTargetIndex = -1;
+            return true;
+        }
+        
         return false;
     }
     
@@ -190,6 +296,21 @@ public class ScrollableWaystoneList extends AbstractWidget {
             
             return true;
         }
+        
+        // Handle waystone drag (Phase 5)
+        if (draggedIndex >= 0) {
+            double deltaY = mouseY - dragStartY;
+            int currentY = this.getY() - (int) scrollOffset;
+            draggedButtonY = currentY + draggedIndex * (BUTTON_HEIGHT + BUTTON_SPACING) + deltaY;
+            
+            // Calculate drop target index
+            int relativeY = (int) (draggedButtonY - currentY + (BUTTON_HEIGHT + BUTTON_SPACING) / 2);
+            dropTargetIndex = relativeY / (BUTTON_HEIGHT + BUTTON_SPACING);
+            dropTargetIndex = Math.max(0, Math.min(dropTargetIndex, waystones.size() - 1));
+            
+            return true;
+        }
+        
         return false;
     }
     

@@ -7,13 +7,15 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Enhanced Waystone Selection Screen with Better Waystones Menu features
- * Phase 4: Search box with real-time filtering
+ * Phase 5: Drag-and-drop reordering
+ * Phase 6: CTRL+hover detailed tooltips
  */
 @SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends Screen {
@@ -30,8 +32,16 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
         
+        // Set up order manager file path
+        Path configDir = Path.of("config");
+        Path orderFile = configDir.resolve("waystoneinjector-order.json");
+        WaystoneOrderManager.setOrderFilePath(orderFile);
+        
         // Extract waystone data from original screen
-        this.allWaystones = WaystoneExtractor.extractWaystones(originalScreen);
+        List<WaystoneData> extractedWaystones = WaystoneExtractor.extractWaystones(originalScreen);
+        
+        // Apply saved order
+        this.allWaystones = WaystoneOrderManager.applyOrder(extractedWaystones);
         this.filteredWaystones = new ArrayList<>(allWaystones);
         
         System.out.println("[WaystoneInjector] Enhanced screen created with " + allWaystones.size() + " waystones");
@@ -118,17 +128,26 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
             this.font,
             this.title,
             this.width / 2,
-            20,
+            8,
             0xFFFFFF
         );
         
-        // Show waystone count
+        // Show waystone count and instructions
         graphics.drawCenteredString(
             this.font,
             Component.literal("Waystones: " + filteredWaystones.size() + " / " + allWaystones.size()),
             this.width / 2,
             this.height - 45,
             0xAAAAAA
+        );
+        
+        // Show drag-and-drop hint
+        graphics.drawCenteredString(
+            this.font,
+            Component.literal("§7SHIFT+Drag to reorder • CTRL+Hover for info"),
+            this.width / 2,
+            this.height - 55,
+            0x888888
         );
         
         // Render widgets (buttons)
