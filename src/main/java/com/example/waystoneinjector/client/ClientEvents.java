@@ -55,6 +55,7 @@ public class ClientEvents {
     
     // Animated portal background for waystone GUIs
     private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/portal_animation.png");
+    private static final ResourceLocation PORTSTONE_PORTAL = new ResourceLocation("waystoneinjector", "textures/gui/portstone_portal.png");
     
     // Sharestone color overlay textures (semi-transparent inner colors)
     private static final ResourceLocation SHARESTONE_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/black.png");
@@ -579,8 +580,12 @@ public class ClientEvents {
         
         // For all waystones (except sharestones), render animated portal background first
         if (!waystoneType.equals("sharestone")) {
-            // Render animated portal texture behind the waystone GUI
-            graphics.blit(PORTAL_ANIMATION, x, y, 0, 0, 256, 256, 256, 256);
+            // Render appropriate portal animation based on type
+            if (waystoneType.equals("portstone")) {
+                graphics.blit(PORTSTONE_PORTAL, x, y, 0, 0, 256, 256, 256, 256);
+            } else {
+                graphics.blit(PORTAL_ANIMATION, x, y, 0, 0, 256, 256, 256, 256);
+            }
         }
         
         // For sharestones, render the color overlay first (as background), then the main opaque sharestone texture on top
