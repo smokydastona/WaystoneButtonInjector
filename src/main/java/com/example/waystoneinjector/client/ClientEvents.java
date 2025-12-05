@@ -1020,6 +1020,7 @@ public class ClientEvents {
             int x = sideMargin + config.xOffset;
             
             final String command = config.command;
+            String serverAddress = parseRedirectAddress(command);
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
             
             System.out.println("[WaystoneInjector] ✓ Creating LEFT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
@@ -1032,7 +1033,8 @@ public class ClientEvents {
                 currentWaystoneType::get,  // Pass supplier that always gets current type
                 "left",
                 i,
-                leftButtons.size()
+                leftButtons.size(),
+                serverAddress  // Pass server address for icon loading
             );
             
             // Add button using the screen's method
@@ -1055,6 +1057,7 @@ public class ClientEvents {
             int x = screen.width - config.width - sideMargin + config.xOffset;
             
             final String command = config.command;
+            String serverAddress = parseRedirectAddress(command);
             Component labelComponent = Component.literal(config.label).withStyle(style -> style.withColor(config.textColor));
             
             System.out.println("[WaystoneInjector] ✓ Creating RIGHT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
@@ -1067,7 +1070,8 @@ public class ClientEvents {
                 currentWaystoneType::get,  // Pass supplier that always gets current type
                 "right",
                 i,
-                rightButtons.size()
+                rightButtons.size(),
+                serverAddress  // Pass server address for icon loading
             );
             
             // Add button using the screen's method
