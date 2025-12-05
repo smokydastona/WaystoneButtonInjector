@@ -14,18 +14,12 @@ import java.util.function.Supplier;
 public class ThemedButton extends Button {
     
     private final Supplier<String> waystoneTypeSupplier;
-    private final String side; // "left" or "right"
-    private final int buttonIndex; // 0-2 for position in stack
-    private final int totalButtons; // Total buttons on this side (1-3)
     
     public ThemedButton(int x, int y, int width, int height, Component message, 
                        OnPress onPress, Supplier<String> waystoneTypeSupplier, String side, 
                        int buttonIndex, int totalButtons) {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
         this.waystoneTypeSupplier = waystoneTypeSupplier;
-        this.side = side;
-        this.buttonIndex = buttonIndex;
-        this.totalButtons = totalButtons;
     }
     
     @Override
@@ -45,7 +39,7 @@ public class ThemedButton extends Button {
     }
     
     private void renderThemedBackground(GuiGraphics graphics) {
-        // Get the appropriate texture based on waystone type, side, and button count
+        // Get the appropriate texture based on waystone type
         ResourceLocation texture = getBackgroundTexture();
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
@@ -53,29 +47,22 @@ public class ThemedButton extends Button {
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         
-        // Calculate texture coordinates based on button position
-        int textureY = buttonIndex * 32; // Each button slot is 32 pixels tall
-        
-        // Render the background texture
+        // Render the background texture (now 64x32 instead of 64x96)
         graphics.blit(texture, 
-            getX(), getY(), // Screen position
-            0, textureY,    // Texture UV start
-            width, height,  // Size to render
-            64, 96);        // Total texture size (64 wide, 96 tall for 3 buttons)
+            getX(), getY(),     // Screen position
+            0, 0,               // Texture UV start (always 0,0 since each file is one button)
+            width, height,      // Size to render
+            64, 32);            // Total texture size (64 wide, 32 tall)
     }
     
     private ResourceLocation getBackgroundTexture() {
-        // Pattern: waystoneinjector:textures/gui/buttons/<type>_<side>_<count>.png
-        // Examples:
-        //   - regular_left_1.png (1 button on left)
-        //   - mossy_right_2.png (2 buttons on right)
-        //   - sharestone_left_3.png (3 buttons on left)
+        // Pattern: waystoneinjector:textures/gui/buttons/<type>.png
+        // Examples: regular.png, mossy.png, sharestone.png, etc.
         
         // Get current waystone type dynamically
         String currentType = waystoneTypeSupplier.get();
         
-        String filename = String.format("textures/gui/buttons/%s_%s_%d.png", 
-            currentType, side, totalButtons);
+        String filename = String.format("textures/gui/buttons/%s.png", currentType);
         
         return new ResourceLocation("waystoneinjector", filename);
     }
