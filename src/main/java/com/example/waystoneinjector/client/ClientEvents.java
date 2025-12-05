@@ -48,6 +48,14 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_WARP_PLATE = new ResourceLocation("waystoneinjector", "textures/gui/warp_plate.png");
     private static final ResourceLocation TEXTURE_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/portstone.png");
     
+    // Waystone list entry overlays (220x36 for each waystone button in the list)
+    private static final ResourceLocation OVERLAY_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/overlays/regular.png");
+    private static final ResourceLocation OVERLAY_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/overlays/mossy.png");
+    private static final ResourceLocation OVERLAY_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/blackstone.png");
+    private static final ResourceLocation OVERLAY_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/deepslate.png");
+    private static final ResourceLocation OVERLAY_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/endstone.png");
+    private static final ResourceLocation OVERLAY_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/sharestone.png");
+    
     // Custom GUI textures - Teleportation Items
     private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/warp_scroll.png");
     private static final ResourceLocation TEXTURE_BOUND_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/bound_scroll.png");
@@ -695,10 +703,14 @@ public class ClientEvents {
                                                 int color = WaystoneTypeRegistry.getColorForType(type);
                                                 int entryY = listY + (i * 36); // Approximate entry height
                                                 
-                                                // Draw semi-transparent colored background
-                                                int alpha = 40; // Low opacity
-                                                int colorWithAlpha = (alpha << 24) | (color & 0xFFFFFF);
-                                                graphics.fill(listX, entryY, listX + 220, entryY + 36, colorWithAlpha);
+                                                // Render waystone-type overlay texture instead of colored fill
+                                                ResourceLocation overlayTexture = getOverlayTextureForType(currentWaystoneType.get());
+                                                if (overlayTexture != null) {
+                                                    RenderSystem.enableBlend();
+                                                    RenderSystem.defaultBlendFunc();
+                                                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                                                    graphics.blit(overlayTexture, listX, entryY, 0, 0, 220, 36, 220, 36);
+                                                }
                                             }
                                         }
                                     }
@@ -829,6 +841,18 @@ public class ClientEvents {
             case "white" -> SHARESTONE_PORTAL_WHITE;
             case "yellow" -> SHARESTONE_PORTAL_YELLOW;
             default -> SHARESTONE_PORTAL_PURPLE; // Default to purple
+        };
+    }
+    
+    private static ResourceLocation getOverlayTextureForType(String type) {
+        return switch (type) {
+            case "regular" -> OVERLAY_REGULAR;
+            case "mossy" -> OVERLAY_MOSSY;
+            case "blackstone" -> OVERLAY_BLACKSTONE;
+            case "deepslate" -> OVERLAY_DEEPSLATE;
+            case "endstone" -> OVERLAY_ENDSTONE;
+            case "sharestone" -> OVERLAY_SHARESTONE;
+            default -> OVERLAY_REGULAR;
         };
     }
     
