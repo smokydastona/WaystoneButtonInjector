@@ -56,6 +56,14 @@ public class ClientEvents {
     private static final ResourceLocation OVERLAY_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/endstone.png");
     private static final ResourceLocation OVERLAY_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/sharestone.png");
     
+    // Mystical portal overlay textures (26 frames for random selection)
+    private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
+    static {
+        for (int i = 1; i <= 26; i++) {
+            MYSTICAL_PORTALS[i-1] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/nether_portal_" + i + ".png");
+        }
+    }
+    
     // Custom GUI textures - Teleportation Items
     private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/warp_scroll.png");
     private static final ResourceLocation TEXTURE_BOUND_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/bound_scroll.png");
@@ -620,6 +628,10 @@ public class ClientEvents {
             } else {
                 graphics.blit(PORTAL_ANIMATION, x, y, 0, 0, 256, 256, 256, 256);
             }
+            
+            // Add mystical portal overlay for extra movement
+            int randomFrame = (int)((System.currentTimeMillis() / 100) % 26);
+            graphics.blit(MYSTICAL_PORTALS[randomFrame], x, y, 0, 0, 256, 256, 256, 256);
         }
         
         // For sharestones, render color-specific portal background then sharestone.png on top
@@ -631,6 +643,10 @@ public class ClientEvents {
             
             // Render color-specific animated portal background
             graphics.blit(sharestonePortal, x, y, 0, 0, 256, 256, 256, 256);
+            
+            // Add mystical portal overlay for extra movement
+            int randomFrame = (int)((System.currentTimeMillis() / 100) % 26);
+            graphics.blit(MYSTICAL_PORTALS[randomFrame], x, y, 0, 0, 256, 256, 256, 256);
             
             // Render sharestone.png on top
             graphics.blit(TEXTURE_SHARESTONE, x, y, 0, 0, 256, 256, 256, 256);
