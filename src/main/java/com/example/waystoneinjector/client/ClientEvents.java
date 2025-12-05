@@ -103,10 +103,11 @@ public class ClientEvents {
 
             System.out.println("[WaystoneInjector] ✓✓✓ WAYSTONE SCREEN DETECTED! Adding enhancements... ✓✓✓");
             
-            // Reset to default before detection
-            currentWaystoneType.set("regular");
+            // Don't reset if we already detected type from right-click
+            String preClickType = currentWaystoneType.get();
+            System.out.println("[WaystoneInjector] Pre-click type was: " + preClickType);
             
-            // Detect waystone type from the screen
+            // Try to detect waystone type from the screen (as backup if right-click didn't work)
             detectWaystoneType(screen);
             System.out.println("[WaystoneInjector] ✓ Final detected type: " + currentWaystoneType.get());
             
@@ -130,7 +131,14 @@ public class ClientEvents {
     
     private static void detectWaystoneType(Screen screen) {
         try {
-            System.out.println("[WaystoneInjector] Attempting to detect waystone type...");
+            // Check if we already have a type from right-click event
+            String currentType = currentWaystoneType.get();
+            if (currentType != null && !currentType.equals("regular")) {
+                System.out.println("[WaystoneInjector] Using type from right-click event: " + currentType);
+                return; // Already detected, don't override
+            }
+            
+            System.out.println("[WaystoneInjector] No right-click type detected, attempting to detect from screen...");
             
             // Try to access the menu to get waystone data
             Field menuField = findField(screen.getClass(), "menu", "container");
