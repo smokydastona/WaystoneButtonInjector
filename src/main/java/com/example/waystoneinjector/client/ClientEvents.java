@@ -57,6 +57,24 @@ public class ClientEvents {
     private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/portal_animation.png");
     private static final ResourceLocation PORTSTONE_PORTAL = new ResourceLocation("waystoneinjector", "textures/gui/portstone_portal.png");
     
+    // Sharestone portal backgrounds (animated, color-specific)
+    private static final ResourceLocation SHARESTONE_PORTAL_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/black.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/blue.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_BROWN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/brown.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_CYAN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/cyan.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/gray.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_GREEN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/green.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/light_blue.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/light_gray.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIME = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/lime.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_MAGENTA = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/magenta.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_ORANGE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/orange.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_PINK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/pink.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_PURPLE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/purple.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_RED = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/red.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/white.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/yellow.png");
+    
     // Sharestone color overlay textures (semi-transparent inner colors)
     private static final ResourceLocation SHARESTONE_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/black.png");
     private static final ResourceLocation SHARESTONE_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/blue.png");
@@ -588,18 +606,18 @@ public class ClientEvents {
             }
         }
         
-        // For sharestones, render the color overlay first (as background), then the main opaque sharestone texture on top
+        // For sharestones, render color-specific portal background then sharestone.png on top
         if (waystoneType.equals("sharestone")) {
             String color = currentSharestoneColor.get();
-            ResourceLocation colorOverlay = getSharestoneColorTexture(color);
+            ResourceLocation sharestonePortal = getSharestonePortalTexture(color);
             
-            System.out.println("[WaystoneInjector] Rendering sharestone - Color: " + color + ", Overlay: " + colorOverlay);
+            System.out.println("[WaystoneInjector] Rendering sharestone - Color: " + color + ", Portal: " + sharestonePortal);
             
-            // Render semi-transparent color overlay first (background layer)
-            graphics.blit(colorOverlay, x, y, 0, 0, 256, 256, 256, 256);
+            // Render color-specific animated portal background
+            graphics.blit(sharestonePortal, x, y, 0, 0, 256, 256, 256, 256);
             
-            // Render main sharestone texture on top (should have transparent areas for color to show through)
-            graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+            // Render sharestone.png on top
+            graphics.blit(TEXTURE_SHARESTONE, x, y, 0, 0, 256, 256, 256, 256);
             
             System.out.println("[WaystoneInjector] Sharestone rendering complete");
         } else {
@@ -782,6 +800,28 @@ public class ClientEvents {
         if (path.contains("return_scroll")) return "return_scroll";
         
         return "regular";
+    }
+    
+    private static ResourceLocation getSharestonePortalTexture(String color) {
+        return switch (color) {
+            case "black" -> SHARESTONE_PORTAL_BLACK;
+            case "blue" -> SHARESTONE_PORTAL_BLUE;
+            case "brown" -> SHARESTONE_PORTAL_BROWN;
+            case "cyan" -> SHARESTONE_PORTAL_CYAN;
+            case "gray" -> SHARESTONE_PORTAL_GRAY;
+            case "green" -> SHARESTONE_PORTAL_GREEN;
+            case "light_blue" -> SHARESTONE_PORTAL_LIGHT_BLUE;
+            case "light_gray" -> SHARESTONE_PORTAL_LIGHT_GRAY;
+            case "lime" -> SHARESTONE_PORTAL_LIME;
+            case "magenta" -> SHARESTONE_PORTAL_MAGENTA;
+            case "orange" -> SHARESTONE_PORTAL_ORANGE;
+            case "pink" -> SHARESTONE_PORTAL_PINK;
+            case "purple" -> SHARESTONE_PORTAL_PURPLE;
+            case "red" -> SHARESTONE_PORTAL_RED;
+            case "white" -> SHARESTONE_PORTAL_WHITE;
+            case "yellow" -> SHARESTONE_PORTAL_YELLOW;
+            default -> SHARESTONE_PORTAL_PURPLE; // Default to purple
+        };
     }
     
     private static ResourceLocation getSharestoneColorTexture(String color) {
