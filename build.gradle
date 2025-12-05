@@ -31,6 +31,12 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 repositories {
     mavenCentral()
     maven { url = 'https://maven.minecraftforge.net/' }
+    maven {
+        url = 'https://maven.twelveiterations.com/repository/maven-public/'
+        content {
+            includeGroup 'net.blay09.mods'
+        }
+    }
 }
 
 minecraft {
@@ -66,9 +72,10 @@ minecraft {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
     
-    // Local JAR dependencies for compile-time API access
-    compileOnly files('libs/waystones-forge-1.20.1-14.1.17.jar')
-    compileOnly files('libs/balm-forge-1.20.1-7.3.9.jar')
+    // Waystones API from Maven - using compileOnly since we only need it at compile time
+    // The actual mod will be present at runtime
+    compileOnly fg.deobf('net.blay09.mods:waystones-forge:1.20.1-14.1.17')
+    compileOnly fg.deobf('net.blay09.mods:balm-forge:1.20.1-7.3.9')
 }
 
 jar {
