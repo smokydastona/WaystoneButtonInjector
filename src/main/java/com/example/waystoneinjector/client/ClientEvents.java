@@ -75,24 +75,6 @@ public class ClientEvents {
     private static final ResourceLocation SHARESTONE_PORTAL_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/white.png");
     private static final ResourceLocation SHARESTONE_PORTAL_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/yellow.png");
     
-    // Sharestone color overlay textures (semi-transparent inner colors)
-    private static final ResourceLocation SHARESTONE_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/black.png");
-    private static final ResourceLocation SHARESTONE_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/blue.png");
-    private static final ResourceLocation SHARESTONE_BROWN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/brown.png");
-    private static final ResourceLocation SHARESTONE_CYAN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/cyan.png");
-    private static final ResourceLocation SHARESTONE_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/gray.png");
-    private static final ResourceLocation SHARESTONE_GREEN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/green.png");
-    private static final ResourceLocation SHARESTONE_LIGHT_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/light_blue.png");
-    private static final ResourceLocation SHARESTONE_LIGHT_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/light_gray.png");
-    private static final ResourceLocation SHARESTONE_LIME = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/lime.png");
-    private static final ResourceLocation SHARESTONE_MAGENTA = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/magenta.png");
-    private static final ResourceLocation SHARESTONE_ORANGE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/orange.png");
-    private static final ResourceLocation SHARESTONE_PINK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/pink.png");
-    private static final ResourceLocation SHARESTONE_PURPLE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/purple.png");
-    private static final ResourceLocation SHARESTONE_RED = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/red.png");
-    private static final ResourceLocation SHARESTONE_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/white.png");
-    private static final ResourceLocation SHARESTONE_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/yellow.png");
-    
     // Track the specific sharestone color variant
     private static final ThreadLocal<String> currentSharestoneColor = ThreadLocal.withInitial(() -> "purple");
 
@@ -821,28 +803,6 @@ public class ClientEvents {
             case "white" -> SHARESTONE_PORTAL_WHITE;
             case "yellow" -> SHARESTONE_PORTAL_YELLOW;
             default -> SHARESTONE_PORTAL_PURPLE; // Default to purple
-        };
-    }
-    
-    private static ResourceLocation getSharestoneColorTexture(String color) {
-        return switch (color) {
-            case "black" -> SHARESTONE_BLACK;
-            case "blue" -> SHARESTONE_BLUE;
-            case "brown" -> SHARESTONE_BROWN;
-            case "cyan" -> SHARESTONE_CYAN;
-            case "gray" -> SHARESTONE_GRAY;
-            case "green" -> SHARESTONE_GREEN;
-            case "light_blue" -> SHARESTONE_LIGHT_BLUE;
-            case "light_gray" -> SHARESTONE_LIGHT_GRAY;
-            case "lime" -> SHARESTONE_LIME;
-            case "magenta" -> SHARESTONE_MAGENTA;
-            case "orange" -> SHARESTONE_ORANGE;
-            case "pink" -> SHARESTONE_PINK;
-            case "purple" -> SHARESTONE_PURPLE;
-            case "red" -> SHARESTONE_RED;
-            case "white" -> SHARESTONE_WHITE;
-            case "yellow" -> SHARESTONE_YELLOW;
-            default -> SHARESTONE_PURPLE; // Default to purple
         };
     }
     
