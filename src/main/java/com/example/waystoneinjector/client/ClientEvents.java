@@ -37,13 +37,20 @@ public class ClientEvents {
     private static final AtomicReference<Object> currentWaystoneList = new AtomicReference<>(null);
     private static final AtomicReference<String> currentWaystoneType = new AtomicReference<>("regular");
     
-    // Custom GUI texture locations
+    // Custom GUI texture locations - Waystone Blocks
     private static final ResourceLocation TEXTURE_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/waystone_regular.png");
     private static final ResourceLocation TEXTURE_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/waystone_mossy.png");
     private static final ResourceLocation TEXTURE_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_blackstone.png");
     private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
+    private static final ResourceLocation TEXTURE_WARP_PLATE = new ResourceLocation("waystoneinjector", "textures/gui/warp_plate.png");
+    
+    // Custom GUI textures - Teleportation Items
+    private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/warp_scroll.png");
+    private static final ResourceLocation TEXTURE_BOUND_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/bound_scroll.png");
+    private static final ResourceLocation TEXTURE_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/warp_stone.png");
+    private static final ResourceLocation TEXTURE_RETURN_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/return_scroll.png");
     
     // Animated portal background for waystone GUIs
     private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/portal_animation.png");
@@ -92,7 +99,9 @@ public class ClientEvents {
         String detectedType = "regular";
         String sharestoneColor = "purple"; // Default sharestone color
         
-        if (path.contains("sharestone")) {
+        if (path.contains("warp_plate")) {
+            detectedType = "warp_plate";
+        } else if (path.contains("sharestone")) {
             detectedType = "sharestone";
             // Extract the specific sharestone color
             if (path.contains("black_")) sharestoneColor = "black";
@@ -148,6 +157,9 @@ public class ClientEvents {
             }
 
             System.out.println("[WaystoneInjector] ✓✓✓ WAYSTONE SCREEN DETECTED! Adding enhancements... ✓✓✓");
+            
+            // Check if player is holding a teleport item
+            detectTeleportItem();
             
             // Don't reset if we already detected type from right-click
             String preClickType = currentWaystoneType.get();
@@ -705,8 +717,52 @@ public class ClientEvents {
             case "blackstone" -> TEXTURE_BLACKSTONE;
             case "deepslate" -> TEXTURE_DEEPSLATE;
             case "endstone" -> TEXTURE_ENDSTONE;
+            case "warp_plate" -> TEXTURE_WARP_PLATE;
+            case "warp_scroll" -> TEXTURE_WARP_SCROLL;
+            case "bound_scroll" -> TEXTURE_BOUND_SCROLL;
+            case "warp_stone" -> TEXTURE_WARP_STONE;
+            case "return_scroll" -> TEXTURE_RETURN_SCROLL;
             default -> TEXTURE_REGULAR;
         };
+    }
+    
+    private static void detectTeleportItem() {
+        try {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.player == null) return;
+            
+            // Check main hand
+            net.minecraft.world.item.ItemStack mainHand = mc.player.getMainHandItem();
+            String itemType = checkItemType(mainHand);
+            
+            // Check off hand if main hand isn't a teleport item
+            if (itemType.equals("regular")) {
+                net.minecraft.world.item.ItemStack offHand = mc.player.getOffhandItem();
+                itemType = checkItemType(offHand);
+            }
+            
+            if (!itemType.equals("regular")) {
+                currentWaystoneType.set(itemType);
+                System.out.println("[WaystoneInjector] ✓ Detected teleport item: " + itemType);
+            }
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Error detecting teleport item: " + e.getMessage());
+        }
+    }
+    
+    private static String checkItemType(net.minecraft.world.item.ItemStack itemStack) {
+        if (itemStack.isEmpty()) return "regular";
+        
+        ResourceLocation itemId = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(itemStack.getItem());
+        if (itemId == null || !itemId.getNamespace().equals("waystones")) return "regular";
+        
+        String path = itemId.getPath();
+        if (path.contains("warp_scroll")) return "warp_scroll";
+        if (path.contains("bound_scroll")) return "bound_scroll";
+        if (path.contains("warp_stone")) return "warp_stone";
+        if (path.contains("return_scroll")) return "return_scroll";
+        
+        return "regular";
     }
     
     private static ResourceLocation getSharestoneColorTexture(String color) {
