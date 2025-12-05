@@ -3,8 +3,8 @@ package com.example.waystoneinjector.client;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,7 +17,7 @@ import java.util.UUID;
 /**
  * Client-side event handler for death and sleep events
  * Executes commands on death/sleep
- * Uses LivingDeathEvent + RespawnEvent for reliable instant-respawn detection
+ * Uses LivingDeathEvent + PlayerRespawnEvent for reliable instant-respawn detection
  */
 @OnlyIn(Dist.CLIENT)
 public class DeathSleepEvents {
@@ -39,7 +39,16 @@ public class DeathSleepEvents {
     
     // Detects client respawn (after death OR dimension join)
     @SubscribeEvent
-    public static void onClientRespawn(ClientPlayerNetworkEvent.RespawnEvent event) {
+    public static void onClientRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        // Only handle client-side
+        if (!event.getEntity().level().isClientSide()) {
+            return;
+        }
+        
+        if (!(event.getEntity() instanceof LocalPlayer)) {
+            return;
+        }
+        
         if (!died) {
             // Not a real death, just dimension change
             return;
