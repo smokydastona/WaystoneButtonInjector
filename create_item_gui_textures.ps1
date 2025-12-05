@@ -12,6 +12,7 @@ $items = @{
     'warp_stone' = @(70, 130, 180)       # Steel blue (stone-like)
     'return_scroll' = @(50, 205, 50)     # Lime green (return/home)
     'warp_plate' = @(128, 128, 128)      # Gray (metal plate)
+    'portstone' = @(186, 85, 211)        # Medium orchid (portal magic)
 }
 
 foreach ($itemName in $items.Keys) {

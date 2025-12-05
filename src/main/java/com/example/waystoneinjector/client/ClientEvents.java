@@ -45,6 +45,7 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
     private static final ResourceLocation TEXTURE_WARP_PLATE = new ResourceLocation("waystoneinjector", "textures/gui/warp_plate.png");
+    private static final ResourceLocation TEXTURE_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/portstone.png");
     
     // Custom GUI textures - Teleportation Items
     private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/warp_scroll.png");
@@ -99,7 +100,9 @@ public class ClientEvents {
         String detectedType = "regular";
         String sharestoneColor = "purple"; // Default sharestone color
         
-        if (path.contains("warp_plate")) {
+        if (path.contains("portstone")) {
+            detectedType = "portstone";
+        } else if (path.contains("warp_plate")) {
             detectedType = "warp_plate";
         } else if (path.contains("sharestone")) {
             detectedType = "sharestone";
@@ -718,6 +721,7 @@ public class ClientEvents {
             case "deepslate" -> TEXTURE_DEEPSLATE;
             case "endstone" -> TEXTURE_ENDSTONE;
             case "warp_plate" -> TEXTURE_WARP_PLATE;
+            case "portstone" -> TEXTURE_PORTSTONE;
             case "warp_scroll" -> TEXTURE_WARP_SCROLL;
             case "bound_scroll" -> TEXTURE_BOUND_SCROLL;
             case "warp_stone" -> TEXTURE_WARP_STONE;
