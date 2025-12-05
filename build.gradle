@@ -31,9 +31,12 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 repositories {
     mavenCentral()
     maven { url = 'https://maven.minecraftforge.net/' }
-    maven { url = 'https://maven.blamejared.com/' }
-    maven { url = 'https://maven.shedaniel.me/' }
-    maven { url = 'https://maven.architectury.dev/' }
+    maven {
+        url = 'https://www.cursemaven.com'
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 minecraft {
@@ -69,9 +72,11 @@ minecraft {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
     
-    // Waystones and its dependencies
-    implementation fg.deobf("com.github.blay09:balm-forge:1.20.1-7.3.9")
-    implementation fg.deobf("com.github.blay09:waystones:1.20.1-14.1.5")
+    // Waystones and its dependencies from CurseForge
+    // Balm (Forge) - Project ID: 531761, File ID: 5228813 (for 1.20.1-7.3.9)
+    implementation fg.deobf("curse.maven:balm-531761:5228813")
+    // Waystones (Forge) - Project ID: 245755, File ID: 5461158 (for 1.20.1-14.1.17)
+    implementation fg.deobf("curse.maven:waystones-245755:5461158")
 }
 
 jar {
