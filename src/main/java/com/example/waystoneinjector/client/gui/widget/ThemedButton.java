@@ -58,15 +58,23 @@ public class ThemedButton extends Button {
     
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        // Render themed background
-        renderThemedBackground(graphics);
+        // Render order:
+        // 1. Server icon (if available) - serves as background
+        // 2. Themed button texture (has transparent areas to show icon through)
+        // 3. Button text on top
         
-        // Render server icon if available (above background, below text)
+        // Render server icon first (if available)
         if (serverIcon != null) {
             renderServerIcon(graphics);
+        } else {
+            // No server icon - render default Waystones button texture as background
+            renderDefaultButtonBackground(graphics);
         }
         
-        // Render button text manually
+        // Render themed overlay texture on top (has transparent spots)
+        renderThemedBackground(graphics);
+        
+        // Render button text on top of everything
         int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
         graphics.drawCenteredString(
             net.minecraft.client.Minecraft.getInstance().font,
@@ -77,21 +85,39 @@ public class ThemedButton extends Button {
         );
     }
     
+    private void renderDefaultButtonBackground(GuiGraphics graphics) {
+        // Render vanilla Waystones button texture when no server icon available
+        // This uses Minecraft's standard button rendering
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        
+        // Standard button background (gray/stone texture)
+        int v = this.isHoveredOrFocused() ? 20 : 0;
+        graphics.blitNineSliced(
+            new ResourceLocation("minecraft", "textures/gui/sprites/widget/button.png"),
+            getX(), getY(), width, height,
+            3, 3, 3, 3,
+            200, 20, 0, v
+        );
+    }
+    
     private void renderServerIcon(GuiGraphics graphics) {
         try {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             
-            // Render 16x16 server icon centered in button, slightly transparent
-            int iconSize = 16;
-            int iconX = getX() + (width - iconSize) / 2;
-            int iconY = getY() + 2; // Near top of button
+            // Render server icon filling the button area as background
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.7F); // 70% opacity
-            graphics.blit(serverIcon, iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F); // Reset
+            // Scale the 64x64 server icon to fill button (keeping aspect ratio)
+            int iconSize = Math.min(width, height);
+            int iconX = getX() + (width - iconSize) / 2;
+            int iconY = getY() + (height - iconSize) / 2;
+            
+            graphics.blit(serverIcon, iconX, iconY, 0, 0, iconSize, iconSize, 64, 64);
         } catch (Exception e) {
-            // Icon might not be loaded yet, ignore
+            // Icon might not be loaded yet, render default background instead
+            renderDefaultButtonBackground(graphics);
         }
     }
     
