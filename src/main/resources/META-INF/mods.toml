@@ -33,3 +33,19 @@ config = "waystoneinjector.mixins.json"
     versionRange="[1.20.1]"
     ordering="NONE"
     side="CLIENT"
+
+# Waystones is required - will auto-download from CurseForge if missing
+[[dependencies.waystoneinjector]]
+    modId="waystones"
+    mandatory=true
+    versionRange="[14.1.0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+# Balm is required by Waystones - will auto-download if missing
+[[dependencies.waystoneinjector]]
+    modId="balm"
+    mandatory=true
+    versionRange="[7.0.0,)"
+    ordering="AFTER"
+    side="CLIENT"
