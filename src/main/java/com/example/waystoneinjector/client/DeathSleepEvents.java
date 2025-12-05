@@ -3,8 +3,7 @@ package com.example.waystoneinjector.client;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,7 +16,7 @@ import java.util.UUID;
 /**
  * Client-side event handler for death and sleep events
  * Executes commands on death/sleep
- * Uses LivingDeathEvent + PlayerRespawnEvent for reliable instant-respawn detection
+ * Uses health monitoring for client-side death detection
  */
 @OnlyIn(Dist.CLIENT)
 public class DeathSleepEvents {
@@ -25,108 +24,85 @@ public class DeathSleepEvents {
     // Track death counts per player (client-side)
     private static final Map<UUID, Integer> playerDeathCounts = new HashMap<>();
     
-    // Track if player actually died (works with instant respawn)
-    private static boolean died = false;
+    // Track player health to detect death
+    private static boolean wasDead = false;
+    private static int deathCooldown = 0;
     
-    // Detects actual client death — works even with instant respawn enabled
     @SubscribeEvent
-    public static void onClientDeath(LivingDeathEvent event) {
-        System.out.println("[WaystoneInjector] LivingDeathEvent fired! Entity: " + event.getEntity().getClass().getName());
-        System.out.println("[WaystoneInjector] Is client side: " + event.getEntity().level().isClientSide());
-        System.out.println("[WaystoneInjector] Is LocalPlayer: " + (event.getEntity() instanceof LocalPlayer));
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
         
-        if (event.getEntity() instanceof LocalPlayer) {
-            died = true;
-            System.out.println("[WaystoneInjector] ✓ Player death detected (LivingDeathEvent) - died flag set to TRUE");
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        
+        if (player == null) {
+            return;
+        }
+        
+        // Cooldown to prevent multiple triggers
+        if (deathCooldown > 0) {
+            deathCooldown--;
+            return;
+        }
+        
+        float currentHealth = player.getHealth();
+        
+        // Detect death: health went to 0 or below
+        if (currentHealth <= 0 && !wasDead) {
+            wasDead = true;
+            System.out.println("[WaystoneInjector] ✓ Player death detected (health: " + currentHealth + ")");
+        }
+        
+        // Detect respawn: health went from 0 to positive
+        if (wasDead && currentHealth > 0) {
+            wasDead = false;
+            deathCooldown = 40; // 2 second cooldown
+            
+            System.out.println("[WaystoneInjector] ✓✓✓ Player respawned (health: " + currentHealth + ")");
+            handleDeath(mc, player);
         }
     }
     
-    // Detects client respawn (after death OR dimension join)
-    @SubscribeEvent
-    public static void onClientRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        System.out.println("[WaystoneInjector] PlayerRespawnEvent fired! Entity: " + event.getEntity().getClass().getName());
-        System.out.println("[WaystoneInjector] Is client side: " + event.getEntity().level().isClientSide());
-        System.out.println("[WaystoneInjector] Is LocalPlayer: " + (event.getEntity() instanceof LocalPlayer));
-        System.out.println("[WaystoneInjector] died flag: " + died);
-        
-        // Only handle client-side
-        if (!event.getEntity().level().isClientSide()) {
-            System.out.println("[WaystoneInjector] ✗ Server-side respawn, ignoring");
+    private static void handleDeath(Minecraft mc, LocalPlayer player) {
+        // Get current server address
+        String currentServer = getCurrentServerAddress(mc);
+        if (currentServer == null) {
+            System.out.println("[WaystoneInjector] Not connected to a server - ignoring death event");
             return;
         }
         
-        if (!(event.getEntity() instanceof LocalPlayer)) {
-            System.out.println("[WaystoneInjector] ✗ Not a LocalPlayer, ignoring");
+        System.out.println("[WaystoneInjector] Current server: " + currentServer);
+        
+        // Get the configured death command for this current server
+        String deathCommand = WaystoneConfig.getDeathRedirectServer(currentServer);
+        if (deathCommand == null || deathCommand.isEmpty()) {
+            System.out.println("[WaystoneInjector] No death command found for server: " + currentServer);
             return;
         }
         
-        if (!died) {
-            // Not a real death, just dimension change
-            System.out.println("[WaystoneInjector] ✗ died flag is FALSE - Not a real death, just dimension change");
+        // Track death count
+        UUID playerId = player.getUUID();
+        int currentDeaths = playerDeathCounts.getOrDefault(playerId, 0);
+        currentDeaths++;
+        playerDeathCounts.put(playerId, currentDeaths);
+        
+        int requiredDeaths = WaystoneConfig.getFeverdreamDeathCount();
+        System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
+        
+        if (currentDeaths < requiredDeaths) {
+            System.out.println("[WaystoneInjector] Not enough deaths yet - command cancelled");
             return;
         }
         
-        // Reset death flag
-        died = false;
+        // Reset death count after triggering command
+        playerDeathCounts.remove(playerId);
+        System.out.println("[WaystoneInjector] Death threshold reached - executing command: " + deathCommand);
         
-        System.out.println("[WaystoneInjector] ✓✓✓ Player respawn after ACTUAL DEATH (instant respawn OK)");
-        System.out.println("[WaystoneInjector] Starting 500ms delay for player loading...");
-        
-        Minecraft mc = Minecraft.getInstance();
-        
-        // Wait for player to be fully loaded (instant respawn needs delay)
-        new Thread(() -> {
-            try {
-                Thread.sleep(500); // Wait 500ms for player to spawn
-                mc.execute(() -> {
-                    LocalPlayer player = mc.player;
-                    if (player == null) {
-                        System.out.println("[WaystoneInjector] Player not ready yet, skipping death command");
-                        return;
-                    }
-                    
-                    // Get current server address
-                    String currentServer = getCurrentServerAddress(mc);
-                    if (currentServer == null) {
-                        System.out.println("[WaystoneInjector] Not connected to a server - ignoring death event");
-                        return;
-                    }
-                    
-                    System.out.println("[WaystoneInjector] Current server: " + currentServer);
-                    
-                    // Get the configured death command for this current server
-                    String deathCommand = WaystoneConfig.getDeathRedirectServer(currentServer);
-                    if (deathCommand == null || deathCommand.isEmpty()) {
-                        System.out.println("[WaystoneInjector] No death command found for server: " + currentServer);
-                        return;
-                    }
-                    
-                    // Track death count
-                    UUID playerId = player.getUUID();
-                    int currentDeaths = playerDeathCounts.getOrDefault(playerId, 0);
-                    currentDeaths++;
-                    playerDeathCounts.put(playerId, currentDeaths);
-                    
-                    int requiredDeaths = WaystoneConfig.getFeverdreamDeathCount();
-                    System.out.println("[WaystoneInjector] Death count: " + currentDeaths + "/" + requiredDeaths);
-                    
-                    if (currentDeaths < requiredDeaths) {
-                        System.out.println("[WaystoneInjector] Not enough deaths yet - command cancelled");
-                        return;
-                    }
-                    
-                    // Reset death count after triggering command
-                    playerDeathCounts.remove(playerId);
-                    System.out.println("[WaystoneInjector] Death threshold reached - executing command: " + deathCommand);
-                    
-                    // Execute command
-                    System.out.println("[WaystoneInjector] Executing death command from respawn");
-                    executeCommand(mc, deathCommand);
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        // Execute command
+        System.out.println("[WaystoneInjector] Executing death command");
+        executeCommand(mc, deathCommand);
     }
     
     @SubscribeEvent
