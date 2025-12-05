@@ -60,7 +60,7 @@ public class ClientEvents {
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
     static {
         for (int i = 1; i <= 26; i++) {
-            MYSTICAL_PORTALS[i-1] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/nether_portal_" + i + ".png");
+            MYSTICAL_PORTALS[i-1] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + i + ".png");
         }
     }
     
