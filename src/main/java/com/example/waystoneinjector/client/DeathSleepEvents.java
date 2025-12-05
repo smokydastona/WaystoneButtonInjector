@@ -31,33 +31,46 @@ public class DeathSleepEvents {
     // Detects actual client death — works even with instant respawn enabled
     @SubscribeEvent
     public static void onClientDeath(LivingDeathEvent event) {
+        System.out.println("[WaystoneInjector] LivingDeathEvent fired! Entity: " + event.getEntity().getClass().getName());
+        System.out.println("[WaystoneInjector] Is client side: " + event.getEntity().level().isClientSide());
+        System.out.println("[WaystoneInjector] Is LocalPlayer: " + (event.getEntity() instanceof LocalPlayer));
+        
         if (event.getEntity() instanceof LocalPlayer) {
             died = true;
-            System.out.println("[WaystoneInjector] Player death detected (LivingDeathEvent)");
+            System.out.println("[WaystoneInjector] ✓ Player death detected (LivingDeathEvent) - died flag set to TRUE");
         }
     }
     
     // Detects client respawn (after death OR dimension join)
     @SubscribeEvent
     public static void onClientRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        System.out.println("[WaystoneInjector] PlayerRespawnEvent fired! Entity: " + event.getEntity().getClass().getName());
+        System.out.println("[WaystoneInjector] Is client side: " + event.getEntity().level().isClientSide());
+        System.out.println("[WaystoneInjector] Is LocalPlayer: " + (event.getEntity() instanceof LocalPlayer));
+        System.out.println("[WaystoneInjector] died flag: " + died);
+        
         // Only handle client-side
         if (!event.getEntity().level().isClientSide()) {
+            System.out.println("[WaystoneInjector] ✗ Server-side respawn, ignoring");
             return;
         }
         
         if (!(event.getEntity() instanceof LocalPlayer)) {
+            System.out.println("[WaystoneInjector] ✗ Not a LocalPlayer, ignoring");
             return;
         }
         
         if (!died) {
             // Not a real death, just dimension change
+            System.out.println("[WaystoneInjector] ✗ died flag is FALSE - Not a real death, just dimension change");
             return;
         }
         
         // Reset death flag
         died = false;
         
-        System.out.println("[WaystoneInjector] Player respawn after ACTUAL DEATH (instant respawn OK)");
+        System.out.println("[WaystoneInjector] ✓✓✓ Player respawn after ACTUAL DEATH (instant respawn OK)");
+        System.out.println("[WaystoneInjector] Starting 500ms delay for player loading...");
         
         Minecraft mc = Minecraft.getInstance();
         
