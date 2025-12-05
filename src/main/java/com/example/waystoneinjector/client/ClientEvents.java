@@ -718,11 +718,15 @@ public class ClientEvents {
                                             String waystoneName = name.toString();
                                             String type = WaystoneTypeRegistry.getWaystoneType(waystoneName);
                                             
+                                            System.out.println("[WaystoneInjector] Entry " + i + ": " + waystoneName + " -> type: " + type);
+                                            
                                             if (!type.equals("unknown")) {
                                                 int entryY = listY + (i * 36); // Approximate entry height
                                                 
                                                 // Render waystone-type overlay texture based on THIS waystone's type
                                                 ResourceLocation overlayTexture = getOverlayTextureForType(type);
+                                                System.out.println("[WaystoneInjector] Rendering overlay at X=" + listX + ", Y=" + entryY + ", texture=" + overlayTexture);
+                                                
                                                 if (overlayTexture != null) {
                                                     RenderSystem.enableBlend();
                                                     RenderSystem.defaultBlendFunc();
