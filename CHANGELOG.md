@@ -2,7 +2,35 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
-## [Unreleased] - 2025-12-04
+## [3.0.138] - 2025-12-05
+
+### Added
+- **Client-Side Health Monitoring**: Death detection via health monitoring (works with instant respawn)
+- **Server Address Field**: New `serverAddress` config field for each button to enable death/sleep triggers on non-redirect commands
+- **Health-Based Detection**: Monitors player health every tick to detect death (health <= 0) and respawn (health > 0)
+- 2-second cooldown after respawn to prevent duplicate triggers
+- Comprehensive debug logging for death/respawn detection
+- Auto-download dependencies: MouseTweaks and MyServerIsCompatible now install automatically
+
+### Changed
+- Death detection now uses `ClientTickEvent` with health monitoring instead of server-side events
+- Death triggers work with ANY command type (not just `redirect` commands)
+- Improved reliability with instant respawn enabled
+- Simplified death/respawn logic - removed threading delays
+
+### Fixed
+- **MAJOR**: Death triggers now work on client-only mod (previous server events never fired)
+- Death detection now works with instant respawn enabled
+- Death triggers now work with non-redirect commands (e.g., `spawn`, `warp lobby`)
+- Server matching now checks explicit `serverAddress` field first, then falls back to parsing redirect commands
+
+### Technical
+- Switched from `LivingDeathEvent`/`PlayerRespawnEvent` (server-only) to `ClientTickEvent` (client-side)
+- Health monitoring: detects death at health <= 0, respawn when health returns to positive
+- Performance: ~0.001ms per tick, with 2-second skip after detection
+- Added `serverAddress` config field to `WaystoneConfig` for all 6 buttons
+
+## [3.0.133] - 2025-12-04
 
 ### Added
 - **Built-in Death/Sleep Detection**: Client-side death and sleep event detection
