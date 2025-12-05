@@ -45,6 +45,9 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
     
+    // Animated portal background for waystone GUIs
+    private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/portal_animation.png");
+    
     // Sharestone color overlay textures (semi-transparent inner colors)
     private static final ResourceLocation SHARESTONE_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/black.png");
     private static final ResourceLocation SHARESTONE_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/blue.png");
@@ -549,26 +552,32 @@ public class ClientEvents {
         int x = (screenWidth - 256) / 2;
         int y = (screenHeight - 256) / 2;
         
+        // Enable blending for transparency
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        
+        // For all waystones (except sharestones), render animated portal background first
+        if (!waystoneType.equals("sharestone")) {
+            // Render animated portal texture behind the waystone GUI
+            graphics.blit(PORTAL_ANIMATION, x, y, 0, 0, 256, 256, 256, 256);
+        }
+        
         // For sharestones, render the color overlay first (as background), then the main texture on top
         if (waystoneType.equals("sharestone")) {
             String color = currentSharestoneColor.get();
             ResourceLocation colorOverlay = getSharestoneColorTexture(color);
-            
-            // Enable blending for transparency
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
             
             // Render semi-transparent color overlay first
             graphics.blit(colorOverlay, x, y, 0, 0, 256, 256, 256, 256);
             
             // Render main sharestone texture on top
             graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
-            
-            RenderSystem.disableBlend();
         } else {
-            // Regular rendering for non-sharestone types
+            // For regular waystones, render the main texture on top of portal animation
             graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
         }
+        
+        RenderSystem.disableBlend();
     }
     
     @SubscribeEvent
