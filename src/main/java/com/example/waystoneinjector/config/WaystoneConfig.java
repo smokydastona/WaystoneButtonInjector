@@ -20,6 +20,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON1_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON1_SLEEP_CHANCE;
@@ -33,6 +34,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON2_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON2_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON2_SLEEP_CHANCE;
@@ -46,6 +48,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON3_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON3_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON3_SLEEP_CHANCE;
@@ -59,6 +62,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON4_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON4_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON4_SLEEP_CHANCE;
@@ -72,6 +76,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON5_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON5_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON5_SLEEP_CHANCE;
@@ -85,6 +90,7 @@ public class WaystoneConfig {
     public static final ForgeConfigSpec.IntValue BUTTON6_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_TEXT_COLOR;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SIDE;
+    public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SERVER_ADDRESS;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_DEATH_REDIRECT;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON6_SLEEP_REDIRECT;
     public static final ForgeConfigSpec.IntValue BUTTON6_SLEEP_CHANCE;
@@ -215,6 +221,11 @@ public class WaystoneConfig {
                 .comment("Placement: 'auto' (balanced), 'left' (force left side), 'right' (force right side)")
                 .define("side", "auto");
         
+        BUTTON1_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (e.g., 'play.example.com' or 'localhost')",
+                        "If empty, will auto-detect from 'command' field (only works for 'redirect' commands)")
+                .define("serverAddress", "");
+        
         BUTTON1_X_OFFSET = builder
                 .comment("Horizontal adjustment in pixels (negative = left, positive = right)")
                 .defineInRange("xOffset", 0, -500, 500);
@@ -259,6 +270,9 @@ public class WaystoneConfig {
         BUTTON2_HEIGHT = builder.defineInRange("height", 30, 15, 100);
         BUTTON2_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON2_SIDE = builder.define("side", "auto");
+        BUTTON2_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (auto-detects from 'command' if empty)")
+                .define("serverAddress", "");
         BUTTON2_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
         BUTTON2_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON2_DEATH_REDIRECT = builder.define("deathRedirect", "");
@@ -277,6 +291,9 @@ public class WaystoneConfig {
         BUTTON3_HEIGHT = builder.defineInRange("height", 30, 15, 100);
         BUTTON3_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON3_SIDE = builder.define("side", "auto");
+        BUTTON3_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (auto-detects from 'command' if empty)")
+                .define("serverAddress", "");
         BUTTON3_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
         BUTTON3_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON3_DEATH_REDIRECT = builder.define("deathRedirect", "");
@@ -295,6 +312,9 @@ public class WaystoneConfig {
         BUTTON4_HEIGHT = builder.defineInRange("height", 30, 15, 100);
         BUTTON4_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON4_SIDE = builder.define("side", "auto");
+        BUTTON4_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (auto-detects from 'command' if empty)")
+                .define("serverAddress", "");
         BUTTON4_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
         BUTTON4_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON4_DEATH_REDIRECT = builder.define("deathRedirect", "");
@@ -313,6 +333,9 @@ public class WaystoneConfig {
         BUTTON5_HEIGHT = builder.defineInRange("height", 30, 15, 100);
         BUTTON5_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON5_SIDE = builder.define("side", "auto");
+        BUTTON5_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (auto-detects from 'command' if empty)")
+                .define("serverAddress", "");
         BUTTON5_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
         BUTTON5_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON5_DEATH_REDIRECT = builder.define("deathRedirect", "");
@@ -331,6 +354,9 @@ public class WaystoneConfig {
         BUTTON6_HEIGHT = builder.defineInRange("height", 30, 15, 100);
         BUTTON6_TEXT_COLOR = builder.define("textColor", "0xFFFFFF");
         BUTTON6_SIDE = builder.define("side", "auto");
+        BUTTON6_SERVER_ADDRESS = builder
+                .comment("Server address to match for death/sleep redirects (auto-detects from 'command' if empty)")
+                .define("serverAddress", "");
         BUTTON6_X_OFFSET = builder.defineInRange("xOffset", 0, -500, 500);
         BUTTON6_Y_OFFSET = builder.defineInRange("yOffset", 0, -500, 500);
         BUTTON6_DEATH_REDIRECT = builder.define("deathRedirect", "");
@@ -395,27 +421,27 @@ public class WaystoneConfig {
     public static String getDeathRedirectServer(String currentServer) {
         // Check each button's command to see if it matches the current server
         // If it does, return that button's death redirect setting
-        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+        if (BUTTON1_ENABLED.get() && serverMatches(currentServer, BUTTON1_SERVER_ADDRESS.get(), BUTTON1_COMMAND.get())) {
             String redirect = BUTTON1_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+        if (BUTTON2_ENABLED.get() && serverMatches(currentServer, BUTTON2_SERVER_ADDRESS.get(), BUTTON2_COMMAND.get())) {
             String redirect = BUTTON2_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+        if (BUTTON3_ENABLED.get() && serverMatches(currentServer, BUTTON3_SERVER_ADDRESS.get(), BUTTON3_COMMAND.get())) {
             String redirect = BUTTON3_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+        if (BUTTON4_ENABLED.get() && serverMatches(currentServer, BUTTON4_SERVER_ADDRESS.get(), BUTTON4_COMMAND.get())) {
             String redirect = BUTTON4_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+        if (BUTTON5_ENABLED.get() && serverMatches(currentServer, BUTTON5_SERVER_ADDRESS.get(), BUTTON5_COMMAND.get())) {
             String redirect = BUTTON5_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+        if (BUTTON6_ENABLED.get() && serverMatches(currentServer, BUTTON6_SERVER_ADDRESS.get(), BUTTON6_COMMAND.get())) {
             String redirect = BUTTON6_DEATH_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
@@ -445,27 +471,27 @@ public class WaystoneConfig {
     public static String getSleepRedirectServer(String currentServer) {
         // Check each button's command to see if it matches the current server
         // If it does, return that button's sleep redirect setting
-        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+        if (BUTTON1_ENABLED.get() && serverMatches(currentServer, BUTTON1_SERVER_ADDRESS.get(), BUTTON1_COMMAND.get())) {
             String redirect = BUTTON1_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+        if (BUTTON2_ENABLED.get() && serverMatches(currentServer, BUTTON2_SERVER_ADDRESS.get(), BUTTON2_COMMAND.get())) {
             String redirect = BUTTON2_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+        if (BUTTON3_ENABLED.get() && serverMatches(currentServer, BUTTON3_SERVER_ADDRESS.get(), BUTTON3_COMMAND.get())) {
             String redirect = BUTTON3_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+        if (BUTTON4_ENABLED.get() && serverMatches(currentServer, BUTTON4_SERVER_ADDRESS.get(), BUTTON4_COMMAND.get())) {
             String redirect = BUTTON4_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+        if (BUTTON5_ENABLED.get() && serverMatches(currentServer, BUTTON5_SERVER_ADDRESS.get(), BUTTON5_COMMAND.get())) {
             String redirect = BUTTON5_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
-        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+        if (BUTTON6_ENABLED.get() && serverMatches(currentServer, BUTTON6_SERVER_ADDRESS.get(), BUTTON6_COMMAND.get())) {
             String redirect = BUTTON6_SLEEP_REDIRECT.get();
             return redirect.isEmpty() ? null : redirect;
         }
@@ -492,41 +518,47 @@ public class WaystoneConfig {
     
     // Get sleep chance percentage for current server
     public static int getSleepChance(String currentServer) {
-        if (BUTTON1_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON1_COMMAND.get())) {
+        if (BUTTON1_ENABLED.get() && serverMatches(currentServer, BUTTON1_SERVER_ADDRESS.get(), BUTTON1_COMMAND.get())) {
             return BUTTON1_SLEEP_CHANCE.get();
         }
-        if (BUTTON2_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON2_COMMAND.get())) {
+        if (BUTTON2_ENABLED.get() && serverMatches(currentServer, BUTTON2_SERVER_ADDRESS.get(), BUTTON2_COMMAND.get())) {
             return BUTTON2_SLEEP_CHANCE.get();
         }
-        if (BUTTON3_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON3_COMMAND.get())) {
+        if (BUTTON3_ENABLED.get() && serverMatches(currentServer, BUTTON3_SERVER_ADDRESS.get(), BUTTON3_COMMAND.get())) {
             return BUTTON3_SLEEP_CHANCE.get();
         }
-        if (BUTTON4_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON4_COMMAND.get())) {
+        if (BUTTON4_ENABLED.get() && serverMatches(currentServer, BUTTON4_SERVER_ADDRESS.get(), BUTTON4_COMMAND.get())) {
             return BUTTON4_SLEEP_CHANCE.get();
         }
-        if (BUTTON5_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON5_COMMAND.get())) {
+        if (BUTTON5_ENABLED.get() && serverMatches(currentServer, BUTTON5_SERVER_ADDRESS.get(), BUTTON5_COMMAND.get())) {
             return BUTTON5_SLEEP_CHANCE.get();
         }
-        if (BUTTON6_ENABLED.get() && serverMatchesCommand(currentServer, BUTTON6_COMMAND.get())) {
+        if (BUTTON6_ENABLED.get() && serverMatches(currentServer, BUTTON6_SERVER_ADDRESS.get(), BUTTON6_COMMAND.get())) {
             return BUTTON6_SLEEP_CHANCE.get();
         }
         return 100; // Default 100% if no button matches
     }
     
     // Helper method to check if current server matches a button's command
-    private static boolean serverMatchesCommand(String currentServer, String command) {
-        // Parse "redirect server.address.com" or "redirect @s server.address.com"
-        String[] parts = command.trim().split("\\s+");
-        if (parts.length >= 2 && parts[0].equalsIgnoreCase("redirect")) {
-            String serverAddress;
-            if (parts[1].equals("@s") && parts.length >= 3) {
-                serverAddress = parts[2];
-            } else {
-                serverAddress = parts[1];
-            }
-            // Match current server (case-insensitive, partial match)
+    private static boolean serverMatches(String currentServer, String serverAddress, String command) {
+        // First check explicit serverAddress field (takes priority)
+        if (serverAddress != null && !serverAddress.isEmpty()) {
             return currentServer.toLowerCase().contains(serverAddress.toLowerCase()) ||
                    serverAddress.toLowerCase().contains(currentServer.toLowerCase());
+        }
+        
+        // Fall back to parsing "redirect" command for server address
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length >= 2 && parts[0].equalsIgnoreCase("redirect")) {
+            String extractedAddress;
+            if (parts[1].equals("@s") && parts.length >= 3) {
+                extractedAddress = parts[2];
+            } else {
+                extractedAddress = parts[1];
+            }
+            // Match current server (case-insensitive, partial match)
+            return currentServer.toLowerCase().contains(extractedAddress.toLowerCase()) ||
+                   extractedAddress.toLowerCase().contains(currentServer.toLowerCase());
         }
         return false;
     }
