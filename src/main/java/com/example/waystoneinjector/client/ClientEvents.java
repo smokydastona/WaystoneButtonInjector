@@ -138,6 +138,9 @@ public class ClientEvents {
         
         currentWaystoneType.set(detectedType);
         System.out.println("[WaystoneInjector] Pre-set waystone type to: " + detectedType);
+        if (detectedType.equals("sharestone")) {
+            System.out.println("[WaystoneInjector] Sharestone color set to: " + currentSharestoneColor.get());
+        }
     }
 
     @SubscribeEvent
@@ -171,6 +174,9 @@ public class ClientEvents {
             // Try to detect waystone type from the screen (as backup if right-click didn't work)
             detectWaystoneType(screen);
             System.out.println("[WaystoneInjector] ✓ Final detected type: " + currentWaystoneType.get());
+            if (currentWaystoneType.get().equals("sharestone")) {
+                System.out.println("[WaystoneInjector] ✓ Sharestone color: " + currentSharestoneColor.get());
+            }
             
             // Store screen reference
             currentWaystoneScreen.set(screen);
