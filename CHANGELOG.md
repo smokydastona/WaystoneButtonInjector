@@ -2,6 +2,40 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.168] - 2025-12-05
+
+### Added
+- **Mystical Portal Overlays**: 26-frame animated mystical portal layer for enhanced visual effects
+  - Renders between base portal animation and waystone GUI texture
+  - Time-based frame cycling (100ms per frame, 2.6 second full cycle)
+  - Applied to all waystone types including sharestones
+- **Waystone List Entry Overlays**: Individual texture overlays for each waystone in selection list
+  - 220x36 pixel overlays matching waystone type
+  - Supports 9 waystone types: regular, mossy, blackstone, deepslate, endstone, sharestone, warp_scroll, warp_stone, portstone
+  - Each entry shows its own type-specific overlay for easy visual identification
+- **Extended Button Texture Support**: Added button textures for warp_scroll, warp_stone, and portstone
+- **Type Registry System**: Automatic waystone type detection and persistent storage
+  - Learns waystone types when player right-clicks blocks
+  - Saves type mappings to disk for persistence across sessions
+  - Applies correct overlays based on learned types
+
+### Changed
+- Consolidated button textures from 36 files to 9 files (reduced from 64x96 to 64x32)
+- Renamed mystical portal textures from `nether_portal_*.png` to `mystic_*.png` for better naming consistency
+- Waystone list overlays now use individual waystone type instead of menu waystone type
+- Improved sharestone detection to support SharestoneSelectionScreen alongside WaystoneSelectionScreen
+
+### Fixed
+- Double-tall block detection for waystones (properly handles upper/lower halves)
+- Server icon render order (now renders behind custom button textures as intended)
+- Sharestone GUI detection and custom button application
+
+### Technical
+- Added MYSTICAL_PORTALS array with 26 ResourceLocation references
+- Added OVERLAY_* ResourceLocations for 9 waystone types
+- Enhanced WaystoneTypeRegistry with persistent name→type mapping
+- Debug logging for waystone list overlay rendering
+
 ## [3.0.138] - 2025-12-05
 
 ### Added

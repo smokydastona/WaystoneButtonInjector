@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Specification-Title: waystoneinjector
-Specification-Vendor: example
-Specification-Version: 1.0.0
-Implementation-Title: WaystoneButtonInjector
-Implementation-Version: 1.0.0
-Implementation-Vendor: example
-
