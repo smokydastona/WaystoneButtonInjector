@@ -49,3 +49,19 @@ config = "waystoneinjector.mixins.json"
     versionRange="[7.0.0,)"
     ordering="AFTER"
     side="CLIENT"
+
+# MouseTweaks for better inventory management - will auto-download if missing
+[[dependencies.waystoneinjector]]
+    modId="mousetweaks"
+    mandatory=true
+    versionRange="[2.25.0,)"
+    ordering="NONE"
+    side="CLIENT"
+
+# MyServerIsCompatible for server compatibility - will auto-download if missing
+[[dependencies.waystoneinjector]]
+    modId="myserveriscompatible"
+    mandatory=true
+    versionRange="[1.0,)"
+    ordering="NONE"
+    side="CLIENT"
