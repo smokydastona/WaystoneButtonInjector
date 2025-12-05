@@ -1,8 +1,6 @@
 package com.example.waystoneinjector.client.gui.screen;
 
 import com.example.waystoneinjector.client.gui.widget.ThemedButton;
-import com.example.waystoneinjector.config.WaystoneConfig;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;

@@ -72,10 +72,9 @@ minecraft {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
     
-    // Waystones API from Maven - using compileOnly since we only need it at compile time
-    // The actual mod will be present at runtime
-    compileOnly fg.deobf('net.blay09.mods:waystones-forge:1.20.1-14.1.17')
-    compileOnly fg.deobf('net.blay09.mods:balm-forge:1.20.1-7.3.9')
+    // Waystones API from Maven - correct version format with +
+    compileOnly fg.deobf('net.blay09.mods:waystones-forge:14.1.17+1.20.1')
+    compileOnly fg.deobf('net.blay09.mods:balm-forge:7.3.9+1.20.1')
 }
 
 jar {
