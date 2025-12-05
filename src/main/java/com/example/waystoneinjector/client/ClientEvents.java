@@ -55,6 +55,9 @@ public class ClientEvents {
     private static final ResourceLocation OVERLAY_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/deepslate.png");
     private static final ResourceLocation OVERLAY_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/endstone.png");
     private static final ResourceLocation OVERLAY_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/sharestone.png");
+    private static final ResourceLocation OVERLAY_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/overlays/warp_scroll.png");
+    private static final ResourceLocation OVERLAY_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/warp_stone.png");
+    private static final ResourceLocation OVERLAY_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/portstone.png");
     
     // Mystical portal overlay textures (26 frames for random selection)
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
@@ -867,6 +870,9 @@ public class ClientEvents {
             case "deepslate" -> OVERLAY_DEEPSLATE;
             case "endstone" -> OVERLAY_ENDSTONE;
             case "sharestone" -> OVERLAY_SHARESTONE;
+            case "warp_scroll" -> OVERLAY_WARP_SCROLL;
+            case "warp_stone" -> OVERLAY_WARP_STONE;
+            case "portstone" -> OVERLAY_PORTSTONE;
             default -> OVERLAY_REGULAR;
         };
     }
