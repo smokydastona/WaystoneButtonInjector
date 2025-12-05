@@ -716,11 +716,10 @@ public class ClientEvents {
                                             String type = WaystoneTypeRegistry.getWaystoneType(waystoneName);
                                             
                                             if (!type.equals("unknown")) {
-                                                int color = WaystoneTypeRegistry.getColorForType(type);
                                                 int entryY = listY + (i * 36); // Approximate entry height
                                                 
-                                                // Render waystone-type overlay texture instead of colored fill
-                                                ResourceLocation overlayTexture = getOverlayTextureForType(currentWaystoneType.get());
+                                                // Render waystone-type overlay texture based on THIS waystone's type
+                                                ResourceLocation overlayTexture = getOverlayTextureForType(type);
                                                 if (overlayTexture != null) {
                                                     RenderSystem.enableBlend();
                                                     RenderSystem.defaultBlendFunc();
