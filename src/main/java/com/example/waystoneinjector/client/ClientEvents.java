@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -86,6 +87,22 @@ public class ClientEvents {
         Level level = event.getLevel();
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
+        
+        // Handle double-tall blocks (waystones and sharestones) - if clicking upper half, check lower half
+        try {
+            if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+                DoubleBlockHalf half = state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.DOUBLE_BLOCK_HALF);
+                if (half == DoubleBlockHalf.UPPER) {
+                    // Get the lower block position and state
+                    pos = pos.below();
+                    state = level.getBlockState(pos);
+                    block = state.getBlock();
+                    System.out.println("[WaystoneInjector] Clicked upper half, checking lower block");
+                }
+            }
+        } catch (Exception e) {
+            // Property might not exist, continue anyway
+        }
         
         // Get block's registry key
         ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
