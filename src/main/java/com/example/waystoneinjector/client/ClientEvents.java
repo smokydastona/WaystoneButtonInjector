@@ -1,22 +1,17 @@
 package com.example.waystoneinjector.client;
 
-import com.example.waystoneinjector.client.gui.screen.CustomWaystoneSelectionScreen;
 import com.example.waystoneinjector.client.gui.widget.ThemedButton;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,52 +44,6 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
-
-    @SubscribeEvent
-    public static void onScreenOpening(ScreenEvent.Opening event) {
-        Screen screen = event.getScreen();
-        if (screen == null) return;
-        
-        String className = screen.getClass().getName();
-        
-        // Intercept Waystones selection screen
-        if (className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
-            System.out.println("[WaystoneInjector] *** Intercepting Waystone Screen - Replacing with Custom Screen ***");
-            
-            try {
-                // Extract menu and inventory from original screen using reflection
-                if (screen instanceof AbstractContainerScreen) {
-                    AbstractContainerScreen<?> containerScreen = (AbstractContainerScreen<?>) screen;
-                    
-                    Field menuField = AbstractContainerScreen.class.getDeclaredField("menu");
-                    menuField.setAccessible(true);
-                    AbstractContainerMenu menu = (AbstractContainerMenu) menuField.get(containerScreen);
-                    
-                    // Get player inventory
-                    Inventory inventory = Minecraft.getInstance().player.getInventory();
-                    
-                    // Create custom screen with the same menu
-                    CustomWaystoneSelectionScreen customScreen = new CustomWaystoneSelectionScreen(
-                        (WaystoneSelectionMenu) menu,
-                        inventory,
-                        screen.getTitle()
-                    );
-                    
-                    // Pass waystone type to custom screen
-                    String waystoneType = currentWaystoneType.get();
-                    CustomWaystoneSelectionScreen.setWaystoneType(waystoneType);
-                    
-                    // Replace the screen
-                    event.setNewScreen(customScreen);
-                    
-                    System.out.println("[WaystoneInjector] ✓ Replaced with CustomWaystoneSelectionScreen (type: " + waystoneType + ")");
-                }
-            } catch (Exception e) {
-                System.err.println("[WaystoneInjector] Failed to replace screen: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -174,8 +123,44 @@ public class ClientEvents {
             
             // Find and store waystone list for keyboard navigation
             findWaystoneList(screen);
+            
+            // Hide pagination buttons (Next/Previous)
+            hidePaginationButtons(screen, event);
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] ERROR in onScreenInit: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private static void hidePaginationButtons(Screen screen, ScreenEvent.Init.Post event) {
+        try {
+            System.out.println("[WaystoneInjector] Attempting to hide pagination buttons...");
+            
+            // Find and hide "Next Page" and "Previous Page" buttons
+            List<?> renderables = event.getListenersList();
+            int hiddenCount = 0;
+            
+            for (Object widget : renderables) {
+                if (widget instanceof net.minecraft.client.gui.components.Button) {
+                    net.minecraft.client.gui.components.Button button = (net.minecraft.client.gui.components.Button) widget;
+                    Component message = button.getMessage();
+                    String text = message.getString().toLowerCase();
+                    
+                    // Check if it's a pagination button
+                    if (text.contains("next") || text.contains("previous") || text.contains("page")) {
+                        // Hide the button by setting it invisible and inactive
+                        button.visible = false;
+                        button.active = false;
+                        hiddenCount++;
+                        System.out.println("[WaystoneInjector] ✓ Hidden pagination button: " + text);
+                    }
+                }
+            }
+            
+            System.out.println("[WaystoneInjector] ✓ Hidden " + hiddenCount + " pagination buttons");
+            
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Error hiding pagination buttons: " + e.getMessage());
             e.printStackTrace();
         }
     }
