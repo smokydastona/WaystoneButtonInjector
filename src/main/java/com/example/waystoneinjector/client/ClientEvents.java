@@ -175,12 +175,21 @@ public class ClientEvents {
             String className = screen.getClass().getName();
             System.out.println("[WaystoneInjector] Screen detected: " + className);
         
-            if (!className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
-                System.out.println("[WaystoneInjector] Not a waystone screen, ignoring");
+            boolean isWaystoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen");
+            boolean isSharestoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.SharestoneSelectionScreen");
+            
+            if (!isWaystoneScreen && !isSharestoneScreen) {
+                System.out.println("[WaystoneInjector] Not a waystone/sharestone screen, ignoring");
                 return;
             }
 
-            System.out.println("[WaystoneInjector] ✓✓✓ WAYSTONE SCREEN DETECTED! Adding enhancements... ✓✓✓");
+            System.out.println("[WaystoneInjector] ✓✓✓ WAYSTONE/SHARESTONE SCREEN DETECTED! Adding enhancements... ✓✓✓");
+            
+            // If it's a sharestone screen and we didn't detect the type yet, set it now
+            if (isSharestoneScreen && !currentWaystoneType.get().equals("sharestone")) {
+                currentWaystoneType.set("sharestone");
+                System.out.println("[WaystoneInjector] Set type to sharestone based on screen class");
+            }
             
             // Check if player is holding a teleport item
             detectTeleportItem();
