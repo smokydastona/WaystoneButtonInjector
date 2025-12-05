@@ -577,15 +577,20 @@ public class ClientEvents {
             graphics.blit(PORTAL_ANIMATION, x, y, 0, 0, 256, 256, 256, 256);
         }
         
-        // For sharestones, render the main texture first, then the semi-transparent color overlay on top
+        // For sharestones, render the color overlay first (as background), then the main opaque sharestone texture on top
         if (waystoneType.equals("sharestone")) {
-            // Render main sharestone texture first
-            graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
-            
-            // Render semi-transparent color overlay on top
             String color = currentSharestoneColor.get();
             ResourceLocation colorOverlay = getSharestoneColorTexture(color);
+            
+            System.out.println("[WaystoneInjector] Rendering sharestone - Color: " + color + ", Overlay: " + colorOverlay);
+            
+            // Render semi-transparent color overlay first (background layer)
             graphics.blit(colorOverlay, x, y, 0, 0, 256, 256, 256, 256);
+            
+            // Render main sharestone texture on top (should have transparent areas for color to show through)
+            graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+            
+            System.out.println("[WaystoneInjector] Sharestone rendering complete");
         } else {
             // For regular waystones, render the main texture on top of portal animation
             graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
