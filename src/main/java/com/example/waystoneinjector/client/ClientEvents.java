@@ -136,58 +136,75 @@ public class ClientEvents {
         try {
             System.out.println("[WaystoneInjector] Attempting to enable continuous scrolling...");
             
-            // Find the waystone list widget using reflection
+            // Find the waystone list widget
             Object waystoneList = null;
+            
             for (Field field : screen.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = field.get(screen);
                 
                 if (value != null && value.getClass().getSimpleName().contains("WaystoneList")) {
                     waystoneList = value;
-                    System.out.println("[WaystoneInjector] Found waystone list: " + value.getClass().getName());
+                    System.out.println("[WaystoneInjector] ✓ Found waystone list: " + value.getClass().getName());
                     break;
                 }
             }
             
             if (waystoneList == null) {
-                System.err.println("[WaystoneInjector] Could not find waystone list!");
+                System.err.println("[WaystoneInjector] ERROR: Could not find waystone list widget!");
                 return;
             }
             
-            // Dump all fields to see what we have
-            System.out.println("[WaystoneInjector] Waystone list fields:");
-            for (Field field : waystoneList.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                System.out.println("  - " + field.getName() + " (" + field.getType().getSimpleName() + ")");
-            }
-            
-            // Try to find and modify pagination-related fields
-            boolean modified = false;
-            for (Field field : waystoneList.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                String fieldName = field.getName();
+            // Access the parent AbstractSelectionList class fields
+            Class<?> currentClass = waystoneList.getClass();
+            while (currentClass != null) {
+                System.out.println("[WaystoneInjector] Checking class: " + currentClass.getName());
                 
-                // Look for page-related fields
-                if (fieldName.contains("page") || fieldName.contains("Page")) {
-                    if (field.getType() == int.class || field.getType() == Integer.class) {
-                        try {
-                            int currentValue = field.getInt(waystoneList);
-                            System.out.println("[WaystoneInjector] Found field: " + fieldName + " = " + currentValue);
-                            
-                            // If it's itemsPerPage or similar, set it very high
-                            if (fieldName.toLowerCase().contains("per") || fieldName.toLowerCase().contains("size")) {
-                                field.setInt(waystoneList, 999);
-                                System.out.println("[WaystoneInjector] ✓ Set " + fieldName + " to 999");
-                                modified = true;
+                for (Field field : currentClass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    String fieldName = field.getName();
+                    
+                    try {
+                        // Look for itemHeight, height, y0, y1 - these control visible area
+                        if (fieldName.equals("itemHeight") || fieldName.equals("y0") || fieldName.equals("y1") || 
+                            fieldName.equals("height") || fieldName.equals("bottom")) {
+                            if (field.getType() == int.class) {
+                                int value = field.getInt(waystoneList);
+                                System.out.println("[WaystoneInjector]   Field: " + fieldName + " = " + value);
+                                
+                                // Increase the visible area
+                                if (fieldName.equals("y1") || fieldName.equals("bottom")) {
+                                    field.setInt(waystoneList, screen.height - 40); // Extend to near bottom
+                                    System.out.println("[WaystoneInjector]   ✓ Extended " + fieldName + " to " + (screen.height - 40));
+                                }
+                                if (fieldName.equals("y0")) {
+                                    field.setInt(waystoneList, 40); // Start near top
+                                    System.out.println("[WaystoneInjector]   ✓ Set " + fieldName + " to 40");
+                                }
                             }
-                        } catch (Exception e) {
-                            System.err.println("[WaystoneInjector] Error modifying field " + fieldName + ": " + e.getMessage());
                         }
+                        
+                        // Look for children/entries list to count total waystones
+                        if (fieldName.equals("children") || fieldName.equals("entries")) {
+                            Object entriesList = field.get(waystoneList);
+                            if (entriesList instanceof List) {
+                                int totalWaystones = ((List<?>) entriesList).size();
+                                System.out.println("[WaystoneInjector]   ✓ Total waystones in list: " + totalWaystones);
+                            }
+                        }
+                        
+                    } catch (Exception e) {
+                        // Skip fields we can't access
                     }
+                }
+                
+                currentClass = currentClass.getSuperclass();
+                if (currentClass != null && currentClass.getName().equals("java.lang.Object")) {
+                    break;
                 }
             }
             
-            // Now hide the pagination buttons
+            // Hide pagination buttons since we're showing everything
             List<?> renderables = event.getListenersList();
             int hiddenCount = 0;
             
@@ -197,7 +214,6 @@ public class ClientEvents {
                     Component message = button.getMessage();
                     String text = message.getString().toLowerCase();
                     
-                    // Check if it's a pagination button
                     if (text.contains("next") || text.contains("previous") || text.contains("page")) {
                         button.visible = false;
                         button.active = false;
@@ -207,8 +223,7 @@ public class ClientEvents {
                 }
             }
             
-            System.out.println("[WaystoneInjector] ✓ Hidden " + hiddenCount + " pagination buttons");
-            System.out.println("[WaystoneInjector] ✓ Modified pagination: " + modified);
+            System.out.println("[WaystoneInjector] ✓ Pagination setup complete. Hidden " + hiddenCount + " buttons.");
             
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] Error enabling continuous scrolling: " + e.getMessage());
