@@ -1,6 +1,5 @@
 package com.example.waystoneinjector.client;
 
-import com.example.waystoneinjector.client.gui.screen.CustomWaystoneScreen;
 import com.example.waystoneinjector.client.gui.widget.ThemedButton;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -82,26 +81,6 @@ public class ClientEvents {
         currentWaystoneType.set(detectedType);
         System.out.println("[WaystoneInjector] Pre-set waystone type to: " + detectedType);
     }
-    
-    @SubscribeEvent
-    public static void onScreenOpening(ScreenEvent.Opening event) {
-        try {
-            Screen screen = event.getScreen();
-            if (screen == null) return;
-            
-            String className = screen.getClass().getName();
-            if (className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen")) {
-                System.out.println("[WaystoneInjector] ✓ Intercepting Waystone screen, replacing with custom screen!");
-                
-                // Replace with our custom screen
-                CustomWaystoneScreen customScreen = new CustomWaystoneScreen(screen, currentWaystoneType::get);
-                event.setNewScreen(customScreen);
-            }
-        } catch (Exception e) {
-            System.err.println("[WaystoneInjector] Error in onScreenOpening: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -110,12 +89,6 @@ public class ClientEvents {
             Screen screen = event.getScreen();
             if (screen == null) {
                 System.out.println("[WaystoneInjector] Screen is null, returning");
-                return;
-            }
-
-            // Check if it's our custom screen
-            if (screen instanceof CustomWaystoneScreen) {
-                System.out.println("[WaystoneInjector] Custom waystone screen detected, skipping injection");
                 return;
             }
 
