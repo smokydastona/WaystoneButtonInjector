@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import java.util.function.Supplier;
 
 /**
  * Custom button that renders with waystone-type themed background textures
@@ -12,16 +13,16 @@ import net.minecraft.resources.ResourceLocation;
 @SuppressWarnings("null")
 public class ThemedButton extends Button {
     
-    private final String waystoneType;
+    private final Supplier<String> waystoneTypeSupplier;
     private final String side; // "left" or "right"
     private final int buttonIndex; // 0-2 for position in stack
     private final int totalButtons; // Total buttons on this side (1-3)
     
     public ThemedButton(int x, int y, int width, int height, Component message, 
-                       OnPress onPress, String waystoneType, String side, 
+                       OnPress onPress, Supplier<String> waystoneTypeSupplier, String side, 
                        int buttonIndex, int totalButtons) {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
-        this.waystoneType = waystoneType;
+        this.waystoneTypeSupplier = waystoneTypeSupplier;
         this.side = side;
         this.buttonIndex = buttonIndex;
         this.totalButtons = totalButtons;
@@ -70,8 +71,11 @@ public class ThemedButton extends Button {
         //   - mossy_right_2.png (2 buttons on right)
         //   - sharestone_left_3.png (3 buttons on left)
         
+        // Get current waystone type dynamically
+        String currentType = waystoneTypeSupplier.get();
+        
         String filename = String.format("textures/gui/buttons/%s_%s_%d.png", 
-            waystoneType, side, totalButtons);
+            currentType, side, totalButtons);
         
         return new ResourceLocation("waystoneinjector", filename);
     }

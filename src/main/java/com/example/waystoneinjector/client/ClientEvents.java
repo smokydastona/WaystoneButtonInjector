@@ -720,12 +720,12 @@ public class ClientEvents {
             
             System.out.println("[WaystoneInjector] ✓ Creating LEFT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
             
-            // Create themed button with waystone type background
+            // Create themed button with waystone type background (using supplier for dynamic updates)
             ThemedButton button = new ThemedButton(
                 x, y, config.width, config.height,
                 labelComponent,
                 btn -> handleServerTransfer(command),
-                currentWaystoneType.get(),
+                currentWaystoneType::get,  // Pass supplier that always gets current type
                 "left",
                 i,
                 leftButtons.size()
@@ -755,12 +755,12 @@ public class ClientEvents {
             
             System.out.println("[WaystoneInjector] ✓ Creating RIGHT button " + (i+1) + ": '" + config.label + "' at (" + x + "," + y + ") type=" + currentWaystoneType.get());
             
-            // Create themed button with waystone type background
+            // Create themed button with waystone type background (using supplier for dynamic updates)
             ThemedButton button = new ThemedButton(
                 x, y, config.width, config.height,
                 labelComponent,
                 btn -> handleServerTransfer(command),
-                currentWaystoneType.get(),
+                currentWaystoneType::get,  // Pass supplier that always gets current type
                 "right",
                 i,
                 rightButtons.size()
