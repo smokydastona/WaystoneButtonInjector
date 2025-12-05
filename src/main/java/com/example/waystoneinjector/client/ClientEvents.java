@@ -44,6 +44,27 @@ public class ClientEvents {
     private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
     private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
     private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
+    
+    // Sharestone color overlay textures (semi-transparent inner colors)
+    private static final ResourceLocation SHARESTONE_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/black.png");
+    private static final ResourceLocation SHARESTONE_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/blue.png");
+    private static final ResourceLocation SHARESTONE_BROWN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/brown.png");
+    private static final ResourceLocation SHARESTONE_CYAN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/cyan.png");
+    private static final ResourceLocation SHARESTONE_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/gray.png");
+    private static final ResourceLocation SHARESTONE_GREEN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/green.png");
+    private static final ResourceLocation SHARESTONE_LIGHT_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/light_blue.png");
+    private static final ResourceLocation SHARESTONE_LIGHT_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/light_gray.png");
+    private static final ResourceLocation SHARESTONE_LIME = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/lime.png");
+    private static final ResourceLocation SHARESTONE_MAGENTA = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/magenta.png");
+    private static final ResourceLocation SHARESTONE_ORANGE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/orange.png");
+    private static final ResourceLocation SHARESTONE_PINK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/pink.png");
+    private static final ResourceLocation SHARESTONE_PURPLE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/purple.png");
+    private static final ResourceLocation SHARESTONE_RED = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/red.png");
+    private static final ResourceLocation SHARESTONE_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/white.png");
+    private static final ResourceLocation SHARESTONE_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_colors/yellow.png");
+    
+    // Track the specific sharestone color variant
+    private static final ThreadLocal<String> currentSharestoneColor = ThreadLocal.withInitial(() -> "purple");
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -66,8 +87,30 @@ public class ClientEvents {
         
         // Detect type from block registry path
         String detectedType = "regular";
+        String sharestoneColor = "purple"; // Default sharestone color
+        
         if (path.contains("sharestone")) {
             detectedType = "sharestone";
+            // Extract the specific sharestone color
+            if (path.contains("black_")) sharestoneColor = "black";
+            else if (path.contains("blue_")) sharestoneColor = "blue";
+            else if (path.contains("brown_")) sharestoneColor = "brown";
+            else if (path.contains("cyan_")) sharestoneColor = "cyan";
+            else if (path.contains("gray_") && !path.contains("light_gray")) sharestoneColor = "gray";
+            else if (path.contains("green_")) sharestoneColor = "green";
+            else if (path.contains("light_blue_")) sharestoneColor = "light_blue";
+            else if (path.contains("light_gray_")) sharestoneColor = "light_gray";
+            else if (path.contains("lime_")) sharestoneColor = "lime";
+            else if (path.contains("magenta_")) sharestoneColor = "magenta";
+            else if (path.contains("orange_")) sharestoneColor = "orange";
+            else if (path.contains("pink_")) sharestoneColor = "pink";
+            else if (path.contains("purple_")) sharestoneColor = "purple";
+            else if (path.contains("red_")) sharestoneColor = "red";
+            else if (path.contains("white_")) sharestoneColor = "white";
+            else if (path.contains("yellow_")) sharestoneColor = "yellow";
+            
+            currentSharestoneColor.set(sharestoneColor);
+            System.out.println("[WaystoneInjector] Detected sharestone color: " + sharestoneColor);
         } else if (path.contains("mossy")) {
             detectedType = "mossy";
         } else if (path.contains("blackstone")) {
@@ -506,7 +549,26 @@ public class ClientEvents {
         int x = (screenWidth - 256) / 2;
         int y = (screenHeight - 256) / 2;
         
-        graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+        // For sharestones, render the color overlay first (as background), then the main texture on top
+        if (waystoneType.equals("sharestone")) {
+            String color = currentSharestoneColor.get();
+            ResourceLocation colorOverlay = getSharestoneColorTexture(color);
+            
+            // Enable blending for transparency
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            
+            // Render semi-transparent color overlay first
+            graphics.blit(colorOverlay, x, y, 0, 0, 256, 256, 256, 256);
+            
+            // Render main sharestone texture on top
+            graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+            
+            RenderSystem.disableBlend();
+        } else {
+            // Regular rendering for non-sharestone types
+            graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
+        }
     }
     
     @SubscribeEvent
@@ -635,6 +697,28 @@ public class ClientEvents {
             case "deepslate" -> TEXTURE_DEEPSLATE;
             case "endstone" -> TEXTURE_ENDSTONE;
             default -> TEXTURE_REGULAR;
+        };
+    }
+    
+    private static ResourceLocation getSharestoneColorTexture(String color) {
+        return switch (color) {
+            case "black" -> SHARESTONE_BLACK;
+            case "blue" -> SHARESTONE_BLUE;
+            case "brown" -> SHARESTONE_BROWN;
+            case "cyan" -> SHARESTONE_CYAN;
+            case "gray" -> SHARESTONE_GRAY;
+            case "green" -> SHARESTONE_GREEN;
+            case "light_blue" -> SHARESTONE_LIGHT_BLUE;
+            case "light_gray" -> SHARESTONE_LIGHT_GRAY;
+            case "lime" -> SHARESTONE_LIME;
+            case "magenta" -> SHARESTONE_MAGENTA;
+            case "orange" -> SHARESTONE_ORANGE;
+            case "pink" -> SHARESTONE_PINK;
+            case "purple" -> SHARESTONE_PURPLE;
+            case "red" -> SHARESTONE_RED;
+            case "white" -> SHARESTONE_WHITE;
+            case "yellow" -> SHARESTONE_YELLOW;
+            default -> SHARESTONE_PURPLE; // Default to purple
         };
     }
     
