@@ -37,59 +37,59 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void init() {
-        super.init();
-        
-        if (useScrollableList) {
-            // Get waystones list from the menu via reflection
-            try {
-                var menuClass = this.menu.getClass();
-                var waystoneField = menuClass.getDeclaredField("waystones");
-                waystoneField.setAccessible(true);
-                @SuppressWarnings("unchecked")
-                List<IWaystone> waystones = (List<IWaystone>) waystoneField.get(this.menu);
-                
-                // Create scrollable list widget
-                int listTop = this.topPos + 64;
-                int listBottom = this.topPos + this.imageHeight - 25;
-                int listHeight = listBottom - listTop;
-                
-                this.scrollableList = new ScrollableWaystoneList(
-                    this,
-                    this.minecraft,
-                    this.width,
-                    listHeight,
-                    listTop,
-                    listBottom,
-                    40, // Item height (increased for better visibility)
-                    waystones
-                );
-                
-                this.addRenderableWidget(scrollableList);
-                
-            } catch (Exception e) {
-                System.err.println("[WaystoneInjector] Failed to create scrollable list: " + e.getMessage());
-                e.printStackTrace();
-                useScrollableList = false; // Fall back to pagination
-            }
+        // DON'T call super.init() - we're replacing the entire UI
+        // Get waystones list from the menu via reflection
+        try {
+            var menuClass = this.menu.getClass();
+            var waystoneField = menuClass.getDeclaredField("waystones");
+            waystoneField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<IWaystone> waystones = (List<IWaystone>) waystoneField.get(this.menu);
+            
+            // Create scrollable list widget that fills most of the screen
+            int listTop = this.topPos + 80; // Space for mystical portal
+            int listBottom = this.height - 40; // Leave space at bottom
+            int listHeight = listBottom - listTop;
+            
+            this.scrollableList = new ScrollableWaystoneList(
+                this,
+                this.minecraft,
+                this.width,
+                listHeight,
+                listTop,
+                listBottom,
+                40, // Item height
+                waystones
+            );
+            
+            this.addRenderableWidget(scrollableList);
+            
+            System.out.println("[WaystoneInjector] Created scrollable list with " + waystones.size() + " waystones");
+            
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Failed to create scrollable list: " + e.getMessage());
+            e.printStackTrace();
+            // Fall back to default pagination
+            useScrollableList = false;
+            super.init();
         }
     }
     
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        if (useScrollableList) {
-            // Custom rendering with scrollable list
+        if (useScrollableList && scrollableList != null) {
+            // Render background
             this.renderBackground(guiGraphics);
             
-            // Render mystical portal animation
+            // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
             
-            // Render the scrollable list
-            if (scrollableList != null) {
-                scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
-            }
+            // Render title above portal
+            int titleX = this.width / 2 - this.font.width(this.title) / 2;
+            guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
             
-            // Render title
-            guiGraphics.drawString(this.font, this.title, this.leftPos + 8, this.topPos + 6, 0x404040, false);
+            // Render the scrollable list
+            scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
             
         } else {
             // Fall back to default pagination rendering
@@ -109,8 +109,8 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         RenderSystem.defaultBlendFunc();
         
         // Render portal at top center of screen
-        int portalX = this.leftPos + (this.imageWidth - 64) / 2;
-        int portalY = this.topPos + 10;
+        int portalX = this.width / 2 - 32; // Center horizontally
+        int portalY = this.topPos + 20;
         
         guiGraphics.blit(MYSTICAL_PORTALS[animationFrame], portalX, portalY, 0, 0, 64, 64, 64, 64);
         RenderSystem.disableBlend();
@@ -153,11 +153,19 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     protected boolean allowSorting() {
-        return !useScrollableList && super.allowSorting();
+        return false; // Disable sorting in scrollable mode
     }
     
     @Override
     protected boolean allowDeletion() {
-        return !useScrollableList && super.allowDeletion();
+        return false; // Disable deletion in scrollable mode
+    }
+    
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        // Don't render the default background when using scrollable list
+        if (!useScrollableList) {
+            super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        }
     }
 }
