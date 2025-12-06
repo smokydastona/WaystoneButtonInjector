@@ -162,8 +162,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     // Custom GUI textures for the enhanced menu
     private static final ResourceLocation MENU_BACKGROUND = 
         new ResourceLocation("waystoneinjector", "textures/gui/menu_background.png");
-    private static final ResourceLocation LIST_PANEL = 
-        new ResourceLocation("waystoneinjector", "textures/gui/list_panel.png");
     private static final ResourceLocation PORTAL_FRAME = 
         new ResourceLocation("waystoneinjector", "textures/gui/portal_frame.png");
     

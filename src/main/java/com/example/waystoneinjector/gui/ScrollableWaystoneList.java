@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -25,6 +26,11 @@ public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaysto
         for (IWaystone waystone : waystones) {
             this.addEntry(new WaystoneEntry(waystone, xpCostPerWaystone));
         }
+    }
+    
+    @Override
+    protected void renderBackground(@Nonnull GuiGraphics guiGraphics) {
+        // Do nothing - prevent dirt background from rendering
     }
     
     @Override
@@ -49,7 +55,7 @@ public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaysto
         }
         
         @Override
-        public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
+        public void render(@Nonnull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
             // Update button position - Button has public x and y fields in 1.20.1
             waystoneButton.setX(left);
             waystoneButton.setY(top);
