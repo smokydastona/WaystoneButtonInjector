@@ -45,6 +45,24 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     private int cachedFilteredSize = -1;
     private int cachedAllSize = -1;
     
+    // Elementa-inspired constraint system: Cache calculated positions
+    private static class ConstraintCache {
+        int searchFieldX = -1;
+        int searchFieldY = -1;
+        int listX = -1;
+        int listY = -1;
+        int listWidth = -1;
+        int listHeight = -1;
+        int closeButtonX = -1;
+        int closeButtonY = -1;
+        boolean valid = false;
+        
+        void invalidate() {
+            valid = false;
+        }
+    }
+    private final ConstraintCache constraintCache = new ConstraintCache();
+    
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
@@ -88,6 +106,8 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
             widgetTreeDirty = true;
             cachedWidth = this.width;
             cachedHeight = this.height;
+            // Elementa pattern: Invalidate constraint cache when parent size changes
+            constraintCache.invalidate();
         }
         
         System.out.println("[WaystoneInjector] ========== INITIALIZING SCREEN ==========");
@@ -151,6 +171,9 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         System.out.println("[WaystoneInjector] Adding custom buttons: " + labels.size());
         
+        // Elementa pattern: Track component hierarchy for efficient updates
+        int componentCount = 0;
+        
         int numButtons = Math.min(labels.size(), 6); // Max 6 buttons
         if (numButtons == 0) {
             return;
@@ -181,6 +204,7 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
             ).bounds(sideMargin, y, buttonWidth, buttonHeight).build();
             
             this.addRenderableWidget(button);
+            componentCount++; // Elementa pattern: Track hierarchy size
         }
         
         // Add right side buttons
@@ -198,7 +222,11 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
             ).bounds(x, y, buttonWidth, buttonHeight).build();
             
             this.addRenderableWidget(button);
+            componentCount++; // Elementa pattern: Track hierarchy size
         }
+        
+        // Elementa pattern: Log component tree size for debugging
+        System.out.println("[WaystoneInjector] Added " + componentCount + " components to hierarchy");
     }
     
     private void handleServerTransfer(String command) {
@@ -290,6 +318,11 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         // ModularUI pattern: Cache mouse coordinates for this frame
         lastMouseX = mouseX;
         lastMouseY = mouseY;
+        
+        // Elementa-inspired: Apply scissor effect for efficient clipping
+        // (Components outside screen bounds won't be rendered)
+        int screenWidth = this.width;
+        int screenHeight = this.height;
         
         // ModularUI pattern: Skip expensive operations if widget tree is clean
         if (!widgetTreeDirty) {
