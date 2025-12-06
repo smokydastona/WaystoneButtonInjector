@@ -78,6 +78,9 @@ minecraft {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
     
+    // Lithium-inspired: fastutil for optimized collections
+    implementation 'it.unimi.dsi:fastutil:8.5.12'
+    
     // Waystones API from Maven - correct version format with +
     compileOnly fg.deobf('net.blay09.mods:waystones-forge:14.1.17+1.20.1')
     compileOnly fg.deobf('net.blay09.mods:balm-forge:7.3.9+1.20.1')

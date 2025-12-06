@@ -4,6 +4,7 @@ import com.example.waystoneinjector.client.ClientEvents;
 import com.example.waystoneinjector.client.gui.widget.ScrollableWaystoneList;
 import com.example.waystoneinjector.client.gui.widget.WaystoneSearchField;
 import com.example.waystoneinjector.config.WaystoneConfig;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,9 +12,7 @@ import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Enhanced Waystone Selection Screen with Better Waystones Menu features
@@ -41,6 +40,11 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     private int lastMouseX = -1;
     private int lastMouseY = -1;
     
+    // Lithium alloc pattern: Cache Component instances to avoid repeated allocations
+    private Component cachedCountText = null;
+    private int cachedFilteredSize = -1;
+    private int cachedAllSize = -1;
+    
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
@@ -59,7 +63,8 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         // Apply saved order
         this.allWaystones = WaystoneOrderManager.applyOrder(extractedWaystones);
-        this.filteredWaystones = new ArrayList<>(allWaystones);
+        // Lithium pattern: Use fastutil ObjectArrayList for reduced allocations
+        this.filteredWaystones = new ObjectArrayList<>(allWaystones);
         
         System.out.println("[WaystoneInjector] After applyOrder: " + allWaystones.size() + " waystones");
         System.out.println("[WaystoneInjector] Filtered waystones: " + filteredWaystones.size());
@@ -219,14 +224,20 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     }
     
     private void onSearchChanged(String query) {
+        // Lithium alloc pattern: Use fastutil collections and avoid stream overhead
         if (query.isEmpty()) {
-            filteredWaystones = new ArrayList<>(allWaystones);
+            filteredWaystones = new ObjectArrayList<>(allWaystones);
         } else {
             String lowerQuery = query.toLowerCase();
-            filteredWaystones = allWaystones.stream()
-                .filter(ws -> ws.getName().toLowerCase().contains(lowerQuery) ||
-                             ws.getDimensionName().toLowerCase().contains(lowerQuery))
-                .collect(Collectors.toList());
+            // Lithium ai.sensor.replace_streams pattern: Replace stream with traditional iteration
+            ObjectArrayList<WaystoneData> filtered = new ObjectArrayList<>(allWaystones.size());
+            for (WaystoneData ws : allWaystones) {
+                if (ws.getName().toLowerCase().contains(lowerQuery) ||
+                    ws.getDimensionName().toLowerCase().contains(lowerQuery)) {
+                    filtered.add(ws);
+                }
+            }
+            filteredWaystones = filtered;
         }
         
         waystoneList.updateWaystones(filteredWaystones);
@@ -298,9 +309,17 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         );
         
         // Show waystone count and instructions
+        // Lithium alloc pattern: Only create Component when sizes change
+        if (cachedCountText == null || 
+            cachedFilteredSize != filteredWaystones.size() || 
+            cachedAllSize != allWaystones.size()) {
+            cachedFilteredSize = filteredWaystones.size();
+            cachedAllSize = allWaystones.size();
+            cachedCountText = Component.literal("Waystones: " + cachedFilteredSize + " / " + cachedAllSize);
+        }
         graphics.drawCenteredString(
             this.font,
-            Component.literal("Waystones: " + filteredWaystones.size() + " / " + allWaystones.size()),
+            cachedCountText,
             this.width / 2,
             this.height - 45,
             0xAAAAAA
