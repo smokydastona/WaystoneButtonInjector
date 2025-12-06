@@ -155,6 +155,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         this.renderBackground(guiGraphics);
         
         if (useScrollableList && scrollableList != null) {
+            // ModernUI-inspired: Update smooth scroll before rendering
+            scrollableList.renderWithSmoothScroll(guiGraphics, mouseX, mouseY, partialTicks);
+            
             // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
             
