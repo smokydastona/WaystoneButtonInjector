@@ -1,39 +1,33 @@
 package com.example.waystoneinjector.mixin;
 
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
-import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.world.inventory.MenuType;
+import net.blay09.mods.balm.api.client.screen.BalmScreens;
+import net.blay09.mods.waystones.menu.ModMenus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Mixin to register our custom scrollable waystone selection screen
+ * Mixin to register our enhanced waystone selection screen via Balm API
  */
 @Mixin(targets = "net.blay09.mods.waystones.client.ModScreens", remap = false)
 public class MixinModScreens {
     
     /**
-     * Inject after Waystones registers its screen to override it with ours
+     * Inject BEFORE Waystones registers its screens so we can override
      */
-    @Inject(method = "initialize", at = @At("RETURN"), remap = false)
-    private static void replaceWaystoneScreen(CallbackInfo ci) {
+    @Inject(method = "initialize", at = @At("HEAD"), remap = false)
+    private static void registerEnhancedScreen(BalmScreens screens, CallbackInfo ci) {
         try {
-            // Get the WaystoneSelectionMenu type
-            var modMenusClass = Class.forName("net.blay09.mods.waystones.menu.ModMenus");
-            var waystoneSelectionField = modMenusClass.getDeclaredField("waystoneSelection");
-            waystoneSelectionField.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            MenuType<WaystoneSelectionMenu> menuType = (MenuType<WaystoneSelectionMenu>) waystoneSelectionField.get(null);
+            System.out.println("[WaystoneInjector] ✓✓✓ MixinModScreens.initialize() CALLED ✓✓✓");
             
-            // Register our enhanced screen that properly extends WaystoneSelectionScreenBase
-            MenuScreens.register(menuType, EnhancedWaystoneSelectionScreen::new);
+            // Register our enhanced screen FIRST - Balm will use the first registration
+            screens.registerScreen(() -> ModMenus.waystoneSelection.get(), EnhancedWaystoneSelectionScreen::new);
             
-            System.out.println("[WaystoneInjector] Successfully replaced waystone selection screen with enhanced version");
+            System.out.println("[WaystoneInjector] ✓ Successfully registered EnhancedWaystoneSelectionScreen via Balm API");
         } catch (Exception e) {
-            System.err.println("[WaystoneInjector] Failed to replace waystone selection screen: " + e.getMessage());
+            System.err.println("[WaystoneInjector] ERROR registering enhanced screen: " + e.getMessage());
             e.printStackTrace();
         }
     }
