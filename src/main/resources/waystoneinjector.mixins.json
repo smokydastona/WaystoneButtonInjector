@@ -9,8 +9,7 @@
   "client": [
     "MixinClientPacketListener",
     "MixinModScreens",
-    "MixinMenuScreens",
-    "MixinMinecraft"
+    "MixinMenuScreens"
   ],
   "injectors": {
     "defaultRequire": 1
