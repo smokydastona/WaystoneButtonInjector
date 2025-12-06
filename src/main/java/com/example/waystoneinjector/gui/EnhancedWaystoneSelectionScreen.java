@@ -17,6 +17,7 @@ import java.util.List;
  * Adds scrollable list functionality and custom overlays while maintaining API compatibility.
  * Dirt background is prevented via MixinScreen.
  */
+@SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase {
     
     // Performance constants (DashLoader-inspired optimization)
@@ -83,7 +84,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         // Clear references to prevent screen from keeping world loaded
         if (scrollableList != null) {
             scrollableList.cleanup(); // Clean up button references
-            this.removeWidget(scrollableList);
+            this.removeWidget((net.minecraft.client.gui.components.events.GuiEventListener) scrollableList);
             scrollableList = null;
         }
         super.removed();
@@ -169,8 +170,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             renderMysticalPortal(guiGraphics);
             
             // Render title above portal
-            int titleX = this.width / 2 - this.font.width(this.title) / 2;
-            guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
+            @Nonnull Component titleComponent = this.title;
+            int titleX = this.width / 2 - this.font.width(titleComponent) / 2;
+            guiGraphics.drawString(this.font, titleComponent, titleX, this.topPos + 6, 0xFFFFFF, true);
             
             // Manually render widgets (bypassing super.render to avoid dirt background)
             for (net.minecraft.client.gui.components.Renderable renderable : this.renderables) {
@@ -242,10 +244,12 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         // Render portal frame behind the animation (80x80)
         int frameX = this.width / 2 - 40;
         int frameY = this.topPos + 12;
-        guiGraphics.blit(PORTAL_FRAME, frameX, frameY, 0, 0, 80, 80, 80, 80);
+        @Nonnull ResourceLocation portalFrame = PORTAL_FRAME;
+        guiGraphics.blit(portalFrame, frameX, frameY, 0, 0, 80, 80, 80, 80);
         
         // Render animated portal on top (uses cached frame for performance)
-        guiGraphics.blit(MYSTICAL_PORTALS[cachedAnimationFrame], portalX, portalY, 0, 0, 64, 64, 64, 64);
+        @Nonnull ResourceLocation animatedPortal = MYSTICAL_PORTALS[cachedAnimationFrame];
+        guiGraphics.blit(animatedPortal, portalX, portalY, 0, 0, 64, 64, 64, 64);
         RenderSystem.disableBlend();
     }
     
