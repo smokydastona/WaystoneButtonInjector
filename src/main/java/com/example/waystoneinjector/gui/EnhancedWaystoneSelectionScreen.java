@@ -42,8 +42,16 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void renderBackground(@Nonnull GuiGraphics guiGraphics) {
-        // Do nothing - prevents dirt background from rendering
-        // Custom background is rendered in render() method instead
+        // Render custom background instead of dirt
+        if (useScrollableList) {
+            // Draw custom menu background texture
+            int x = (this.width - this.imageWidth) / 2;
+            int y = (this.height - this.imageHeight) / 2;
+            RenderSystem.setShaderTexture(0, MENU_BACKGROUND);
+            guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+        } else {
+            super.renderBackground(guiGraphics);
+        }
     }
     
     @Override
@@ -107,13 +115,11 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
+        
+        // Render background first (custom or vanilla)
+        this.renderBackground(guiGraphics);
+        
         if (useScrollableList && scrollableList != null) {
-            // Draw custom menu background texture FIRST (this appears above any vanilla dirt)
-            int x = (this.width - this.imageWidth) / 2;
-            int y = (this.height - this.imageHeight) / 2;
-            RenderSystem.setShaderTexture(0, MENU_BACKGROUND);
-            guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-            
             // Render the scrollable list (contains waystone buttons)
             scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
             
