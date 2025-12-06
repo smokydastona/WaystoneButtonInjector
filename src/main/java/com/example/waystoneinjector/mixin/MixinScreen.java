@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Screen.class)
 public class MixinScreen {
     
-    @Inject(method = "renderBackground(Lnet/minecraft/client/gui/GuiGraphics;)V", at = @At("HEAD"), cancellable = true)
-    private void preventDirtBackground(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    private void preventDirtBackground(GuiGraphics guiGraphics, int vOffset, CallbackInfo ci) {
         // Cast this to Screen to check instance type
         Screen screen = (Screen) (Object) this;
         
