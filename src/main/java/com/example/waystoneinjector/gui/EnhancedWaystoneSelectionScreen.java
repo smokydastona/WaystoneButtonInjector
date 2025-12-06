@@ -96,10 +96,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
         if (useScrollableList && scrollableList != null) {
-            // Render background (dirt texture)
-            this.renderBackground(guiGraphics);
-            
-            // Render the container GUI box
+            // Render the container GUI box (no dirt background)
             this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
             
             // Render the scrollable list (this has its own semi-transparent background)
