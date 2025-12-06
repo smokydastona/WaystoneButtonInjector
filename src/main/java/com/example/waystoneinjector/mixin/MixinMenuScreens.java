@@ -8,11 +8,11 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 /**
- * Mixin to intercept MenuScreens registration and replace WaystoneSelectionScreen factory
- * Uses @ModifyArg to replace the factory parameter at the registration point
+ * MIXIN #2 - Intercepts MenuScreens factory wrapper
+ * Replaces factory at the Map storage level
  */
 @Mixin(MenuScreens.class)
 public class MixinMenuScreens {
@@ -20,44 +20,41 @@ public class MixinMenuScreens {
     static {
         System.out.println("[WaystoneInjector] ╔═══════════════════════════════════════════════════════╗");
         System.out.println("[WaystoneInjector] ║  MixinMenuScreens CLASS LOADED                        ║");
-        System.out.println("[WaystoneInjector] ║  Targeting: net.minecraft.client.gui.screens.MenuScreens ║");
+        System.out.println("[WaystoneInjector] ║  Targeting: MenuScreens factory storage              ║");
         System.out.println("[WaystoneInjector] ╚═══════════════════════════════════════════════════════╝");
     }
     
     /**
-     * Modify the factory argument when registering screens
-     * This intercepts at the exact moment the factory is being stored
+     * INTERCEPT #2: Modify the ScreenConstructor being stored
      */
-    @SuppressWarnings("unchecked")
-    @ModifyArg(
-        method = "m_96206_",
-        at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-        index = 1,
-        remap = false
+    @ModifyVariable(
+        method = "*",
+        at = @At("HEAD"),
+        argsOnly = true
     )
-    private static <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> MenuScreens.ScreenConstructor<M, U> modifyFactory(
-            MenuScreens.ScreenConstructor<M, U> originalFactory) {
+    private static <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> 
+    MenuScreens.ScreenConstructor<M, U> replaceScreenConstructor(MenuScreens.ScreenConstructor<M, U> factory) {
         
-        // We need to check the MenuType in the method context
-        // Since we can't access method parameters in @ModifyArg, we'll wrap the factory
-        // and check at creation time
+        // Wrap the factory to check at creation time
         return (menu, inv, title) -> {
-            // Check if this is a WaystoneSelectionMenu
             if (menu instanceof WaystoneSelectionMenu) {
-                System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-                System.out.println("[WaystoneInjector] INTERCEPTED WaystoneSelectionScreen creation!");
-                System.out.println("[WaystoneInjector] Creating EnhancedWaystoneSelectionScreen instead");
-                System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println("[WaystoneInjector] ═══════════════════════════════════════════════════════");
+                System.out.println("[WaystoneInjector] ██ MIXIN #2 - FACTORY WRAPPER TRIGGERED ██");
+                System.out.println("[WaystoneInjector] ██ Menu type: " + menu.getClass().getSimpleName());
+                System.out.println("[WaystoneInjector] ██ Creating EnhancedWaystoneSelectionScreen ██");
+                System.out.println("[WaystoneInjector] ═══════════════════════════════════════════════════════");
                 
-                return (U) new EnhancedWaystoneSelectionScreen(
+                @SuppressWarnings("unchecked")
+                U enhanced = (U) new EnhancedWaystoneSelectionScreen(
                     (WaystoneSelectionMenu) menu,
                     inv,
                     title
                 );
+                return enhanced;
             }
             
-            // For all other menus, use the original factory
-            return originalFactory.create(menu, inv, title);
+            // For all other screens, use original factory
+            return factory.create(menu, inv, title);
         };
     }
 }
