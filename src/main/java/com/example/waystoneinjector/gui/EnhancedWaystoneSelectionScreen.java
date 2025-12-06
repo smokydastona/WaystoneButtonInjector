@@ -39,9 +39,18 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     }
     
     @Override
+    public void renderBackground(GuiGraphics graphics) {
+        // Leave empty so Minecraft does not draw the dirt texture
+    }
+    
+    @Override
     public void init() {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.init() called");
-        // DON'T call super.init() - we're replacing the entire UI
+        // Call super.init() first, then disable opacity
+        super.init();
+        // Disable the default screen opacity/blur
+        this.clearWidgets(); // Clear any widgets added by super.init()
+        
         // Get waystones list and xp cost from the menu via reflection
         try {
             var menuClass = this.menu.getClass();
