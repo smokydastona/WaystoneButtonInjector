@@ -1,8 +1,8 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
+import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.client.OpenScreenEvent;
-import net.blay09.mods.balm.forge.event.ForgeBalmEvents;
 import net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,7 +20,8 @@ public class ScreenReplacementHandler {
         System.out.println("[WaystoneInjector] ║  Using Balm OpenScreenEvent (Sodium-style approach)  ║");
         System.out.println("[WaystoneInjector] ╚═══════════════════════════════════════════════════════╝");
         
-        ForgeBalmEvents.onOpenScreen(ScreenReplacementHandler::onScreenOpen);
+        // Register using Balm's event system
+        Balm.getEvents().onEvent(OpenScreenEvent.class, ScreenReplacementHandler::onScreenOpen);
         
         System.out.println("[WaystoneInjector] ✓ ScreenReplacementHandler registered successfully");
     }
@@ -42,10 +43,17 @@ public class ScreenReplacementHandler {
                 if (containerScreen.getMenu() instanceof WaystoneSelectionMenu) {
                     WaystoneSelectionMenu menu = (WaystoneSelectionMenu) containerScreen.getMenu();
                     
+                    var minecraft = net.minecraft.client.Minecraft.getInstance();
+                    var player = minecraft.player;
+                    if (player == null) {
+                        System.out.println("[WaystoneInjector] ⚠ Warning: Player is null, cannot create enhanced screen");
+                        return;
+                    }
+                    
                     // Create our enhanced screen with the same menu
                     EnhancedWaystoneSelectionScreen enhancedScreen = new EnhancedWaystoneSelectionScreen(
                         menu,
-                        net.minecraft.client.Minecraft.getInstance().player.getInventory(),
+                        player.getInventory(),
                         screen.getTitle()
                     );
                     
