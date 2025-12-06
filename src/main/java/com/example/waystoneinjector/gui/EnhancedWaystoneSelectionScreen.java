@@ -105,11 +105,11 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
         if (useScrollableList && scrollableList != null) {
-            // Render the container GUI box (no dirt background)
-            this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-            
-            // Render the scrollable list (this has its own semi-transparent background)
-            scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
+            // Draw custom menu background texture FIRST (this appears above any vanilla dirt)
+            int x = (this.width - this.imageWidth) / 2;
+            int y = (this.height - this.imageHeight) / 2;
+            RenderSystem.setShaderTexture(0, MENU_BACKGROUND);
+            guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
             
             // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
@@ -118,8 +118,15 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             int titleX = this.width / 2 - this.font.width(this.title) / 2;
             guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
             
-            // Render labels and tooltips
-            this.renderLabels(guiGraphics, mouseX, mouseY);
+            // Render all widgets/children manually
+            for (var listener : this.children()) {
+                if (listener instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
+                    widget.render(guiGraphics, mouseX, mouseY, partialTicks);
+                }
+            }
+            
+            // Render tooltips
+            this.renderTooltip(guiGraphics, mouseX, mouseY);
             
         } else {
             // Fall back to default pagination rendering
@@ -143,12 +150,8 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // Draw custom menu background
-        int x = (this.width - this.imageWidth) / 2;
-        int y = (this.height - this.imageHeight) / 2;
-        
-        // Render custom menu background texture (270x200)
-        guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+        // Do NOT call super.renderBg — this prevents container backgrounds
+        // Background is drawn in render() method instead
     }
     
     // Custom GUI textures for the enhanced menu
