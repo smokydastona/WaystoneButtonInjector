@@ -198,12 +198,4 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     protected boolean allowDeletion() {
         return false; // Disable deletion in scrollable mode
     }
-    
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // Don't render the default background when using scrollable list
-        if (!useScrollableList) {
-            super.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-        }
-    }
 }
