@@ -55,16 +55,8 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void renderBackground(@Nonnull GuiGraphics guiGraphics) {
-        // Render custom background instead of dirt
-        if (useScrollableList) {
-            // Draw custom menu background texture
-            int x = (this.width - this.imageWidth) / 2;
-            int y = (this.height - this.imageHeight) / 2;
-            RenderSystem.setShaderTexture(0, MENU_BACKGROUND);
-            guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-        } else {
-            super.renderBackground(guiGraphics);
-        }
+        // No background - fully transparent (prevents dirt texture)
+        // World will be visible behind the GUI
     }
     
     @Override
@@ -151,9 +143,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        // ModernUI-inspired: Render solid background instead of dirt texture
-        renderSolidBackground(guiGraphics);
-        
         if (useScrollableList && scrollableList != null) {
             // ModernUI-inspired: Update smooth scroll before rendering
             scrollableList.renderWithSmoothScroll(guiGraphics, mouseX, mouseY, partialTicks);
@@ -198,8 +187,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     }
     
     // Custom GUI textures for the enhanced menu
-    private static final ResourceLocation MENU_BACKGROUND = 
-        new ResourceLocation("waystoneinjector", "textures/gui/menu_background.png");
     private static final ResourceLocation PORTAL_FRAME = 
         new ResourceLocation("waystoneinjector", "textures/gui/portal_frame.png");
     
@@ -207,14 +194,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
      * Renders the animated mystical portal texture with frame
      * Optimized with frame caching (DashLoader-inspired)
      */
-    /**
-     * ModernUI-inspired: Render transparent background (no dirt texture)
-     */
-    private void renderSolidBackground(GuiGraphics guiGraphics) {
-        // Render fully transparent background - allows world/textures to show through
-        // This matches ModernUI's approach of removing the dirt background entirely
-    }
-    
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
         // Calculate current animation frame (cached for performance)
         long elapsed = System.currentTimeMillis() - animationStartTime;
