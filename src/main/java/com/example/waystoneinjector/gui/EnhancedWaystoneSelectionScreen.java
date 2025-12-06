@@ -38,6 +38,10 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     private ScrollableWaystoneList scrollableList;
     private boolean useScrollableList = true; // Toggle between pagination and scrollable
     
+    // Cached reflection objects (Fastload-inspired optimization - reuse instead of recreating)
+    private static java.lang.reflect.Field waystoneFieldCache = null;
+    private static java.lang.reflect.Method xpCostMethodCache = null;
+    
     public EnhancedWaystoneSelectionScreen(WaystoneSelectionMenu container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
         this.animationStartTime = System.currentTimeMillis();
@@ -68,22 +72,33 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         // Disable the default screen opacity/blur
         this.clearWidgets(); // Clear any widgets added by super.init()
         
-        // Get waystones list and xp cost from the menu via reflection
+        // Get waystones list and xp cost from the menu via reflection (Fastload-inspired: cached reflection)
         try {
             var menuClass = this.menu.getClass();
-            var waystoneField = menuClass.getDeclaredField("waystones");
-            waystoneField.setAccessible(true);
+            
+            // Use cached reflection field or create and cache it (reduces overhead on reopening GUI)
+            if (waystoneFieldCache == null) {
+                waystoneFieldCache = menuClass.getDeclaredField("waystones");
+                waystoneFieldCache.setAccessible(true);
+            }
+            
             @SuppressWarnings("unchecked")
-            List<IWaystone> waystones = (List<IWaystone>) waystoneField.get(this.menu);
+            List<IWaystone> waystones = (List<IWaystone>) waystoneFieldCache.get(this.menu);
+            
+            // Early exit if no waystones (Fastload philosophy: skip unnecessary work)
+            if (waystones.isEmpty()) {
+                System.out.println("[WaystoneInjector] No waystones available, skipping list creation");
+                return;
+            }
             
             // Get XP cost per waystone (default to 1 if can't find it)
             int xpCostPerWaystone = 1;
             try {
-                var xpCostMethod = menuClass.getDeclaredMethod("getCostForWaystone", IWaystone.class);
-                xpCostMethod.setAccessible(true);
-                if (!waystones.isEmpty()) {
-                    xpCostPerWaystone = (int) xpCostMethod.invoke(this.menu, waystones.get(0));
+                if (xpCostMethodCache == null) {
+                    xpCostMethodCache = menuClass.getDeclaredMethod("getCostForWaystone", IWaystone.class);
+                    xpCostMethodCache.setAccessible(true);
                 }
+                xpCostPerWaystone = (int) xpCostMethodCache.invoke(this.menu, waystones.get(0));
             } catch (Exception ignored) {
                 System.out.println("[WaystoneInjector] Using default XP cost: 1");
             }
