@@ -14,11 +14,9 @@ import java.util.List;
 /**
  * Enhanced waystone selection screen that extends the base Waystones screen.
  * Adds scrollable list functionality and custom overlays while maintaining API compatibility.
+ * Dirt background is prevented via MixinScreen.
  */
 public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase {
-    
-    // Clear transparent texture to prevent dirt background
-    private static final ResourceLocation CLEAR_BACKGROUND = new ResourceLocation("waystoneinjector", "textures/gui/clear.png");
     
     // Mystical portal animation textures (26 frames)
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
@@ -41,12 +39,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         System.out.println("========================================");
     }
     
-    @Override
-    public void renderBackground(GuiGraphics graphics) {
-        // Clear PNG = full transparent background, prevents vanilla dirt
-        RenderSystem.setShaderTexture(0, CLEAR_BACKGROUND);
-        graphics.blit(CLEAR_BACKGROUND, 0, 0, 0, 0, this.width, this.height);
-    }
+    // renderBackground() is disabled via MixinScreen to prevent dirt texture
     
     @Override
     public void init() {
