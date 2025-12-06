@@ -7,8 +7,7 @@
   "mixins": [],
   "client": [
     "MixinClientPacketListener",
-    "MixinWaystoneSelectionScreen",
-    "IWaystoneSelectionScreenAccessor"
+    "MixinWaystoneSelectionScreen"
   ],
   "injectors": {
     "defaultRequire": 1
