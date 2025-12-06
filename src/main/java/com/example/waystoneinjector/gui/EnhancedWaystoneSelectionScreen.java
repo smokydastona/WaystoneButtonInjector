@@ -33,10 +33,14 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     public EnhancedWaystoneSelectionScreen(WaystoneSelectionMenu container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
         this.animationStartTime = System.currentTimeMillis();
+        System.out.println("========================================");
+        System.out.println("[WaystoneInjector] ✓✓✓ EnhancedWaystoneSelectionScreen CONSTRUCTOR CALLED ✓✓✓");
+        System.out.println("========================================");
     }
     
     @Override
     public void init() {
+        System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.init() called");
         // DON'T call super.init() - we're replacing the entire UI
         // Get waystones list from the menu via reflection
         try {
@@ -77,6 +81,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
         if (useScrollableList && scrollableList != null) {
             // Render background
             this.renderBackground(guiGraphics);

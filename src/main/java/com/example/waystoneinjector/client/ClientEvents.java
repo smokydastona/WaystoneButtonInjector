@@ -194,7 +194,8 @@ public class ClientEvents {
             String className = screen.getClass().getName();
             System.out.println("[WaystoneInjector] Screen detected: " + className);
         
-            boolean isWaystoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen");
+            boolean isWaystoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen") ||
+                                       className.equals("com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen");
             boolean isSharestoneScreen = className.equals("net.blay09.mods.waystones.client.gui.screen.SharestoneSelectionScreen");
             
             if (!isWaystoneScreen && !isSharestoneScreen) {
