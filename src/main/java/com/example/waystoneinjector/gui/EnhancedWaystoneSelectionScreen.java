@@ -42,12 +42,15 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     private static java.lang.reflect.Field waystoneFieldCache = null;
     private static java.lang.reflect.Method xpCostMethodCache = null;
     
+    // Debug logging flag (FastAsyncWorldSave-inspired: prevent I/O blocking)
+    private static final boolean DEBUG_LOGGING = false; // Set to true for development
+    
     public EnhancedWaystoneSelectionScreen(WaystoneSelectionMenu container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
         this.animationStartTime = System.currentTimeMillis();
-        System.out.println("========================================");
-        System.out.println("[WaystoneInjector] ✓✓✓ EnhancedWaystoneSelectionScreen CONSTRUCTOR CALLED ✓✓✓");
-        System.out.println("========================================");
+        if (DEBUG_LOGGING) {
+            System.out.println("[WaystoneInjector] EnhancedWaystoneSelectionScreen initialized");
+        }
     }
     
     @Override
@@ -66,7 +69,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void init() {
-        System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.init() called");
         // Call super.init() first, then disable opacity
         super.init();
         // Disable the default screen opacity/blur
@@ -87,7 +89,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             
             // Early exit if no waystones (Fastload philosophy: skip unnecessary work)
             if (waystones.isEmpty()) {
-                System.out.println("[WaystoneInjector] No waystones available, skipping list creation");
+                if (DEBUG_LOGGING) System.out.println("[WaystoneInjector] No waystones available");
                 return;
             }
             
@@ -100,7 +102,7 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
                 }
                 xpCostPerWaystone = (int) xpCostMethodCache.invoke(this.menu, waystones.get(0));
             } catch (Exception ignored) {
-                System.out.println("[WaystoneInjector] Using default XP cost: 1");
+                // Default to 1 if method not found
             }
             
             // Create scrollable list widget that fills most of the screen
@@ -122,7 +124,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             
             this.addRenderableWidget(scrollableList);
             
-            System.out.println("[WaystoneInjector] Created scrollable list with " + waystones.size() + " waystones (XP cost: " + xpCostPerWaystone + ")");
+            if (DEBUG_LOGGING) {
+                System.out.println("[WaystoneInjector] Created scrollable list: " + waystones.size() + " waystones");
+            }
             
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] Failed to create scrollable list: " + e.getMessage());
@@ -135,8 +139,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
-        
         // Render background first (custom or vanilla)
         this.renderBackground(guiGraphics);
         
