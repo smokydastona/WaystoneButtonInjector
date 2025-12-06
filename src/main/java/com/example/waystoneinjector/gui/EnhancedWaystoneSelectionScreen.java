@@ -23,14 +23,32 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     private static final int ANIMATION_FRAME_COUNT = 26;
     private static final long ANIMATION_FRAME_TIME_MS = 100L; // 100ms per frame
     
-    // Mystical portal animation textures (26 frames)
+    // Forge-inspired: Lazy-loaded animation textures (loaded async in background)
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[ANIMATION_FRAME_COUNT];
+    private static volatile boolean animationTexturesLoaded = false;
+    private static final Object loadLock = new Object();
     
     static {
-        // Pre-load all animation frame ResourceLocations (cached for performance)
-        for (int i = 0; i < ANIMATION_FRAME_COUNT; i++) {
-            MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + (i + 1) + ".png");
-        }
+        // Forge-inspired: Async background loading of animation frames
+        Thread animationLoader = new Thread(() -> {
+            try {
+                for (int i = 0; i < ANIMATION_FRAME_COUNT; i++) {
+                    MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + (i + 1) + ".png");
+                    // Small delay to prevent resource spike (Forge's GPU weight management philosophy)
+                    if (i % 5 == 0 && i > 0) {
+                        Thread.sleep(10); // Yield to other threads every 5 frames
+                    }
+                }
+                synchronized (loadLock) {
+                    animationTexturesLoaded = true;
+                }
+            } catch (Exception e) {
+                System.err.println("[WaystoneInjector] Failed to load animation textures: " + e.getMessage());
+            }
+        }, "WaystoneAnimationLoader");
+        animationLoader.setDaemon(true); // Don't block shutdown
+        animationLoader.setPriority(Thread.MIN_PRIORITY); // Low priority background loading
+        animationLoader.start();
     }
     
     private long animationStartTime;
@@ -195,11 +213,23 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     /**
      * Renders the animated mystical portal texture with frame
      * Optimized with frame caching (DashLoader-inspired)
+     * Forge-inspired: Async loading with null-safety
      */
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
+        // Forge-inspired: Check if textures are loaded before rendering
+        if (!animationTexturesLoaded) {
+            // Optionally render a placeholder or just skip
+            return;
+        }
+        
         // Calculate current animation frame (cached for performance)
         long elapsed = System.currentTimeMillis() - animationStartTime;
         cachedAnimationFrame = (int) ((elapsed / ANIMATION_FRAME_TIME_MS) % ANIMATION_FRAME_COUNT);
+        
+        // Null-safety check for async-loaded textures
+        if (MYSTICAL_PORTALS[cachedAnimationFrame] == null) {
+            return;
+        }
         
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
