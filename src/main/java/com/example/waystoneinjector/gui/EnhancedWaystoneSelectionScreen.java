@@ -19,16 +19,22 @@ import java.util.List;
  */
 public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase {
     
+    // Performance constants (DashLoader-inspired optimization)
+    private static final int ANIMATION_FRAME_COUNT = 26;
+    private static final long ANIMATION_FRAME_TIME_MS = 100L; // 100ms per frame
+    
     // Mystical portal animation textures (26 frames)
-    private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
+    private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[ANIMATION_FRAME_COUNT];
     
     static {
-        for (int i = 0; i < 26; i++) {
+        // Pre-load all animation frame ResourceLocations (cached for performance)
+        for (int i = 0; i < ANIMATION_FRAME_COUNT; i++) {
             MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + (i + 1) + ".png");
         }
     }
     
     private long animationStartTime;
+    private int cachedAnimationFrame = 0; // Cached to reduce recalculation (performance optimization)
     private ScrollableWaystoneList scrollableList;
     private boolean useScrollableList = true; // Toggle between pagination and scrollable
     
@@ -167,10 +173,12 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     /**
      * Renders the animated mystical portal texture with frame
+     * Optimized with frame caching (DashLoader-inspired)
      */
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
+        // Calculate current animation frame (cached for performance)
         long elapsed = System.currentTimeMillis() - animationStartTime;
-        int animationFrame = (int) ((elapsed / 100) % 26); // 100ms per frame, loop through 26 frames
+        cachedAnimationFrame = (int) ((elapsed / ANIMATION_FRAME_TIME_MS) % ANIMATION_FRAME_COUNT);
         
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
@@ -185,8 +193,8 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         int frameY = this.topPos + 12;
         guiGraphics.blit(PORTAL_FRAME, frameX, frameY, 0, 0, 80, 80, 80, 80);
         
-        // Render animated portal on top
-        guiGraphics.blit(MYSTICAL_PORTALS[animationFrame], portalX, portalY, 0, 0, 64, 64, 64, 64);
+        // Render animated portal on top (uses cached frame for performance)
+        guiGraphics.blit(MYSTICAL_PORTALS[cachedAnimationFrame], portalX, portalY, 0, 0, 64, 64, 64, 64);
         RenderSystem.disableBlend();
     }
     
