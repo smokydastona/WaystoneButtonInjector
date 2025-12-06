@@ -154,8 +154,10 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             int titleX = this.width / 2 - this.font.width(this.title) / 2;
             guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
             
-            // Call super.render to handle widgets (including scrollable list)
-            super.render(guiGraphics, mouseX, mouseY, partialTicks);
+            // Manually render widgets (bypassing super.render to avoid dirt background)
+            for (net.minecraft.client.gui.components.Renderable renderable : this.renderables) {
+                renderable.render(guiGraphics, mouseX, mouseY, partialTicks);
+            }
             
             // Render tooltips
             this.renderTooltip(guiGraphics, mouseX, mouseY);
