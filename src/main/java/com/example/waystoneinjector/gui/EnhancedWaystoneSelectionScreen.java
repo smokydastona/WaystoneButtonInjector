@@ -99,13 +99,11 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             // Render background (dirt texture)
             this.renderBackground(guiGraphics);
             
+            // Render the container GUI box
+            this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+            
             // Render the scrollable list (this has its own semi-transparent background)
             scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
-            
-            // Render GUI elements on top
-            // Call super.render to render the container GUI elements (but skip the renderBackground call)
-            // This renders buttons, tooltips, and container elements
-            super.renderLabels(guiGraphics, mouseX, mouseY);
             
             // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
@@ -114,11 +112,28 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             int titleX = this.width / 2 - this.font.width(this.title) / 2;
             guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
             
+            // Render labels and tooltips
+            this.renderLabels(guiGraphics, mouseX, mouseY);
+            
         } else {
             // Fall back to default pagination rendering
             super.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
     }
+    
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        // Draw standard container GUI box
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
+        
+        // Use the standard container GUI rendering
+        // This draws the gray container box background
+        guiGraphics.blit(GUI_CONTAINER_LOCATION, x, y, 0, 0, this.imageWidth, this.imageHeight);
+    }
+    
+    private static final net.minecraft.resources.ResourceLocation GUI_CONTAINER_LOCATION = 
+        new net.minecraft.resources.ResourceLocation("textures/gui/container/generic_54.png");
     
     /**
      * Renders the animated mystical portal texture
