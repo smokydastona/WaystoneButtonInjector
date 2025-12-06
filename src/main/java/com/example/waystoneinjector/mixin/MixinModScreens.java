@@ -18,6 +18,13 @@ import java.util.function.Supplier;
 @Mixin(targets = "net.blay09.mods.waystones.client.ModScreens", remap = false)
 public class MixinModScreens {
     
+    static {
+        System.out.println("[WaystoneInjector] ╔═══════════════════════════════════════════════════════╗");
+        System.out.println("[WaystoneInjector] ║  MixinModScreens CLASS LOADED                         ║");
+        System.out.println("[WaystoneInjector] ║  Mixin targeting: net.blay09.mods.waystones.client.ModScreens  ║");
+        System.out.println("[WaystoneInjector] ╚═══════════════════════════════════════════════════════╝");
+    }
+    
     /**
      * Redirect the first registerScreen call (waystoneSelection) to use our enhanced screen
      */
