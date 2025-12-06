@@ -1,33 +1,39 @@
 package com.example.waystoneinjector.mixin;
 
+import com.example.waystoneinjector.gui.CustomWaystoneButton;
+import net.blay09.mods.waystones.api.IWaystone;
+import net.blay09.mods.waystones.client.gui.widget.WaystoneButton;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Mixin to inject into Waystones' WaystoneSelectionScreen to customize button rendering
+ * Mixin to replace WaystoneButton creation with CustomWaystoneButton.
+ * This allows overlay textures to render behind button content.
  */
-@Mixin(targets = "net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen", remap = false)
-public class MixinWaystoneSelectionScreen extends Screen {
-    
-    protected MixinWaystoneSelectionScreen() {
-        super(null);
-    }
-    
-    @Shadow
-    private Object waystoneList;
-    
+@Mixin(targets = "net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreenBase", remap = false)
+public abstract class MixinWaystoneSelectionScreen {
+
     /**
-     * Inject after the screen renders to add our custom overlays
+     * Redirects WaystoneButton instantiation to use CustomWaystoneButton instead.
+     * This is called in createWaystoneButton() method.
      */
-    @Inject(method = "render", at = @At("RETURN"))
-    private void onRenderPost(GuiGraphics graphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        System.out.println("[WaystoneInjector-Mixin] Render post-injection triggered");
-        // Our custom rendering will be handled by ClientEvents which has access to this
+    @Redirect(
+        method = "createWaystoneButton",
+        at = @At(
+            value = "NEW",
+            target = "(IILnet/blay09/mods/waystones/api/IWaystone;ILnet/minecraft/client/gui/components/Button$OnPress;)Lnet/blay09/mods/waystones/client/gui/widget/WaystoneButton;"
+        ),
+        remap = false
+    )
+    private WaystoneButton redirectWaystoneButtonCreation(
+        int x, 
+        int y, 
+        IWaystone waystone, 
+        int xpLevelCost, 
+        net.minecraft.client.gui.components.Button.OnPress pressable
+    ) {
+        System.out.println("[WaystoneInjector] Injecting custom button for waystone: " + waystone.getName());
+        return new CustomWaystoneButton(x, y, waystone, xpLevelCost, pressable);
     }
 }
