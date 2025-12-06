@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Custom waystone button that renders type-specific overlay textures behind the button content.
+ * Custom waystone button that renders type-specific overlay textures on top of everything.
  * Extends WaystoneButton to inject overlay rendering while preserving original functionality.
  */
 public class CustomWaystoneButton extends WaystoneButton {
@@ -33,12 +33,15 @@ public class CustomWaystoneButton extends WaystoneButton {
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        // STEP 1: Render original button background and base
+        // STEP 1: Render original button with all its overlays (background, text, distance, XP cost)
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         
-        // STEP 2: Render overlay texture ON TOP of button background
+        // STEP 2: Render waystone overlay texture as FINAL LAYER on top of everything
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         guiGraphics.blit(overlayTexture, this.getX(), this.getY() - 8, 0, 0, 220, 36, 220, 36);
+        RenderSystem.disableBlend();
     }
     
     /**
