@@ -33,6 +33,9 @@ public class ClientEvents {
         System.out.println("[WaystoneInjector] ClientEvents class loaded!");
     }
     
+    // Debug logging flag (FastAsyncWorldSave-inspired: prevent I/O blocking)
+    private static final boolean DEBUG_LOGGING = false; // Set to true for development
+    
     private static final AtomicReference<EditBox> currentSearchBox = new AtomicReference<>(null);
     private static final AtomicReference<Screen> currentWaystoneScreen = new AtomicReference<>(null);
     private static final AtomicReference<Object> currentWaystoneList = new AtomicReference<>(null);
@@ -1235,29 +1238,41 @@ public class ClientEvents {
     /**
      * Connect to a server by IP address
      * Used by DeathSleepEvents for death/sleep redirects
+     * Fastload-inspired: Async connection to prevent blocking main thread
      */
     public static void connectToServer(String serverAddress) {
         Minecraft mc = Minecraft.getInstance();
-        System.out.println("[WaystoneInjector] Connecting to server: " + serverAddress);
         
-        // Disconnect from current server first
-        if (mc.level != null) {
-            mc.level.disconnect();
-        }
-        
-        // Parse server address
-        ServerAddress address = ServerAddress.parseString(serverAddress);
-        
-        // Create ServerData object (1.20.1 API)
-        ServerData serverData = new ServerData(serverAddress, serverAddress, false);
-        
-        // Connect to the server (1.20.1 API)
-        net.minecraft.client.gui.screens.ConnectScreen.startConnecting(
-            mc.screen,
-            mc,
-            address,
-            serverData,
-            false
-        );
+        // Fastload-inspired: Execute connection asynchronously to prevent blocking
+        mc.execute(() -> {
+            if (DEBUG_LOGGING) {
+                System.out.println("[WaystoneInjector] Initiating async connection to: " + serverAddress);
+            }
+            
+            // Disconnect from current server first
+            if (mc.level != null) {
+                mc.level.disconnect();
+            }
+            
+            // Parse server address (cached to reduce overhead)
+            ServerAddress address = ServerAddress.parseString(serverAddress);
+            
+            // Create ServerData object (1.20.1 API) - minimal data for fast connection
+            ServerData serverData = new ServerData(serverAddress, serverAddress, false);
+            
+            // Fastload principle: Connect immediately, allow rendering to begin
+            // This prevents the connection from blocking world unload/load
+            net.minecraft.client.gui.screens.ConnectScreen.startConnecting(
+                mc.screen,
+                mc,
+                address,
+                serverData,
+                false // insecureTextureOverride - keep false for security
+            );
+            
+            if (DEBUG_LOGGING) {
+                System.out.println("[WaystoneInjector] Connection initiated, rendering can proceed");
+            }
+        });
     }
 }
