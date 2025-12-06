@@ -1,6 +1,6 @@
 package com.example.waystoneinjector.mixin;
 
-import com.example.waystoneinjector.gui.GuiWaystoneSelectionScreen;
+import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.inventory.MenuType;
@@ -28,10 +28,10 @@ public class MixinModScreens {
             @SuppressWarnings("unchecked")
             MenuType<WaystoneSelectionMenu> menuType = (MenuType<WaystoneSelectionMenu>) waystoneSelectionField.get(null);
             
-            // Register our custom screen
-            MenuScreens.register(menuType, GuiWaystoneSelectionScreen::new);
+            // Register our enhanced screen that properly extends WaystoneSelectionScreenBase
+            MenuScreens.register(menuType, EnhancedWaystoneSelectionScreen::new);
             
-            System.out.println("[WaystoneInjector] Successfully replaced waystone selection screen with scrollable version");
+            System.out.println("[WaystoneInjector] Successfully replaced waystone selection screen with enhanced version");
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] Failed to replace waystone selection screen: " + e.getMessage());
             e.printStackTrace();

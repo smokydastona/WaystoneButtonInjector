@@ -16,9 +16,9 @@ import java.util.List;
  */
 public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaystoneList.WaystoneEntry> {
     
-    private final GuiWaystoneSelectionScreen parent;
+    private final EnhancedWaystoneSelectionScreen parent;
     
-    public ScrollableWaystoneList(GuiWaystoneSelectionScreen parent, Minecraft mc, int width, int height, int top, int bottom, int itemHeight, List<IWaystone> waystones) {
+    public ScrollableWaystoneList(EnhancedWaystoneSelectionScreen parent, Minecraft mc, int width, int height, int top, int bottom, int itemHeight, List<IWaystone> waystones) {
         super(mc, width, height, top, bottom, itemHeight);
         this.parent = parent;
         
