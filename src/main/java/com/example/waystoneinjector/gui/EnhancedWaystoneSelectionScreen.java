@@ -123,20 +123,24 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // Draw standard container GUI box
+        // Draw custom menu background
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         
-        // Use the standard container GUI rendering
-        // This draws the gray container box background
-        guiGraphics.blit(GUI_CONTAINER_LOCATION, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        // Render custom menu background texture (270x200)
+        guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
     }
     
-    private static final net.minecraft.resources.ResourceLocation GUI_CONTAINER_LOCATION = 
-        new net.minecraft.resources.ResourceLocation("textures/gui/container/generic_54.png");
+    // Custom GUI textures for the enhanced menu
+    private static final ResourceLocation MENU_BACKGROUND = 
+        new ResourceLocation("waystoneinjector", "textures/gui/menu_background.png");
+    private static final ResourceLocation LIST_PANEL = 
+        new ResourceLocation("waystoneinjector", "textures/gui/list_panel.png");
+    private static final ResourceLocation PORTAL_FRAME = 
+        new ResourceLocation("waystoneinjector", "textures/gui/portal_frame.png");
     
     /**
-     * Renders the animated mystical portal texture
+     * Renders the animated mystical portal texture with frame
      */
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
         long elapsed = System.currentTimeMillis() - animationStartTime;
@@ -147,9 +151,15 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         RenderSystem.defaultBlendFunc();
         
         // Render portal at top center of screen
-        int portalX = this.width / 2 - 32; // Center horizontally
+        int portalX = this.width / 2 - 32; // Center horizontally (64x64 portal)
         int portalY = this.topPos + 20;
         
+        // Render portal frame behind the animation (80x80)
+        int frameX = this.width / 2 - 40;
+        int frameY = this.topPos + 12;
+        guiGraphics.blit(PORTAL_FRAME, frameX, frameY, 0, 0, 80, 80, 80, 80);
+        
+        // Render animated portal on top
         guiGraphics.blit(MYSTICAL_PORTALS[animationFrame], portalX, portalY, 0, 0, 64, 64, 64, 64);
         RenderSystem.disableBlend();
     }
