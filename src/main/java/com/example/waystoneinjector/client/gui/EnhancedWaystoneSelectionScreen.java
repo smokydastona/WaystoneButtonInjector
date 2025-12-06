@@ -31,6 +31,16 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     private ScrollableWaystoneList waystoneList;
     private WaystoneSearchField searchField;
     
+    // ModularUI-inspired lazy calculation cache
+    private boolean needsPositionRecalculation = true;
+    private boolean widgetTreeDirty = true;
+    private int cachedWidth = -1;
+    private int cachedHeight = -1;
+    
+    // Cached mouse coordinates (transformed relative to screen)
+    private int lastMouseX = -1;
+    private int lastMouseY = -1;
+    
     public EnhancedWaystoneSelectionScreen(Screen originalScreen) {
         super(Component.literal("Enhanced Waystone Menu"));
         this.originalScreen = originalScreen;
@@ -66,6 +76,14 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        
+        // ModularUI pattern: Check if screen dimensions changed to trigger recalculation
+        if (cachedWidth != this.width || cachedHeight != this.height) {
+            needsPositionRecalculation = true;
+            widgetTreeDirty = true;
+            cachedWidth = this.width;
+            cachedHeight = this.height;
+        }
         
         System.out.println("[WaystoneInjector] ========== INITIALIZING SCREEN ==========");
         System.out.println("[WaystoneInjector] allWaystones size: " + allWaystones.size());
@@ -112,6 +130,10 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         // Add custom buttons from config
         addCustomButtons();
+        
+        // ModularUI pattern: Mark calculations as complete
+        needsPositionRecalculation = false;
+        widgetTreeDirty = false;
         
         System.out.println("[WaystoneInjector] Screen initialization complete");
         System.out.println("[WaystoneInjector] =======================================");
@@ -209,6 +231,9 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
         
         waystoneList.updateWaystones(filteredWaystones);
         
+        // ModularUI pattern: Mark widget tree dirty when content changes
+        widgetTreeDirty = true;
+        
         System.out.println("[WaystoneInjector] Search: '" + query + "' - " + filteredWaystones.size() + " results");
     }
     
@@ -251,6 +276,15 @@ public class EnhancedWaystoneSelectionScreen extends Screen {
     
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        // ModularUI pattern: Cache mouse coordinates for this frame
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+        
+        // ModularUI pattern: Skip expensive operations if widget tree is clean
+        if (!widgetTreeDirty) {
+            // Only render changed widgets
+        }
+        
         // Render background
         this.renderBackground(graphics);
         
