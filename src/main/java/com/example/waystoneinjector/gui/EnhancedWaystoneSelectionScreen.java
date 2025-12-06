@@ -42,13 +42,25 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     public void init() {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.init() called");
         // DON'T call super.init() - we're replacing the entire UI
-        // Get waystones list from the menu via reflection
+        // Get waystones list and xp cost from the menu via reflection
         try {
             var menuClass = this.menu.getClass();
             var waystoneField = menuClass.getDeclaredField("waystones");
             waystoneField.setAccessible(true);
             @SuppressWarnings("unchecked")
             List<IWaystone> waystones = (List<IWaystone>) waystoneField.get(this.menu);
+            
+            // Get XP cost per waystone (default to 1 if can't find it)
+            int xpCostPerWaystone = 1;
+            try {
+                var xpCostMethod = menuClass.getDeclaredMethod("getCostForWaystone", IWaystone.class);
+                xpCostMethod.setAccessible(true);
+                if (!waystones.isEmpty()) {
+                    xpCostPerWaystone = (int) xpCostMethod.invoke(this.menu, waystones.get(0));
+                }
+            } catch (Exception ignored) {
+                System.out.println("[WaystoneInjector] Using default XP cost: 1");
+            }
             
             // Create scrollable list widget that fills most of the screen
             int listTop = this.topPos + 80; // Space for mystical portal
@@ -62,13 +74,14 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
                 listHeight,
                 listTop,
                 listBottom,
-                40, // Item height
-                waystones
+                20, // Item height - standard button height
+                waystones,
+                xpCostPerWaystone
             );
             
             this.addRenderableWidget(scrollableList);
             
-            System.out.println("[WaystoneInjector] Created scrollable list with " + waystones.size() + " waystones");
+            System.out.println("[WaystoneInjector] Created scrollable list with " + waystones.size() + " waystones (XP cost: " + xpCostPerWaystone + ")");
             
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] Failed to create scrollable list: " + e.getMessage());
