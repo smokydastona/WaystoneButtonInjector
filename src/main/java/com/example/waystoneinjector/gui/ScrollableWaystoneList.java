@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * Scrollable list widget for waystone selection.
  * Replaces the paginated button system with a smooth scrolling list.
  */
-public class ScrollableWaystoneList extends AbstractSelectionList<ScrollableWaystoneList.WaystoneEntry> {
+public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaystoneList.WaystoneEntry> {
     
     private final GuiWaystoneSelectionScreen parent;
     
@@ -38,7 +38,7 @@ public class ScrollableWaystoneList extends AbstractSelectionList<ScrollableWays
         return this.width / 2 + 124;
     }
     
-    public class WaystoneEntry extends AbstractSelectionList.Entry<WaystoneEntry> {
+    public class WaystoneEntry extends ObjectSelectionList.Entry<WaystoneEntry> {
         
         private final IWaystone waystone;
         private final ResourceLocation overlayTexture;
