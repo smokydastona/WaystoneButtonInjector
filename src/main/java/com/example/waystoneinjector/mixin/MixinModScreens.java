@@ -1,34 +1,35 @@
 package com.example.waystoneinjector.mixin;
 
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
-import net.blay09.mods.balm.api.client.screen.BalmScreens;
-import net.blay09.mods.waystones.menu.ModMenus;
+import net.blay09.mods.balm.api.client.screen.BalmScreenFactory;
+import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /**
- * Mixin to register our enhanced waystone selection screen via Balm API
+ * Mixin to replace WaystoneSelectionScreen with our enhanced version
  */
 @Mixin(targets = "net.blay09.mods.waystones.client.ModScreens", remap = false)
 public class MixinModScreens {
     
     /**
-     * Inject BEFORE Waystones registers its screens so we can override
+     * Intercept the first registerScreen call (waystoneSelection) and replace with our screen
      */
-    @Inject(method = "initialize", at = @At("HEAD"), remap = false)
-    private static void registerEnhancedScreen(BalmScreens screens, CallbackInfo ci) {
-        try {
-            System.out.println("[WaystoneInjector] ✓✓✓ MixinModScreens.initialize() CALLED ✓✓✓");
-            
-            // Register our enhanced screen FIRST - Balm will use the first registration
-            screens.registerScreen(() -> ModMenus.waystoneSelection.get(), EnhancedWaystoneSelectionScreen::new);
-            
-            System.out.println("[WaystoneInjector] ✓ Successfully registered EnhancedWaystoneSelectionScreen via Balm API");
-        } catch (Exception e) {
-            System.err.println("[WaystoneInjector] ERROR registering enhanced screen: " + e.getMessage());
-            e.printStackTrace();
-        }
+    @ModifyArg(
+        method = "initialize",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/blay09/mods/balm/api/client/screen/BalmScreens;registerScreen(Ljava/util/function/Supplier;Lnet/blay09/mods/balm/api/client/screen/BalmScreenFactory;)V",
+            ordinal = 0,
+            remap = false
+        ),
+        index = 1,
+        remap = false
+    )
+    private static BalmScreenFactory<?, ?> replaceWaystoneScreenFactory(BalmScreenFactory<?, ?> original) {
+        System.out.println("[WaystoneInjector] ✓✓✓ Replacing WaystoneSelectionScreen with EnhancedWaystoneSelectionScreen ✓✓✓");
+        BalmScreenFactory<WaystoneSelectionMenu, EnhancedWaystoneSelectionScreen> factory = EnhancedWaystoneSelectionScreen::new;
+        return factory;
     }
 }
