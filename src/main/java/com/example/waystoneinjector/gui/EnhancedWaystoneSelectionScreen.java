@@ -96,8 +96,16 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         System.out.println("[WaystoneInjector] ✓ EnhancedWaystoneSelectionScreen.render() called - useScrollableList=" + useScrollableList);
         if (useScrollableList && scrollableList != null) {
-            // Render background
+            // Render background (dirt texture)
             this.renderBackground(guiGraphics);
+            
+            // Render the scrollable list (this has its own semi-transparent background)
+            scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
+            
+            // Render GUI elements on top
+            // Call super.render to render the container GUI elements (but skip the renderBackground call)
+            // This renders buttons, tooltips, and container elements
+            super.renderLabels(guiGraphics, mouseX, mouseY);
             
             // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
@@ -105,9 +113,6 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             // Render title above portal
             int titleX = this.width / 2 - this.font.width(this.title) / 2;
             guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
-            
-            // Render the scrollable list
-            scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
             
         } else {
             // Fall back to default pagination rendering
