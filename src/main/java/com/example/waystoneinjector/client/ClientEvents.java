@@ -661,20 +661,14 @@ public class ClientEvents {
         }
         
         RenderSystem.disableBlend();
+        
+        // Render waystone list entry overlays BEFORE buttons are drawn
+        renderWaystoneListOverlays(graphics, screen);
     }
     
-    @SubscribeEvent
-    public static void onRenderWaystoneList(ScreenEvent.Render.Post event) {
-        Screen screen = currentWaystoneScreen.get();
-        if (screen == null || event.getScreen() != screen) return;
-        
+    private static void renderWaystoneListOverlays(GuiGraphics graphics, Screen screen) {
         Object waystoneList = currentWaystoneList.get();
         if (waystoneList == null) return;
-        
-        GuiGraphics graphics = event.getGuiGraphics();
-        
-        // Get current waystone type color for custom buttons
-        int buttonColor = WaystoneTypeRegistry.getColorForType(currentWaystoneType.get());
         
         try {
             // Get the waystone entries from the list
@@ -744,7 +738,22 @@ public class ClientEvents {
                     }
                 }
             }
-            
+        } catch (Exception e) {
+            // Silently fail - rendering is optional
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onRenderWaystoneList(ScreenEvent.Render.Post event) {
+        Screen screen = currentWaystoneScreen.get();
+        if (screen == null || event.getScreen() != screen) return;
+        
+        GuiGraphics graphics = event.getGuiGraphics();
+        
+        // Get current waystone type color for custom buttons
+        int buttonColor = WaystoneTypeRegistry.getColorForType(currentWaystoneType.get());
+        
+        try {
             // Render colored overlays on custom server transfer buttons
             renderCustomButtonOverlays(graphics, screen, buttonColor);
             
