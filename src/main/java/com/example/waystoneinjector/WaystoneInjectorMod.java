@@ -23,6 +23,11 @@ public class WaystoneInjectorMod {
             WaystoneConfig.register();
             System.out.println("[WaystoneInjector] Config registered!");
             
+            // Register screen replacement handler (Sodium-inspired approach using events)
+            System.out.println("[WaystoneInjector] Registering ScreenReplacementHandler...");
+            com.example.waystoneinjector.client.ScreenReplacementHandler.register();
+            System.out.println("[WaystoneInjector] ScreenReplacementHandler registered!");
+            
             // Register client-only event handlers (static methods require class registration)
             System.out.println("[WaystoneInjector] Registering ClientEvents...");
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(com.example.waystoneinjector.client.ClientEvents.class);
