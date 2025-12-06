@@ -68,6 +68,18 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     }
     
     @Override
+    public void removed() {
+        // CRITICAL: Prevent memory leak (MemoryLeakFix-inspired MC-101260)
+        // Clear references to prevent screen from keeping world loaded
+        if (scrollableList != null) {
+            scrollableList.cleanup(); // Clean up button references
+            this.removeWidget(scrollableList);
+            scrollableList = null;
+        }
+        super.removed();
+    }
+    
+    @Override
     public void init() {
         // Call super.init() first, then disable opacity
         super.init();

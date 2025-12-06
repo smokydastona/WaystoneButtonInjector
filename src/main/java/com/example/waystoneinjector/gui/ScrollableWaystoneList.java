@@ -43,6 +43,13 @@ public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaysto
         return this.width / 2 + 108; // Match original waystone menu scrollbar position
     }
     
+    /**
+     * Clean up resources to prevent memory leaks (MemoryLeakFix-inspired)
+     */
+    public void cleanup() {
+        super.clearEntries(); // Clear all entries and their button references
+    }
+    
     public class WaystoneEntry extends ObjectSelectionList.Entry<WaystoneEntry> {
         
         private final WaystoneButton waystoneButton;
