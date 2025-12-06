@@ -6,7 +6,9 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [],
   "client": [
-    "MixinClientPacketListener"
+    "MixinClientPacketListener",
+    "MixinWaystoneSelectionScreen",
+    "IWaystoneSelectionScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
