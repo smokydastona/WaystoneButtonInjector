@@ -33,12 +33,12 @@ public class CustomWaystoneButton extends WaystoneButton {
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        // STEP 1: Render overlay texture FIRST (behind everything)
+        // STEP 1: Render original button background and base
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        
+        // STEP 2: Render overlay texture ON TOP of button background
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         guiGraphics.blit(overlayTexture, this.getX(), this.getY() - 8, 0, 0, 220, 36, 220, 36);
-        
-        // STEP 2: Render original button (this will render on top of overlay)
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
     }
     
     /**
