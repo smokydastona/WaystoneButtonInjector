@@ -1,6 +1,7 @@
 package com.example.waystoneinjector.mixin;
 
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
+import net.blay09.mods.waystones.menu.ModMenus;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,7 +30,7 @@ public class MixinMenuScreens {
     /**
      * Intercept ALL screen registrations and replace WaystoneSelectionScreen
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes", "null"})
     @Inject(
         method = "register(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V",
         at = @At("HEAD"),
@@ -40,29 +41,34 @@ public class MixinMenuScreens {
             MenuScreens.ScreenConstructor<M, U> factory, 
             CallbackInfo ci) {
         
-        // Check if this is registering WaystoneSelectionMenu
-        if (menuType.toString().contains("waystones:waystone_selection")) {
-            System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            System.out.println("[WaystoneInjector] INTERCEPTED MenuScreens.register()!");
-            System.out.println("[WaystoneInjector] MenuType: " + menuType);
-            System.out.println("[WaystoneInjector] Factory: " + factory);
-            System.out.println("[WaystoneInjector] Replacing with EnhancedWaystoneSelectionScreen");
-            
-            // Register our enhanced screen instead
-            MenuScreens.ScreenConstructor enhancedFactory = 
-                (menu, inv, title) -> new EnhancedWaystoneSelectionScreen(
-                    (WaystoneSelectionMenu) menu, 
-                    inv, 
-                    title
-                );
-            
-            MenuScreens.register((MenuType) menuType, enhancedFactory);
-            
-            System.out.println("[WaystoneInjector] ✓✓✓ Successfully registered EnhancedWaystoneSelectionScreen ✓✓✓");
-            System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            
-            // Cancel the original registration
-            ci.cancel();
+        // Check if this is registering WaystoneSelectionMenu by comparing with ModMenus.waystoneSelection
+        try {
+            if (menuType == ModMenus.waystoneSelection.get()) {
+                System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println("[WaystoneInjector] INTERCEPTED MenuScreens.register()!");
+                System.out.println("[WaystoneInjector] MenuType: " + menuType);
+                System.out.println("[WaystoneInjector] Replacing with EnhancedWaystoneSelectionScreen");
+                
+                // Register our enhanced screen instead
+                MenuScreens.ScreenConstructor enhancedFactory = 
+                    (menu, inv, title) -> new EnhancedWaystoneSelectionScreen(
+                        (WaystoneSelectionMenu) menu, 
+                        inv, 
+                        title
+                    );
+                
+                @SuppressWarnings("null")
+                MenuType<?> menuTypeNonNull = (MenuType<?>) menuType;
+                MenuScreens.register(menuTypeNonNull, enhancedFactory);
+                
+                System.out.println("[WaystoneInjector] ✓✓✓ Successfully registered EnhancedWaystoneSelectionScreen ✓✓✓");
+                System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                
+                // Cancel the original registration
+                ci.cancel();
+            }
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] ⚠ Error checking menu type: " + e.getMessage());
         }
     }
 }
