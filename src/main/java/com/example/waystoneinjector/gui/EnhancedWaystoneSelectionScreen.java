@@ -111,6 +111,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             RenderSystem.setShaderTexture(0, MENU_BACKGROUND);
             guiGraphics.blit(MENU_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
             
+            // Render the scrollable list (contains waystone buttons)
+            scrollableList.render(guiGraphics, mouseX, mouseY, partialTicks);
+            
             // Render mystical portal animation at top center
             renderMysticalPortal(guiGraphics);
             
@@ -118,9 +121,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
             int titleX = this.width / 2 - this.font.width(this.title) / 2;
             guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
             
-            // Render all widgets/children manually
+            // Render all other widgets/children manually
             for (var listener : this.children()) {
-                if (listener instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
+                if (listener instanceof net.minecraft.client.gui.components.AbstractWidget widget && listener != scrollableList) {
                     widget.render(guiGraphics, mouseX, mouseY, partialTicks);
                 }
             }
