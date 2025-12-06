@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -39,7 +40,11 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
         System.out.println("========================================");
     }
     
-    // renderBackground() is disabled via MixinScreen to prevent dirt texture
+    @Override
+    public void renderBackground(@Nonnull GuiGraphics guiGraphics) {
+        // Do nothing - prevents dirt background from rendering
+        // Custom background is rendered in render() method instead
+    }
     
     @Override
     public void init() {

@@ -7,8 +7,7 @@
   "mixins": [],
   "client": [
     "MixinClientPacketListener",
-    "MixinModScreens",
-    "MixinScreen"
+    "MixinModScreens"
   ],
   "injectors": {
     "defaultRequire": 1
