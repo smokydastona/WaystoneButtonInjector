@@ -7,9 +7,7 @@
   "priority": 1100,
   "mixins": [],
   "client": [
-    "MixinClientPacketListener",
-    "MixinMenuScreens",
-    "MixinModScreens"
+    "MixinClientPacketListener"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,73 +1,76 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
-import net.blay09.mods.balm.api.Balm;
-import net.blay09.mods.balm.api.event.client.OpenScreenEvent;
 import net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreen;
-import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
- * Event-based screen replacement handler (Sodium-inspired approach)
- * Intercepts screen opening events and replaces WaystoneSelectionScreen with EnhancedWaystoneSelectionScreen
+ * Screen replacement handler using Forge's ScreenEvent.Opening (BetterWaystonesMenu approach)
+ * Intercepts screen opening to replace WaystoneSelectionScreen with EnhancedWaystoneSelectionScreen
  */
 public class ScreenReplacementHandler {
     
-    public static void register() {
+    static {
         System.out.println("[WaystoneInjector] ╔═══════════════════════════════════════════════════════╗");
-        System.out.println("[WaystoneInjector] ║  Registering ScreenReplacementHandler                ║");
-        System.out.println("[WaystoneInjector] ║  Using Balm OpenScreenEvent (Sodium-style approach)  ║");
+        System.out.println("[WaystoneInjector] ║  ScreenReplacementHandler CLASS LOADED                ║");
+        System.out.println("[WaystoneInjector] ║  Using Forge's ScreenEvent.Opening                    ║");
         System.out.println("[WaystoneInjector] ╚═══════════════════════════════════════════════════════╝");
-        
-        // Register using Balm's event system
-        Balm.getEvents().onEvent(OpenScreenEvent.class, ScreenReplacementHandler::onScreenOpen);
-        
-        System.out.println("[WaystoneInjector] ✓ ScreenReplacementHandler registered successfully");
     }
     
-    private static void onScreenOpen(OpenScreenEvent event) {
-        Screen screen = event.getScreen();
+    public static void register() {
+        System.out.println("[WaystoneInjector] Registering ScreenEvent.Opening handler...");
         
-        // Check if the screen being opened is WaystoneSelectionScreen
-        if (screen instanceof WaystoneSelectionScreen) {
-            System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            System.out.println("[WaystoneInjector] INTERCEPTED WaystoneSelectionScreen opening!");
-            System.out.println("[WaystoneInjector] Screen type: " + screen.getClass().getName());
+        try {
+            MinecraftForge.EVENT_BUS.register(new ScreenReplacementHandler());
+            System.out.println("[WaystoneInjector] ✓ ScreenEvent.Opening handler registered successfully!");
+        } catch (Exception e) {
+            System.out.println("[WaystoneInjector] ✗ Failed to register ScreenEvent.Opening handler!");
+            e.printStackTrace();
+        }
+    }
+    
+    @SubscribeEvent
+    @SuppressWarnings("null")
+    public void onScreenOpen(ScreenEvent.Opening event) {
+        if (event.getScreen() == null) return;
+        
+        System.out.println("[WaystoneInjector] ScreenEvent.Opening fired!");
+        System.out.println("[WaystoneInjector] Screen type: " + event.getScreen().getClass().getName());
+        
+        // Check if the screen being opened is a WaystoneSelectionScreen
+        if (event.getScreen() instanceof WaystoneSelectionScreen) {
+            WaystoneSelectionScreen originalScreen = (WaystoneSelectionScreen) event.getScreen();
             
-            // Cast to access menu (WaystoneSelectionScreen extends AbstractContainerScreen)
-            if (screen instanceof AbstractContainerScreen) {
-                AbstractContainerScreen<?> containerScreen = (AbstractContainerScreen<?>) screen;
-                
-                // Get the menu from the screen
-                if (containerScreen.getMenu() instanceof WaystoneSelectionMenu) {
-                    WaystoneSelectionMenu menu = (WaystoneSelectionMenu) containerScreen.getMenu();
-                    
-                    var minecraft = net.minecraft.client.Minecraft.getInstance();
-                    var player = minecraft.player;
-                    if (player == null) {
-                        System.out.println("[WaystoneInjector] ⚠ Warning: Player is null, cannot create enhanced screen");
-                        return;
-                    }
-                    
-                    // Create our enhanced screen with the same menu
-                    EnhancedWaystoneSelectionScreen enhancedScreen = new EnhancedWaystoneSelectionScreen(
-                        menu,
-                        player.getInventory(),
-                        screen.getTitle()
-                    );
-                    
-                    // Replace the screen!
-                    event.setScreen(enhancedScreen);
-                    
-                    System.out.println("[WaystoneInjector] ✓✓✓ Replaced with EnhancedWaystoneSelectionScreen ✓✓✓");
-                    System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-                    return;
-                }
+            System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.println("[WaystoneInjector] INTERCEPTED WaystoneSelectionScreen!");
+            System.out.println("[WaystoneInjector] Replacing with EnhancedWaystoneSelectionScreen");
+            
+            Minecraft client = Minecraft.getInstance();
+            if (client.player == null) {
+                System.out.println("[WaystoneInjector] ⚠ Player is null, cannot create enhanced screen");
+                return;
             }
             
-            System.out.println("[WaystoneInjector] ⚠ Warning: Could not extract menu from screen");
-            System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            try {
+                // Create the enhanced screen
+                EnhancedWaystoneSelectionScreen enhancedScreen = new EnhancedWaystoneSelectionScreen(
+                    originalScreen.getMenu(),
+                    client.player.getInventory(),
+                    originalScreen.getTitle()
+                );
+                
+                // Replace the screen using setNewScreen
+                event.setNewScreen(enhancedScreen);
+                
+                System.out.println("[WaystoneInjector] ✓✓✓ Successfully replaced screen! ✓✓✓");
+                System.out.println("[WaystoneInjector] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            } catch (Exception ex) {
+                System.out.println("[WaystoneInjector] ✗ Failed to replace screen!");
+                ex.printStackTrace();
+            }
         }
     }
 }
