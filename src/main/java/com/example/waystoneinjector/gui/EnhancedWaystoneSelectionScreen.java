@@ -119,6 +119,20 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     }
     
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Override to prevent base class from accessing null searchBox
+        if (useScrollableList && scrollableList != null) {
+            // Handle ESC key to close screen
+            if (keyCode == 256) { // GLFW_KEY_ESCAPE
+                this.onClose();
+                return true;
+            }
+            return false;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+    
+    @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         // Draw custom menu background
         int x = (this.width - this.imageWidth) / 2;
