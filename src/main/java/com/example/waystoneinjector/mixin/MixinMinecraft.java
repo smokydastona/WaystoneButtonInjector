@@ -25,11 +25,13 @@ public class MixinMinecraft {
     /**
      * INTERCEPT #3: At the very last moment before screen is set
      * This is called EVERY time any screen opens, so we check the type
+     * NOTE: Uses "m_91152_" as SRG name for setScreen in production
      */
     @ModifyVariable(
-        method = "setScreen",
+        method = {"setScreen", "m_91152_"},
         at = @At("HEAD"),
-        argsOnly = true
+        argsOnly = true,
+        require = 0
     )
     @SuppressWarnings("null")
     private Screen replaceWaystoneScreenAtDisplay(Screen screen) {
