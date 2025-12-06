@@ -151,8 +151,8 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        // Render background first (custom or vanilla)
-        this.renderBackground(guiGraphics);
+        // ModernUI-inspired: Render solid background instead of dirt texture
+        renderSolidBackground(guiGraphics);
         
         if (useScrollableList && scrollableList != null) {
             // ModernUI-inspired: Update smooth scroll before rendering
@@ -207,6 +207,14 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
      * Renders the animated mystical portal texture with frame
      * Optimized with frame caching (DashLoader-inspired)
      */
+    /**
+     * ModernUI-inspired: Render transparent background (no dirt texture)
+     */
+    private void renderSolidBackground(GuiGraphics guiGraphics) {
+        // Render fully transparent background - allows world/textures to show through
+        // This matches ModernUI's approach of removing the dirt background entirely
+    }
+    
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
         // Calculate current animation frame (cached for performance)
         long elapsed = System.currentTimeMillis() - animationStartTime;

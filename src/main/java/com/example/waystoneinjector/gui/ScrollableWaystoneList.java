@@ -97,21 +97,30 @@ public class ScrollableWaystoneList extends ObjectSelectionList<ScrollableWaysto
         
         @Override
         public void render(@Nonnull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks) {
-            // Update button position - Button has public x and y fields in 1.20.1
+            // Update button position and size
             waystoneButton.setX(left);
             waystoneButton.setY(top);
+            waystoneButton.setWidth(width);
+            waystoneButton.setHeight(height);
             
             // Render the actual WaystoneButton - this will use all your custom textures
-            // m_87963_ is the obfuscated name for renderButton in 1.20.1
             waystoneButton.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
         
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == 0 && waystoneButton.active) {
-                return waystoneButton.mouseClicked(mouseX, mouseY, button);
+            // Forward mouse clicks to the button with proper bounds checking
+            if (waystoneButton.isMouseOver(mouseX, mouseY)) {
+                waystoneButton.onClick(mouseX, mouseY);
+                return true;
             }
             return false;
+        }
+        
+        @Override
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
+            // Forward mouse release events to the button
+            return waystoneButton.mouseReleased(mouseX, mouseY, button);
         }
         
         @Override
