@@ -17,6 +17,9 @@ import java.util.List;
  */
 public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase {
     
+    // Clear transparent texture to prevent dirt background
+    private static final ResourceLocation CLEAR_BACKGROUND = new ResourceLocation("waystoneinjector", "textures/gui/clear.png");
+    
     // Mystical portal animation textures (26 frames)
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
     
@@ -40,7 +43,9 @@ public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase
     
     @Override
     public void renderBackground(GuiGraphics graphics) {
-        // Leave empty so Minecraft does not draw the dirt texture
+        // Clear PNG = full transparent background, prevents vanilla dirt
+        RenderSystem.setShaderTexture(0, CLEAR_BACKGROUND);
+        graphics.blit(CLEAR_BACKGROUND, 0, 0, 0, 0, this.width, this.height);
     }
     
     @Override
