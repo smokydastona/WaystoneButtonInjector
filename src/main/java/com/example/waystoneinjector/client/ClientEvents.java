@@ -716,7 +716,9 @@ public class ClientEvents {
                                         
                                         if (name != null) {
                                             String waystoneName = name.toString();
-                                            String type = WaystoneTypeRegistry.getWaystoneType(waystoneName);
+                                            
+                                            // Try to get waystone block type from the waystone object
+                                            String type = getWaystoneBlockType(waystone);
                                             
                                             System.out.println("[WaystoneInjector] Entry " + i + ": " + waystoneName + " -> type: " + type);
                                             
@@ -879,6 +881,64 @@ public class ClientEvents {
             case "portstone" -> OVERLAY_PORTSTONE;
             default -> OVERLAY_REGULAR;
         };
+    }
+    
+    private static String getWaystoneBlockType(Object waystone) {
+        try {
+            // Try to get the waystoneType field from the waystone object
+            Field waystoneTypeField = findField(waystone.getClass(), "waystoneType", "type", "blockType");
+            if (waystoneTypeField != null) {
+                waystoneTypeField.setAccessible(true);
+                Object waystoneTypeObj = waystoneTypeField.get(waystone);
+                
+                if (waystoneTypeObj != null) {
+                    String typeString = waystoneTypeObj.toString();
+                    System.out.println("[WaystoneInjector] Found waystoneType field: " + typeString);
+                    
+                    // Parse the type string to get the waystone variant
+                    String lowerType = typeString.toLowerCase();
+                    
+                    if (lowerType.contains("mossy")) return "mossy";
+                    if (lowerType.contains("blackstone")) return "blackstone";
+                    if (lowerType.contains("deepslate")) return "deepslate";
+                    if (lowerType.contains("end_stone") || lowerType.contains("endstone")) return "endstone";
+                    if (lowerType.contains("sharestone")) return "sharestone";
+                    if (lowerType.contains("portstone")) return "portstone";
+                    if (lowerType.contains("warp_stone")) return "warp_stone";
+                    if (lowerType.contains("warp_scroll")) return "warp_scroll";
+                    
+                    return "regular";
+                }
+            }
+            
+            // Try to get block/item information
+            Field blockField = findField(waystone.getClass(), "block", "waystoneBlock");
+            if (blockField != null) {
+                blockField.setAccessible(true);
+                Object block = blockField.get(waystone);
+                
+                if (block != null) {
+                    String blockString = block.toString();
+                    System.out.println("[WaystoneInjector] Found block field: " + blockString);
+                    
+                    String lowerBlock = blockString.toLowerCase();
+                    
+                    if (lowerBlock.contains("mossy")) return "mossy";
+                    if (lowerBlock.contains("blackstone")) return "blackstone";
+                    if (lowerBlock.contains("deepslate")) return "deepslate";
+                    if (lowerBlock.contains("end_stone") || lowerBlock.contains("endstone")) return "endstone";
+                    if (lowerBlock.contains("sharestone")) return "sharestone";
+                    if (lowerBlock.contains("portstone")) return "portstone";
+                    
+                    return "regular";
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Error reading waystone block type: " + e.getMessage());
+        }
+        
+        return "unknown";
     }
     
     private static Field findField(Class<?> clazz, String... fieldNames) {
