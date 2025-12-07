@@ -24,7 +24,7 @@ Only consider the job done when the entire mod works as a system, not when just 
 2. **Fix all errors systematically** - Address every error found, not just one file
 3. **Re-validate after each fix** - Ensure no new errors were introduced
 4. **Explain every change** - What was wrong, what you changed, and why
-5. **Push to GitHub Actions** - Commit, push, and tag for compilation
+5. **Push to GitHub Actions** - Commit and push ONLY (no tagging)
 6. **Only stop when 100% validated** - Continue until all files are completely correct and compile without errors
 
 ## Compilation Workflow
@@ -35,9 +35,9 @@ Only consider the job done when the entire mod works as a system, not when just 
 git add -A
 git commit -m "descriptive message"
 git push
-git tag v3.0.X
-git push origin v3.0.X
 ```
+
+**STOP HERE.** Do NOT run `git tag` - the user will create tags manually when ready.
 
 This triggers GitHub Actions to compile the mod. The workspace must stay clean - no `build/` or `.gradle/` directories.
 
@@ -55,13 +55,17 @@ This triggers GitHub Actions to compile the mod. The workspace must stay clean -
 - ✅ **Scan → Fix → Validate → Push** after every change
 - ✅ Treat the entire codebase as a system, not individual files
 - ✅ Always push to GitHub Actions for compilation
-- ❌ NEVER auto-tag releases without explicit user request
+- ✅ Only commit and push code changes - stop there
+- ❌ **NEVER CREATE RELEASES** - The user will tag versions manually
+- ❌ **NEVER RUN `git tag`** unless the user explicitly tells you the exact tag to create
 - ❌ NEVER build locally (no `gradlew build`)
 - ❌ NEVER skip error validation before pushing
+- ❌ DO NOT auto-tag, auto-release, or create versions on your own
 
 ## Version Management
 
 Version format: `3.0.{git-commit-count}`
 - Auto-increments from git commit history
+- **THE USER CREATES TAGS MANUALLY - NOT YOU**
 - Tags trigger GitHub Actions release workflow
-- User decides when to tag, not the AI
+- After pushing code, STOP and let the user decide if they want to tag

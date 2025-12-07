@@ -1,8 +1,15 @@
 package com.example.waystoneinjector.gui;
 
+import com.daqem.uilib.api.background.IBackground;
+import com.daqem.uilib.api.component.IComponent;
+import com.daqem.uilib.gui.AbstractContainerScreen;
+import com.daqem.uilib.gui.background.AnimatedTextureBackground;
+import com.daqem.uilib.gui.component.AdvancedButtonComponent;
+import com.daqem.uilib.gui.component.ScrollComponent;
+import com.daqem.uilib.gui.component.TextComponent;
+import com.daqem.uilib.gui.component.TextureComponent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blay09.mods.waystones.api.IWaystone;
-import net.blay09.mods.waystones.client.gui.screen.WaystoneSelectionScreenBase;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -10,15 +17,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Enhanced waystone selection screen that extends the base Waystones screen.
- * Adds scrollable list functionality and custom overlays while maintaining API compatibility.
- * Dirt background is prevented via MixinScreen.
+ * Enhanced waystone selection screen built with UILib.
+ * Provides custom background, animated portal, and scrollable waystone list.
  */
 @SuppressWarnings("null")
-public class EnhancedWaystoneSelectionScreen extends WaystoneSelectionScreenBase {
+public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<WaystoneSelectionMenu> {
     
     // Performance constants (DashLoader-inspired optimization)
     private static final int ANIMATION_FRAME_COUNT = 26;

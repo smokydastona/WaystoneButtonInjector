@@ -50,6 +50,14 @@ config = "waystoneinjector.mixins.json"
     ordering="AFTER"
     side="CLIENT"
 
+# UI Lib - Modern UI library for custom GUIs
+[[dependencies.waystoneinjector]]
+    modId="uilib"
+    mandatory=true
+    versionRange="[1.0.0,)"
+    ordering="BEFORE"
+    side="CLIENT"
+
 # MouseTweaks for better inventory management - will auto-download if missing
 [[dependencies.waystoneinjector]]
     modId="mousetweaks"
