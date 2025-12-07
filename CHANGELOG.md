@@ -2,6 +2,31 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.236] - 2025-12-06
+
+### Fixed - @Shadow Field Access with @Final @Mutable
+- **MixinMenuScreens @Shadow Fix**: Added `@Final` and `@Mutable` annotations to properly access static final field
+  - Root Cause: The `SCREENS`/`f_96579_` field in `MenuScreens` class is declared as `private static final`
+  - Previous Fix (v3.0.235): Changed field name to SRG `f_96579_` but didn't account for `final` modifier
+  - Issue: Mixin couldn't locate field because it lacked proper annotations for final field access
+  - Solution: Added `@Final` to declare it's a final field and `@Mutable` to allow modifications
+  - Technical Change:
+    ```java
+    @Shadow
+    @Final
+    @Mutable
+    private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> f_96579_;
+    ```
+  - Impact: Mixin can now properly access and modify the static final registry map
+  - Error Message Before: `@Shadow field f_96579_ was not located in the target class. No refMap loaded.`
+  - Status: ✅ Fixed - Proper annotations for final field shadowing
+
+### Technical Details
+- **Why @Final**: Tells Mixin the target field is declared as `final` in the target class
+- **Why @Mutable**: Allows the mixin to modify a final field (removes final modifier at runtime)
+- **Why No Aliases**: Direct SRG name with proper annotations is cleaner than alias approach
+- **Backwards Compatibility**: ✅ Fully compatible - annotations are Mixin framework features
+
 ## [3.0.235] - 2025-12-06
 
 ### Fixed - Critical Production Obfuscation Fix

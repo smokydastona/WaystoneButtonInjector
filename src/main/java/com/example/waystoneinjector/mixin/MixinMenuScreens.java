@@ -7,7 +7,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +24,9 @@ import java.util.Map;
 @Mixin(MenuScreens.class)
 public class MixinMenuScreens {
     
-    @Shadow(aliases = {"SCREENS", "f_96579_"})
+    @Shadow
+    @Final
+    @Mutable
     private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> f_96579_;
     
     static {
