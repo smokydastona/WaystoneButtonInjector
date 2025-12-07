@@ -2,6 +2,31 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.235] - 2025-12-06
+
+### Fixed - Critical Production Obfuscation Fix
+- **MixinMenuScreens Obfuscation Fix**: Changed `@Shadow` field from `SCREENS` to `f_96579_` with dual aliases
+  - Root Cause: In production (obfuscated) environment, field ONLY exists as SRG name `f_96579_`
+  - Previous Fix (v3.0.231): Added SRG alias but kept MCP name as primary field name
+  - Issue: Mixin tried to match field named "SCREENS" which doesn't exist in obfuscated bytecode
+  - Solution: Use SRG name as primary field name with aliases `{"SCREENS", "f_96579_"}`
+  - Technical: `@Shadow(aliases = {"SCREENS", "f_96579_"}) private static Map<...> f_96579_;`
+  - Impact: Mod now works in both development (MCP names) and production (SRG names) environments
+  - Error Message Before: `@Shadow field SCREENS was not located in the target class. No refMap loaded.`
+  - Status: ✅ Fixed - Uses SRG name directly, aliases handle both environments
+
+### Technical Details
+- **Why This Matters**: Forge uses different naming conventions in dev vs production
+  - Development: Uses MCP (Mod Coder Pack) names like `SCREENS` for readability
+  - Production: Uses SRG (Searge) names like `f_96579_` for obfuscation
+  - Mixin @Shadow annotations must match the actual bytecode field name
+- **What Changed**: 
+  - Field name: `SCREENS` → `f_96579_`
+  - Aliases: `"f_96579_"` → `{"SCREENS", "f_96579_"}`
+  - All references updated to use `f_96579_` throughout the class
+- **Why v3.0.231 Fix Wasn't Enough**: Aliases are search hints, but the primary field name must match runtime bytecode
+- **Backwards Compatibility**: ✅ Fully compatible - aliases ensure dev environment still works
+
 ## [3.0.233] - 2025-12-06
 
 ### Added - Quality of Life & Robustness Improvements

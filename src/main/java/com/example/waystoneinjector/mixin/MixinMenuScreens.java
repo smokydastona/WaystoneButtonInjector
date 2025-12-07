@@ -22,8 +22,8 @@ import java.util.Map;
 @Mixin(MenuScreens.class)
 public class MixinMenuScreens {
     
-    @Shadow(aliases = "f_96579_")
-    private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> SCREENS;
+    @Shadow(aliases = {"SCREENS", "f_96579_"})
+    private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> f_96579_;
     
     static {
         System.out.println("[WaystoneInjector] ╔═══════════════════════════════════════════════════════╗");
@@ -68,7 +68,7 @@ public class MixinMenuScreens {
                 };
                 
                 // Replace in map
-                SCREENS.put(menuType, wrappedFactory);
+                f_96579_.put(menuType, wrappedFactory);
                 System.out.println("[WaystoneInjector] ✓ Factory replaced in registry");
             }
         } catch (Exception e) {
