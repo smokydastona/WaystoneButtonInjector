@@ -2,6 +2,59 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.232] - 2025-12-06
+
+### Added
+- **DebugLogger System**: Centralized logging with multiple verbosity levels
+  - Debug mode for detailed troubleshooting logs
+  - Verbose mode for ultra-detailed logging
+  - Specialized logging categories: GUI, config, mixin, redirect, event, resource
+  - Helper methods: `buttonPress()`, `redirectAttempt/Result()`, `textureLoaded()`, `guiDetected()`
+- **ConfigValidator System**: Comprehensive configuration validation
+  - Validates labels (empty check, length warnings >50 chars)
+  - Validates commands (format, redirect syntax, server addresses)
+  - Validates dimensions (width 20-200, height 15-100)
+  - Validates offsets (warns if >500 pixels, likely off-screen)
+  - Validates colors (hex format `0xFFFFFF`)
+  - Validates sides (`auto`, `left`, `right`)
+  - Validates sleep chance (0-100%)
+  - Validates server addresses (domain:port regex)
+  - Auto-disables buttons with critical errors
+- **Debug Configuration Section**: New `[debug]` section in config
+  - `debugMode = false` - Enable detailed logging for troubleshooting
+  - `verboseMode = false` - Enable ultra-detailed logging (very spammy)
+- **IMPROVEMENTS.md**: 600+ line comprehensive improvement roadmap
+  - Completed improvements documentation
+  - High-priority next steps (texture fallbacks, redirect timeouts)
+  - Medium-priority improvements (GUI compatibility, screen resolution handling)
+  - Code organization recommendations
+  - Testing checklist and known limitations
+
+### Changed
+- Config validation now runs automatically on load/reload
+- Invalid configurations are caught early with clear, actionable error messages
+- Debug settings applied automatically from config
+
+### Fixed
+- **CRITICAL**: Added SRG obfuscation alias `f_96579_` to `@Shadow` SCREENS field in MixinMenuScreens
+  - Fixes production crash: "field SCREENS was not located in target class"
+  - Now works in both development and production environments
+- Buttons with invalid configurations are gracefully disabled instead of causing crashes
+
+### Technical
+- SLF4J integration for professional-grade logging
+- Regex-based validation for server addresses, hex colors, command formats
+- `DebugLogger.java` (230 lines) - Centralized logging utilities
+- `ConfigValidator.java` (350 lines) - Config validation system
+- Modified `WaystoneConfig.java` - Added debug config section + validation integration
+- Modified `WaystoneInjectorMod.java` - Calls validation on startup
+- Modified `MixinMenuScreens.java` - Added SRG alias for production compatibility
+
+### Breaking Changes
+None - fully backwards compatible. New config options have sensible defaults.
+
+---
+
 ## [3.0.168] - 2025-12-05
 
 ### Added
