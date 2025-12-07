@@ -1,0 +1,42 @@
+{
+  "enabled": true,
+  "showDebugOverlay": true,
+  "scrollList": {
+    "xOffset": 0,
+    "yOffset": 0,
+    "width": 180,
+    "height": 150,
+    "topMargin": 80,
+    "bottomMargin": 40,
+    "itemHeight": 22,
+    "centered": true
+  },
+  "portal": {
+    "xOffset": 0,
+    "yOffset": -50,
+    "width": 128,
+    "height": 128,
+    "centered": true,
+    "animationSpeed": 100
+  },
+  "background": {
+    "renderDirtBackground": false,
+    "backgroundColor": -2147483648,
+    "renderMenuBackground": true,
+    "menuBackgroundAlpha": 180
+  },
+  "textures": {
+    "portalAnimation": "waystoneinjector:textures/gui/animations/portal/mystic_%d.png",
+    "listBackground": "waystoneinjector:textures/gui/backgrounds/list_panel.png",
+    "menuBackground": "waystoneinjector:textures/gui/backgrounds/menu_background.png",
+    "entryBackground": "waystoneinjector:textures/gui/backgrounds/list_entry_background.png",
+    "portalFrame": "waystoneinjector:textures/gui/backgrounds/portal_frame.png"
+  },
+  "renderOrder": {
+    "background": 0,
+    "portal": 10,
+    "scrollList": 20,
+    "buttons": 30,
+    "tooltips": 100
+  }
+}

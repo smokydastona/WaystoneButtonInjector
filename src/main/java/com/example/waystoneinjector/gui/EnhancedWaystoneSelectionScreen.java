@@ -1,5 +1,6 @@
 package com.example.waystoneinjector.gui;
 
+import com.example.waystoneinjector.config.DevConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
@@ -25,7 +26,6 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     // Animation constants
     private static final int ANIMATION_FRAME_COUNT = 26;
-    private static final long ANIMATION_FRAME_TIME_MS = 100L;
     
     // Lazy-loaded animation textures
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[ANIMATION_FRAME_COUNT];
@@ -84,6 +84,9 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     protected void init() {
         super.init();
         
+        // Load/reload dev config
+        DevConfig.checkReload();
+        
         try {
             // Get waystones from menu via reflection
             if (waystoneFieldCache == null) {
@@ -98,10 +101,13 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 return;
             }
             
-            // Create scrollable waystone list
-            int listTop = this.topPos + 80; // Space for portal animation
-            int listBottom = this.height - 40;
-            int listWidth = Math.min(300, this.width - 40);
+            // Get settings from dev config or use defaults
+            DevConfig.ScrollListSettings listSettings = DevConfig.getScrollList();
+            
+            int listWidth = DevConfig.isEnabled() ? listSettings.width : Math.min(300, this.width - 40);
+            int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 80);
+            int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.height - 40);
+            int itemHeight = DevConfig.isEnabled() ? listSettings.itemHeight : 22;
             
             waystoneList = new WaystoneListWidget(
                 this.minecraft,
@@ -109,9 +115,10 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 listBottom - listTop,
                 listTop,
                 listBottom,
-                22, // Item height
+                itemHeight,
                 waystones,
-                this::selectWaystone
+                this::selectWaystone,
+                listSettings
             );
             
             this.addRenderableWidget(waystoneList);
@@ -124,6 +131,17 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     @Override
     public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        DevConfig.checkReload();
+        
+        // Render elements in order based on render order settings
+        if (DevConfig.isEnabled()) {
+            renderInDevMode(guiGraphics, mouseX, mouseY, partialTicks);
+        } else {
+            renderInNormalMode(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+    }
+    
+    private void renderInNormalMode(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         // Render animated portal at top center
         renderMysticalPortal(guiGraphics);
         
@@ -135,31 +153,70 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
     
-    private void renderMysticalPortal(GuiGraphics guiGraphics) {
-        if (!animationTexturesLoaded) {
-            return;
+    private void renderInDevMode(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        // Render portal
+        int[] portalBounds = renderMysticalPortal(guiGraphics);
+        
+        // Render title
+        int titleX = this.width / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
+        
+        // Render widgets
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        
+        // Render debug overlay on top
+        if (waystoneList != null) {
+            DebugOverlay.render(guiGraphics, this.width, this.height,
+                waystoneList.getX0(), waystoneList.getY0(), 
+                waystoneList.getListWidth(), waystoneList.getListHeight(),
+                portalBounds[0], portalBounds[1], portalBounds[2], portalBounds[3]);
         }
+    }
+    
+    private int[] renderMysticalPortal(GuiGraphics guiGraphics) {
+        if (!animationTexturesLoaded) {
+            return new int[]{0, 0, 0, 0};
+        }
+        
+        // Get animation speed from dev config
+        long frameTimeMs = DevConfig.isEnabled() ? 
+            DevConfig.getPortal().animationSpeed : 100L;
         
         // Calculate current frame
         long elapsedTime = System.currentTimeMillis() - animationStartTime;
-        int frameIndex = (int) ((elapsedTime / ANIMATION_FRAME_TIME_MS) % ANIMATION_FRAME_COUNT);
+        int frameIndex = (int) ((elapsedTime / frameTimeMs) % ANIMATION_FRAME_COUNT);
         
         if (frameIndex != cachedAnimationFrame) {
             cachedAnimationFrame = frameIndex;
         }
         
-        // Render portal centered at top
-        int portalWidth = 128;
-        int portalHeight = 128;
-        int portalX = (this.width - portalWidth) / 2;
-        int portalY = this.topPos + 20;
+        // Get portal settings
+        DevConfig.PortalSettings portalSettings = DevConfig.getPortal();
+        int portalWidth = DevConfig.isEnabled() ? portalSettings.width : 128;
+        int portalHeight = DevConfig.isEnabled() ? portalSettings.height : 128;
+        
+        int portalX, portalY;
+        if (DevConfig.isEnabled() && portalSettings.centered) {
+            portalX = (this.width - portalWidth) / 2 + portalSettings.xOffset;
+            portalY = (this.height - portalHeight) / 2 + portalSettings.yOffset;
+        } else if (DevConfig.isEnabled()) {
+            portalX = portalSettings.xOffset;
+            portalY = portalSettings.yOffset;
+        } else {
+            portalX = (this.width - portalWidth) / 2;
+            portalY = this.topPos + 20;
+        }
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         
+        ResourceLocation texture = DevConfig.isEnabled() ? 
+            DevConfig.getPortalTexture(cachedAnimationFrame) : 
+            MYSTICAL_PORTALS[cachedAnimationFrame];
+        
         guiGraphics.blit(
-            MYSTICAL_PORTALS[cachedAnimationFrame],
+            texture,
             portalX, portalY,
             0, 0,
             portalWidth, portalHeight,
@@ -167,6 +224,8 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         );
         
         RenderSystem.disableBlend();
+        
+        return new int[]{portalX, portalY, portalWidth, portalHeight};
     }
     
     private void selectWaystone(IWaystone waystone) {
@@ -186,16 +245,37 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
      * Scrollable list widget for displaying waystones
      */
     private static class WaystoneListWidget extends ObjectSelectionList<WaystoneListWidget.Entry> {
+        private int xPos;
         
         public WaystoneListWidget(net.minecraft.client.Minecraft minecraft, int width, int height, 
                                    int y0, int y1, int itemHeight, List<IWaystone> waystones,
-                                   java.util.function.Consumer<IWaystone> onSelect) {
+                                   java.util.function.Consumer<IWaystone> onSelect,
+                                   DevConfig.ScrollListSettings settings) {
             super(minecraft, width, height, y0, y1, itemHeight);
+            
+            // Center horizontally if enabled
+            if (DevConfig.isEnabled() && settings.centered) {
+                this.xPos = (minecraft.getWindow().getGuiScaledWidth() - width) / 2 + settings.xOffset;
+            } else if (DevConfig.isEnabled()) {
+                this.xPos = settings.xOffset;
+            } else {
+                this.xPos = (minecraft.getWindow().getGuiScaledWidth() - width) / 2;
+            }
             
             // Add entries for each waystone
             for (IWaystone waystone : waystones) {
                 this.addEntry(new Entry(waystone, onSelect, width - 8));
             }
+        }
+        
+        public int getX0() { return this.xPos; }
+        public int getY0() { return this.y0; }
+        public int getListWidth() { return this.width; }
+        public int getListHeight() { return this.height; }
+        
+        @Override
+        public int getRowLeft() {
+            return this.xPos + 4;
         }
         
         @Override
@@ -205,14 +285,14 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         
         @Override
         protected int getScrollbarPosition() {
-            return this.x0 + this.width - 6;
+            return this.xPos + this.width - 6;
         }
         
         @Override
         protected void renderBackground(@Nonnull GuiGraphics guiGraphics) {
             // Semi-transparent dark background
-            guiGraphics.fill(this.x0, this.y0, 
-                           this.x1, this.y1, 
+            guiGraphics.fill(this.xPos, this.y0, 
+                           this.xPos + this.width, this.y1, 
                            0xAA000000);
         }
         

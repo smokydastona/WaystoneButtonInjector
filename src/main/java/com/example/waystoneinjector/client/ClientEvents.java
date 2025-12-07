@@ -1,6 +1,7 @@
 package com.example.waystoneinjector.client;
 
 import com.example.waystoneinjector.client.gui.widget.ThemedButton;
+import com.example.waystoneinjector.config.DevConfig;
 import com.example.waystoneinjector.config.WaystoneConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -31,6 +32,11 @@ public class ClientEvents {
 
     static {
         System.out.println("[WaystoneInjector] ClientEvents class loaded!");
+        // Initialize dev config
+        DevConfig.load();
+        if (DevConfig.isEnabled()) {
+            System.out.println("[WaystoneInjector] Dev mode ENABLED - Edit config/waystoneinjector-dev.json for live GUI editing");
+        }
     }
     
     // Debug logging flag (FastAsyncWorldSave-inspired: prevent I/O blocking)
