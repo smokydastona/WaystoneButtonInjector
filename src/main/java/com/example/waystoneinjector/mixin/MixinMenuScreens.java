@@ -22,7 +22,7 @@ import java.util.Map;
 @Mixin(MenuScreens.class)
 public class MixinMenuScreens {
     
-    @Shadow
+    @Shadow(aliases = "f_96579_")
     private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> SCREENS;
     
     static {
