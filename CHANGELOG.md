@@ -11,6 +11,7 @@ All notable changes to the Runa Waystone mod will be documented in this file.
   - Project Name: Internal project renamed to `RunaWaystone`
   - GitHub Repository: Updated URL references (redirects maintained)
   - Documentation: All docs updated with new name
+  - Config File Header: Now shows "Runa Waystone - Client Configuration"
   - Backwards Compatibility: ✅ Mod ID remains `waystoneinjector` - no config/save breaking changes
 
 ### Technical Details

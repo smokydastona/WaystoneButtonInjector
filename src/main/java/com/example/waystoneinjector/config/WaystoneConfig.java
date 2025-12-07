@@ -126,7 +126,7 @@ public class WaystoneConfig {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
         builder.comment("═══════════════════════════════════════════════════════════════════════════════",
-                        "  Waystone Button Injector - Client Configuration",
+                        "  Runa Waystone - Client Configuration",
                         "═══════════════════════════════════════════════════════════════════════════════",
                         "",
                         "QUICK START GUIDE:",
