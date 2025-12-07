@@ -106,9 +106,9 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
             // Get settings from dev config or use defaults
             DevConfig.ScrollListSettings listSettings = DevConfig.getScrollList();
             
-            int listWidth = DevConfig.isEnabled() ? listSettings.width : Math.min(300, this.width - 40);
-            int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 80);
-            int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.height - 40);
+            int listWidth = DevConfig.isEnabled() ? listSettings.width : 250;
+            int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 60);
+            int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.topPos + 210);
             int itemHeight = DevConfig.isEnabled() ? listSettings.itemHeight : 22;
             
             System.out.println("[WaystoneInjector] List dimensions: " + listWidth + "x" + (listBottom - listTop) + " at y=" + listTop);
