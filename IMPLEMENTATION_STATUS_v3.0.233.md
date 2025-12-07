@@ -1,4 +1,4 @@
-# WaystoneButtonInjector v3.0.233 - Implementation Summary
+# RunaWaystone v3.0.233 - Implementation Summary
 
 ## STATUS: Ready for Integration
 
@@ -84,7 +84,7 @@ All core utility classes have been created and compilation errors have been reso
 ---
 
 ### 5. QOL_IMPROVEMENTS_v3.0.233.md (Documentation)
-**Path:** `WaystoneButtonInjector/QOL_IMPROVEMENTS_v3.0.233.md`
+**Path:** `RunaWaystone/QOL_IMPROVEMENTS_v3.0.233.md`
 
 **Purpose:** Comprehensive implementation guide
 
@@ -103,7 +103,7 @@ All core utility classes have been created and compilation errors have been reso
 ---
 
 ### 6. CONFIG_PATCH_v3.0.233.md (Integration Guide)
-**Path:** `WaystoneButtonInjector/CONFIG_PATCH_v3.0.233.md`
+**Path:** `RunaWaystone/CONFIG_PATCH_v3.0.233.md`
 
 **Purpose:** Exact config additions for WaystoneConfig.java
 

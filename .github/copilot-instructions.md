@@ -1,4 +1,4 @@
-# Copilot Instructions — WaystoneButtonInjector
+# Copilot Instructions — RunaWaystone
 
 You are a Minecraft Forge mod development expert working on a client-side mod for Minecraft 1.20.1.
 

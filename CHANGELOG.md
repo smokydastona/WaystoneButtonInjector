@@ -1,6 +1,30 @@
 # Changelog
 
-All notable changes to the Waystone Button Injector mod will be documented in this file.
+All notable changes to the Runa Waystone mod will be documented in this file.
+
+## [3.0.238] - 2025-12-07
+
+### Changed - Mod Rebranding
+- **Official Name Change**: "Waystone Button Injector" → "Runa Waystone"
+  - Reason: Shorter, easier to type, more memorable
+  - Display Name: Now shows as "Runa Waystone" in mod lists
+  - Project Name: Internal project renamed to `RunaWaystone`
+  - GitHub Repository: Updated URL references (redirects maintained)
+  - Documentation: All docs updated with new name
+  - Backwards Compatibility: ✅ Mod ID remains `waystoneinjector` - no config/save breaking changes
+
+### Technical Details
+- **What Changed**:
+  - `mods.toml`: `displayName` updated to "Runa Waystone"
+  - `settings.gradle`: `rootProject.name` changed to "RunaWaystone"
+  - All documentation files updated (README, CHANGELOG, etc.)
+  - GitHub URL references updated
+- **What Stayed the Same**:
+  - Mod ID: Still `waystoneinjector` (no breaking changes)
+  - Package names: Still `com.example.waystoneinjector`
+  - Config file names: Still `waystoneinjector-client.toml`
+  - JAR file prefix: Still `waystoneinjector-*.jar`
+- **Impact**: Purely cosmetic - existing configs, saves, and installations unaffected
 
 ## [3.0.237] - 2025-12-06
 

@@ -1,4 +1,4 @@
-# WaystoneButtonInjector v3.0.233 - Quality of Life Improvements
+# RunaWaystone v3.0.233 - Quality of Life Improvements
 
 ## FILES CREATED (Ready to Use)
 

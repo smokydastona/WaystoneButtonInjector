@@ -1,4 +1,4 @@
-# Waystone Button Injector
+# Runa Waystone
 
 Forge 1.20.1 **client-side mod** that adds custom configurable buttons to the Waystones selection screen and listens for server redirect packets.
 
@@ -74,10 +74,10 @@ Add as many buttons as needed - just ensure labels and commands arrays have the 
 Local builds may fail or produce inconsistent results. Always use GitHub Actions.
 
 ## Installation
-1. **Client:** Install WaystoneButtonInjector in your client's `mods/` folder
+1. **Client:** Install RunaWaystone in your client's `mods/` folder
 2. **Server (optional):** If using Feverdream auto-redirect, install the Feverdream server mod
 3. Configure buttons in `config/waystoneinjector-client.toml`
-4. **That's it!** No server-side installation of WaystoneButtonInjector needed
+4. **That's it!** No server-side installation of RunaWaystone needed
 
 ## Death/Sleep Redirection
 Configure automatic server redirects when you die or sleep using the `feverdream.redirects` config option. Each server can have separate death and sleep destinations. Example:

@@ -6,7 +6,7 @@ license="MIT"
 [[mods]]
 modId="waystoneinjector"
 version="${file.jarVersion}"
-displayName="Waystone Button Injector"
+displayName="Runa Waystone"
 description="Client-side mod that adds server transfer buttons to Waystones GUI. Includes built-in death/sleep redirects and server compatibility bypass. Handles server connections directly without requiring server-side installation."
 authors=["RunawayStone"]
 # This mod is CLIENT ONLY and does not need to be installed on the server

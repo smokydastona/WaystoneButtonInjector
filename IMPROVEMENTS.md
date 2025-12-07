@@ -1,4 +1,4 @@
-# WaystoneButtonInjector - Code Quality Improvements (v3.0.232)
+# RunaWaystone - Code Quality Improvements (v3.0.232)
 
 ## ✅ COMPLETED IMPROVEMENTS
 
