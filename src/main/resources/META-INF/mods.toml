@@ -50,11 +50,11 @@ config = "waystoneinjector.mixins.json"
     ordering="AFTER"
     side="CLIENT"
 
-# UI Lib - Modern UI library for custom GUIs
+# ModernUI - Modern UI framework
 [[dependencies.waystoneinjector]]
-    modId="uilib"
+    modId="modernui"
     mandatory=true
-    versionRange="[1.0.0,)"
+    versionRange="[3.12.0,)"
     ordering="BEFORE"
     side="CLIENT"
 

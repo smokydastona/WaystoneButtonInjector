@@ -49,6 +49,9 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
+    flatDir {
+        dir 'libs'
+    }
 }
 
 minecraft {
@@ -87,8 +90,8 @@ dependencies {
     // Lithium-inspired: fastutil for optimized collections
     implementation 'it.unimi.dsi:fastutil:8.5.12'
     
-    // UI Lib - Modern UI library for custom GUIs (1.20.1 version)
-    implementation fg.deobf('curse.maven:ui-lib-933200:5197652')
+    // ModernUI - Modern UI framework from libs folder
+    implementation fg.deobf(name: 'ModernUI-Forge-1.20.1-3.12.0.1-universal', ext: 'jar')
     
     // Waystones API from Maven - correct version format with +
     compileOnly fg.deobf('net.blay09.mods:waystones-forge:14.1.17+1.20.1')

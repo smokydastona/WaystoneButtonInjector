@@ -1,307 +1,266 @@
 package com.example.waystoneinjector.gui;
 
-import com.daqem.uilib.api.background.IBackground;
-import com.daqem.uilib.api.component.IComponent;
-import com.daqem.uilib.gui.AbstractContainerScreen;
-import com.daqem.uilib.gui.background.AnimatedTextureBackground;
-import com.daqem.uilib.gui.component.AdvancedButtonComponent;
-import com.daqem.uilib.gui.component.ScrollComponent;
-import com.daqem.uilib.gui.component.TextComponent;
-import com.daqem.uilib.gui.component.TextureComponent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Enhanced waystone selection screen built with UILib.
- * Provides custom background, animated portal, and scrollable waystone list.
+ * Enhanced waystone selection screen with scrollable list and animated portal.
+ * Features transparent background to show the world behind the GUI.
  */
 @SuppressWarnings("null")
 public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<WaystoneSelectionMenu> {
     
-    // Performance constants (DashLoader-inspired optimization)
+    // Animation constants
     private static final int ANIMATION_FRAME_COUNT = 26;
-    private static final long ANIMATION_FRAME_TIME_MS = 100L; // 100ms per frame
+    private static final long ANIMATION_FRAME_TIME_MS = 100L;
     
-    // Forge-inspired: Lazy-loaded animation textures (loaded async in background)
+    // Lazy-loaded animation textures
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[ANIMATION_FRAME_COUNT];
     private static volatile boolean animationTexturesLoaded = false;
-    private static final Object loadLock = new Object();
     
     static {
-        // Forge-inspired: Async background loading of animation frames
+        // Background thread to load animation frames
         Thread animationLoader = new Thread(() -> {
             try {
                 for (int i = 0; i < ANIMATION_FRAME_COUNT; i++) {
                     MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + (i + 1) + ".png");
-                    // Small delay to prevent resource spike (Forge's GPU weight management philosophy)
                     if (i % 5 == 0 && i > 0) {
-                        Thread.sleep(10); // Yield to other threads every 5 frames
+                        Thread.sleep(10);
                     }
                 }
-                synchronized (loadLock) {
-                    animationTexturesLoaded = true;
-                }
+                animationTexturesLoaded = true;
             } catch (Exception e) {
                 System.err.println("[WaystoneInjector] Failed to load animation textures: " + e.getMessage());
             }
         }, "WaystoneAnimationLoader");
-        animationLoader.setDaemon(true); // Don't block shutdown
-        animationLoader.setPriority(Thread.MIN_PRIORITY); // Low priority background loading
+        animationLoader.setDaemon(true);
+        animationLoader.setPriority(Thread.MIN_PRIORITY);
         animationLoader.start();
     }
     
     private long animationStartTime;
-    private int cachedAnimationFrame = 0; // Cached to reduce recalculation (performance optimization)
-    private ScrollableWaystoneList scrollableList;
-    private boolean useScrollableList = true; // Toggle between pagination and scrollable
+    private int cachedAnimationFrame = 0;
+    private WaystoneListWidget waystoneList;
     
-    // Cached reflection objects (Fastload-inspired optimization - reuse instead of recreating)
-    private static java.lang.reflect.Field waystoneFieldCache = null;
-    private static java.lang.reflect.Method xpCostMethodCache = null;
-    
-    // Debug logging flag (FastAsyncWorldSave-inspired: prevent I/O blocking)
-    private static final boolean DEBUG_LOGGING = false; // Set to true for development
+    // Cached reflection objects
+    private static Field waystoneFieldCache = null;
+    private static Method selectWaystoneMethodCache = null;
     
     public EnhancedWaystoneSelectionScreen(WaystoneSelectionMenu container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
         this.animationStartTime = System.currentTimeMillis();
-        if (DEBUG_LOGGING) {
-            System.out.println("[WaystoneInjector] EnhancedWaystoneSelectionScreen initialized");
-        }
+        this.imageWidth = 256;
+        this.imageHeight = 256;
     }
     
     @Override
-    public void renderBackground(@Nonnull GuiGraphics guiGraphics) {
-        // No background - fully transparent (prevents dirt texture)
-        // World will be visible behind the GUI
+    protected void renderBg(@Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        // No background - fully transparent
     }
     
     @Override
     public void removed() {
-        // CRITICAL: Prevent memory leak (MemoryLeakFix-inspired MC-101260)
-        // Clear references to prevent screen from keeping world loaded
-        if (scrollableList != null) {
-            scrollableList.cleanup(); // Clean up button references
-            this.removeWidget((net.minecraft.client.gui.components.events.GuiEventListener) scrollableList);
-            scrollableList = null;
+        if (waystoneList != null) {
+            this.removeWidget(waystoneList);
+            waystoneList = null;
         }
         super.removed();
     }
     
     @Override
-    public void init() {
-        // Call super.init() first, then disable opacity
+    protected void init() {
         super.init();
-        // Disable the default screen opacity/blur
-        this.clearWidgets(); // Clear any widgets added by super.init()
         
-        // Get waystones list and xp cost from the menu via reflection (Fastload-inspired: cached reflection)
         try {
-            var menuClass = this.menu.getClass();
-            
-            // Use cached reflection field or create and cache it (reduces overhead on reopening GUI)
+            // Get waystones from menu via reflection
             if (waystoneFieldCache == null) {
-                waystoneFieldCache = menuClass.getDeclaredField("waystones");
+                waystoneFieldCache = this.menu.getClass().getDeclaredField("waystones");
                 waystoneFieldCache.setAccessible(true);
             }
             
             @SuppressWarnings("unchecked")
             List<IWaystone> waystones = (List<IWaystone>) waystoneFieldCache.get(this.menu);
             
-            // Early exit if no waystones (Fastload philosophy: skip unnecessary work)
             if (waystones.isEmpty()) {
-                if (DEBUG_LOGGING) System.out.println("[WaystoneInjector] No waystones available");
                 return;
             }
             
-            // Get XP cost per waystone (default to 1 if can't find it)
-            int xpCostPerWaystone = 1;
-            try {
-                if (xpCostMethodCache == null) {
-                    xpCostMethodCache = menuClass.getDeclaredMethod("getCostForWaystone", IWaystone.class);
-                    xpCostMethodCache.setAccessible(true);
-                }
-                xpCostPerWaystone = (int) xpCostMethodCache.invoke(this.menu, waystones.get(0));
-            } catch (Exception ignored) {
-                // Default to 1 if method not found
-            }
+            // Create scrollable waystone list
+            int listTop = this.topPos + 80; // Space for portal animation
+            int listBottom = this.height - 40;
+            int listWidth = Math.min(300, this.width - 40);
             
-            // Create scrollable list widget that fills most of the screen
-            int listTop = this.topPos + 80; // Space for mystical portal
-            int listBottom = this.height - 40; // Leave space at bottom
-            int listHeight = listBottom - listTop;
-            
-            this.scrollableList = new ScrollableWaystoneList(
-                this,
+            waystoneList = new WaystoneListWidget(
                 this.minecraft,
-                this.width,
-                listHeight,
+                listWidth,
+                listBottom - listTop,
                 listTop,
                 listBottom,
-                20, // Item height - standard button height
+                22, // Item height
                 waystones,
-                xpCostPerWaystone
+                this::selectWaystone
             );
             
-            this.addRenderableWidget(scrollableList);
-            
-            if (DEBUG_LOGGING) {
-                System.out.println("[WaystoneInjector] Created scrollable list: " + waystones.size() + " waystones");
-            }
+            this.addRenderableWidget(waystoneList);
             
         } catch (Exception e) {
-            System.err.println("[WaystoneInjector] Failed to create scrollable list: " + e.getMessage());
+            System.err.println("[WaystoneInjector] Failed to initialize waystone list: " + e.getMessage());
             e.printStackTrace();
-            // Fall back to default pagination
-            useScrollableList = false;
-            super.init();
         }
     }
     
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        if (useScrollableList && scrollableList != null) {
-            // ModernUI-inspired: Update smooth scroll before rendering
-            scrollableList.renderWithSmoothScroll(guiGraphics, mouseX, mouseY, partialTicks);
-            
-            // Render mystical portal animation at top center
-            renderMysticalPortal(guiGraphics);
-            
-            // Render title above portal
-            @Nonnull Component titleComponent = this.title;
-            int titleX = this.width / 2 - this.font.width(titleComponent) / 2;
-            guiGraphics.drawString(this.font, titleComponent, titleX, this.topPos + 6, 0xFFFFFF, true);
-            
-            // Manually render widgets (bypassing super.render to avoid dirt background)
-            for (net.minecraft.client.gui.components.Renderable renderable : this.renderables) {
-                renderable.render(guiGraphics, mouseX, mouseY, partialTicks);
-            }
-            
-            // Render tooltips
-            this.renderTooltip(guiGraphics, mouseX, mouseY);
-            
-        } else {
-            // Fall back to default pagination rendering
-            super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        }
+    public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        // Render animated portal at top center
+        renderMysticalPortal(guiGraphics);
+        
+        // Render title above portal
+        int titleX = this.width / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
+        
+        // Render widgets (scrollable list)
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
     
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Override to prevent base class from accessing null searchBox
-        if (useScrollableList && scrollableList != null) {
-            // Handle ESC key to close screen
-            if (keyCode == 256) { // GLFW_KEY_ESCAPE
-                this.onClose();
-                return true;
-            }
-            return false;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-    
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // Do NOT call super.renderBg — this prevents container backgrounds
-        // Background is drawn in render() method instead
-    }
-    
-    // Custom GUI textures for the enhanced menu
-    private static final ResourceLocation PORTAL_FRAME = 
-        new ResourceLocation("waystoneinjector", "textures/gui/portal_frame.png");
-    
-    /**
-     * Renders the animated mystical portal texture with frame
-     * Optimized with frame caching (DashLoader-inspired)
-     * Forge-inspired: Async loading with null-safety
-     */
     private void renderMysticalPortal(GuiGraphics guiGraphics) {
-        // Forge-inspired: Check if textures are loaded before rendering
         if (!animationTexturesLoaded) {
-            // Optionally render a placeholder or just skip
             return;
         }
         
-        // Calculate current animation frame (cached for performance)
-        long elapsed = System.currentTimeMillis() - animationStartTime;
-        cachedAnimationFrame = (int) ((elapsed / ANIMATION_FRAME_TIME_MS) % ANIMATION_FRAME_COUNT);
+        // Calculate current frame
+        long elapsedTime = System.currentTimeMillis() - animationStartTime;
+        int frameIndex = (int) ((elapsedTime / ANIMATION_FRAME_TIME_MS) % ANIMATION_FRAME_COUNT);
         
-        // Null-safety check for async-loaded textures
-        if (MYSTICAL_PORTALS[cachedAnimationFrame] == null) {
-            return;
+        if (frameIndex != cachedAnimationFrame) {
+            cachedAnimationFrame = frameIndex;
         }
         
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        // Render portal centered at top
+        int portalWidth = 128;
+        int portalHeight = 128;
+        int portalX = (this.width - portalWidth) / 2;
+        int portalY = this.topPos + 20;
+        
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         
-        // Render portal at top center of screen
-        int portalX = this.width / 2 - 32; // Center horizontally (64x64 portal)
-        int portalY = this.topPos + 20;
+        guiGraphics.blit(
+            MYSTICAL_PORTALS[cachedAnimationFrame],
+            portalX, portalY,
+            0, 0,
+            portalWidth, portalHeight,
+            portalWidth, portalHeight
+        );
         
-        // Render portal frame behind the animation (80x80)
-        int frameX = this.width / 2 - 40;
-        int frameY = this.topPos + 12;
-        @Nonnull ResourceLocation portalFrame = PORTAL_FRAME;
-        guiGraphics.blit(portalFrame, frameX, frameY, 0, 0, 80, 80, 80, 80);
-        
-        // Render animated portal on top (uses cached frame for performance)
-        @Nonnull ResourceLocation animatedPortal = MYSTICAL_PORTALS[cachedAnimationFrame];
-        guiGraphics.blit(animatedPortal, portalX, portalY, 0, 0, 64, 64, 64, 64);
         RenderSystem.disableBlend();
     }
     
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        if (useScrollableList && scrollableList != null) {
-            return scrollableList.mouseScrolled(mouseX, mouseY, delta);
-        }
-        return super.mouseScrolled(mouseX, mouseY, delta);
-    }
-    
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (useScrollableList && scrollableList != null) {
-            if (scrollableList.mouseClicked(mouseX, mouseY, button)) {
-                return true;
+    private void selectWaystone(IWaystone waystone) {
+        try {
+            if (selectWaystoneMethodCache == null) {
+                selectWaystoneMethodCache = this.menu.getClass().getDeclaredMethod("selectWaystone", IWaystone.class);
+                selectWaystoneMethodCache.setAccessible(true);
             }
+            selectWaystoneMethodCache.invoke(this.menu, waystone);
+            this.onClose();
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Failed to select waystone: " + e.getMessage());
         }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-    
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (useScrollableList && scrollableList != null) {
-            if (scrollableList.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-                return true;
-            }
-        }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
     
     /**
-     * Called when a waystone is selected from the scrollable list
+     * Scrollable list widget for displaying waystones
      */
-    public void onWaystoneSelected(IWaystone waystone) {
-        super.onWaystoneSelected(waystone);
-    }
-    
-    @Override
-    protected boolean allowSorting() {
-        return false; // Disable sorting in scrollable mode
-    }
-    
-    @Override
-    protected boolean allowDeletion() {
-        return false; // Disable deletion in scrollable mode
+    private static class WaystoneListWidget extends ObjectSelectionList<WaystoneListWidget.Entry> {
+        
+        public WaystoneListWidget(net.minecraft.client.Minecraft minecraft, int width, int height, 
+                                   int y0, int y1, int itemHeight, List<IWaystone> waystones,
+                                   java.util.function.Consumer<IWaystone> onSelect) {
+            super(minecraft, width, height, y0, y1, itemHeight);
+            
+            // Add entries for each waystone
+            for (IWaystone waystone : waystones) {
+                this.addEntry(new Entry(waystone, onSelect, width - 8));
+            }
+        }
+        
+        @Override
+        public int getRowWidth() {
+            return this.width - 8;
+        }
+        
+        @Override
+        protected int getScrollbarPosition() {
+            return this.x0 + this.width - 6;
+        }
+        
+        @Override
+        protected void renderBackground(@Nonnull GuiGraphics guiGraphics) {
+            // Semi-transparent dark background
+            guiGraphics.fill(this.x0, this.y0, 
+                           this.x1, this.y1, 
+                           0xAA000000);
+        }
+        
+        /**
+         * Individual waystone entry in the list
+         */
+        private static class Entry extends ObjectSelectionList.Entry<Entry> {
+            private final IWaystone waystone;
+            private final Button button;
+            
+            public Entry(IWaystone waystone, java.util.function.Consumer<IWaystone> onSelect, int width) {
+                this.waystone = waystone;
+                
+                String displayName = waystone.getName();
+                
+                this.button = Button.builder(
+                    Component.literal(displayName),
+                    btn -> onSelect.accept(waystone)
+                ).bounds(0, 0, width, 20).build();
+            }
+            
+            @Override
+            public void render(@Nonnull GuiGraphics guiGraphics, int index, int top, int left, 
+                             int width, int height, int mouseX, int mouseY, 
+                             boolean hovering, float partialTicks) {
+                this.button.setX(left);
+                this.button.setY(top);
+                this.button.setWidth(width);
+                this.button.render(guiGraphics, mouseX, mouseY, partialTicks);
+            }
+            
+            @Override
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                return this.button.mouseClicked(mouseX, mouseY, button);
+            }
+            
+            @Override
+            public @Nonnull Component getNarration() {
+                return this.button.getMessage();
+            }
+            
+            public @Nonnull List<? extends net.minecraft.client.gui.components.events.GuiEventListener> children() {
+                return java.util.Collections.singletonList(this.button);
+            }
+            
+            public @Nonnull List<? extends net.minecraft.client.gui.narration.NarratableEntry> narratables() {
+                return java.util.Collections.singletonList(this.button);
+            }
+        }
     }
 }
