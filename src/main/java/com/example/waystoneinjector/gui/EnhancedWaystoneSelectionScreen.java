@@ -68,7 +68,14 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     @Override
     protected void renderBg(@Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // No background - fully transparent
+        // Render custom centered background instead of full-screen dirt
+        int bgWidth = 250;
+        int bgHeight = 150;
+        int bgX = (this.width - bgWidth) / 2;
+        int bgY = (this.height - bgHeight) / 2;
+        
+        // Render semi-transparent dark background
+        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA000000);
     }
     
     @Override
@@ -295,16 +302,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         
         @Override
         protected void renderBackground(@Nonnull GuiGraphics guiGraphics) {
-            // Fixed size centered background: 250 wide x 150 high
-            int bgWidth = DevConfig.isEnabled() ? this.width : 250;
-            int bgHeight = DevConfig.isEnabled() ? (this.y1 - this.y0) : 150;
-            int bgX = DevConfig.isEnabled() ? this.xPos : (this.minecraft.getWindow().getGuiScaledWidth() - bgWidth) / 2;
-            int bgY = DevConfig.isEnabled() ? this.y0 : (this.minecraft.getWindow().getGuiScaledHeight() - bgHeight) / 2;
-            
-            // Semi-transparent dark background
-            guiGraphics.fill(bgX, bgY, 
-                           bgX + bgWidth, bgY + bgHeight, 
-                           0xAA000000);
+            // No background here - handled by main screen
         }
         
         /**
