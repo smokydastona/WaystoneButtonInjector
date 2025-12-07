@@ -39,6 +39,15 @@ public class DevConfig {
         // Texture overrides
         public TextureOverrides textures = new TextureOverrides();
         
+        // Waystone/Block variant settings
+        public WaystoneVariantSettings waystoneVariant = new WaystoneVariantSettings();
+        
+        // Button settings
+        public ButtonSettings buttons = new ButtonSettings();
+        
+        // Title/Text settings
+        public TextSettings text = new TextSettings();
+        
         // Render order (higher = rendered on top)
         public RenderOrder renderOrder = new RenderOrder();
     }
@@ -78,11 +87,68 @@ public class DevConfig {
         public String portalFrame = "waystoneinjector:textures/gui/backgrounds/portal_frame.png";
     }
     
+    public static class WaystoneVariantSettings {
+        // Which waystone texture to use
+        public String variant = "regular";  // regular, mossy, blackstone, deepslate, endstone
+        public boolean showVariantTexture = false;  // Show waystone block in GUI
+        public int variantX = 0;
+        public int variantY = 0;
+        public int variantWidth = 64;
+        public int variantHeight = 64;
+        
+        // Sharestone settings
+        public String sharestoneColor = "purple";  // black, blue, brown, cyan, gray, green, light_blue, light_gray, lime, magenta, orange, pink, purple, red, white, yellow
+        public boolean showSharestoneTexture = false;
+        public int sharestoneX = 0;
+        public int sharestoneY = 0;
+        public int sharestoneWidth = 32;
+        public int sharestoneHeight = 32;
+        
+        // Other items
+        public boolean showWarpScroll = false;
+        public boolean showBoundScroll = false;
+        public boolean showReturnScroll = false;
+        public boolean showWarpStone = false;
+        public boolean showPortstone = false;
+        public boolean showWarpPlate = false;
+    }
+    
+    public static class ButtonSettings {
+        // Waystone entry buttons
+        public int buttonHeight = 20;
+        public int buttonSpacing = 2;
+        public String buttonColor = "default";  // default, blue, green, red, purple
+        public boolean showButtonBackground = true;
+        
+        // Close/Cancel buttons
+        public boolean showCloseButton = true;
+        public int closeButtonX = 0;
+        public int closeButtonY = 0;
+    }
+    
+    public static class TextSettings {
+        // Title
+        public boolean showTitle = true;
+        public int titleX = 0;           // Offset from center
+        public int titleY = 6;           // Y position
+        public int titleColor = 0xFFFFFF;  // RGB hex
+        public boolean titleShadow = true;
+        
+        // Waystone names in list
+        public int nameColor = 0xFFFFFF;
+        public boolean nameShadow = false;
+        
+        // Debug text
+        public String customDebugText = "";  // Custom text to show in debug overlay
+    }
+    
     public static class RenderOrder {
         public int background = 0;
+        public int waystoneVariant = 5;
         public int portal = 10;
         public int scrollList = 20;
         public int buttons = 30;
+        public int text = 40;
         public int tooltips = 100;
     }
     
@@ -141,6 +207,9 @@ public class DevConfig {
     public static PortalSettings getPortal() { return data.portal; }
     public static BackgroundSettings getBackground() { return data.background; }
     public static TextureOverrides getTextures() { return data.textures; }
+    public static WaystoneVariantSettings getWaystoneVariant() { return data.waystoneVariant; }
+    public static ButtonSettings getButtons() { return data.buttons; }
+    public static TextSettings getText() { return data.text; }
     public static RenderOrder getRenderOrder() { return data.renderOrder; }
     
     /**
@@ -179,5 +248,37 @@ public class DevConfig {
         }
         
         return defaultTexture;
+    }
+    
+    /**
+     * Get waystone variant texture based on config
+     */
+    public static ResourceLocation getWaystoneVariantTexture() {
+        if (!data.enabled) return null;
+        
+        String variant = data.waystoneVariant.variant.toLowerCase();
+        return new ResourceLocation("waystoneinjector", 
+            "textures/gui/variants/waystone_" + variant + ".png");
+    }
+    
+    /**
+     * Get sharestone color texture based on config
+     */
+    public static ResourceLocation getSharestoneTexture() {
+        if (!data.enabled) return null;
+        
+        String color = data.waystoneVariant.sharestoneColor.toLowerCase();
+        return new ResourceLocation("waystoneinjector", 
+            "textures/gui/animations/sharestone/" + color + ".png");
+    }
+    
+    /**
+     * Get item texture by type
+     */
+    public static ResourceLocation getItemTexture(String itemType) {
+        if (!data.enabled) return null;
+        
+        return new ResourceLocation("waystoneinjector", 
+            "textures/gui/items/" + itemType + ".png");
     }
 }

@@ -32,11 +32,52 @@
     "entryBackground": "waystoneinjector:textures/gui/backgrounds/list_entry_background.png",
     "portalFrame": "waystoneinjector:textures/gui/backgrounds/portal_frame.png"
   },
+  "waystoneVariant": {
+    "variant": "regular",
+    "showVariantTexture": false,
+    "variantX": 0,
+    "variantY": 0,
+    "variantWidth": 64,
+    "variantHeight": 64,
+    "sharestoneColor": "purple",
+    "showSharestoneTexture": false,
+    "sharestoneX": 0,
+    "sharestoneY": 0,
+    "sharestoneWidth": 32,
+    "sharestoneHeight": 32,
+    "showWarpScroll": false,
+    "showBoundScroll": false,
+    "showReturnScroll": false,
+    "showWarpStone": false,
+    "showPortstone": false,
+    "showWarpPlate": false
+  },
+  "buttons": {
+    "buttonHeight": 20,
+    "buttonSpacing": 2,
+    "buttonColor": "default",
+    "showButtonBackground": true,
+    "showCloseButton": true,
+    "closeButtonX": 0,
+    "closeButtonY": 0
+  },
+  "text": {
+    "showTitle": true,
+    "titleX": 0,
+    "titleY": 6,
+    "titleColor": 16777215,
+    "titleShadow": true,
+    "nameColor": 16777215,
+    "nameShadow": false,
+    "customDebugText": ""
+  },
   "renderOrder": {
     "background": 0,
+    "waystoneVariant": 5,
     "portal": 10,
     "scrollList": 20,
     "buttons": 30,
+    "text": 40,
     "tooltips": 100
   }
 }
