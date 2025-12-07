@@ -1,7 +1,6 @@
 package com.example.waystoneinjector.util;
 
 import com.example.waystoneinjector.WaystoneInjectorMod;
-import net.minecraftforge.common.ForgeConfigSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +16,14 @@ public class DebugLogger {
     private static boolean debugMode = false;
     private static boolean verboseMode = false;
     
+    // Granular category toggles
+    private static boolean debugGui = true;
+    private static boolean debugConfig = true;
+    private static boolean debugMixin = true;
+    private static boolean debugRedirect = true;
+    private static boolean debugEvent = true;
+    private static boolean debugResource = true;
+    
     public static void setDebugMode(boolean enabled) {
         debugMode = enabled;
         if (enabled) {
@@ -29,6 +36,14 @@ public class DebugLogger {
     public static void setVerboseMode(boolean enabled) {
         verboseMode = enabled;
     }
+    
+    // Granular category setters
+    public static void setDebugGui(boolean enabled) { debugGui = enabled; }
+    public static void setDebugConfig(boolean enabled) { debugConfig = enabled; }
+    public static void setDebugMixin(boolean enabled) { debugMixin = enabled; }
+    public static void setDebugRedirect(boolean enabled) { debugRedirect = enabled; }
+    public static void setDebugEvent(boolean enabled) { debugEvent = enabled; }
+    public static void setDebugResource(boolean enabled) { debugResource = enabled; }
     
     public static boolean isDebugMode() {
         return debugMode;
@@ -96,42 +111,54 @@ public class DebugLogger {
      * GUI-related debug logs
      */
     public static void gui(String message) {
-        debug("[GUI] " + message);
+        if (debugGui) {
+            debug("[GUI] " + message);
+        }
     }
     
     /**
      * Config-related debug logs
      */
     public static void config(String message) {
-        debug("[CONFIG] " + message);
+        if (debugConfig) {
+            debug("[CONFIG] " + message);
+        }
     }
     
     /**
      * Mixin-related debug logs
      */
     public static void mixin(String message) {
-        debug("[MIXIN] " + message);
+        if (debugMixin) {
+            debug("[MIXIN] " + message);
+        }
     }
     
     /**
      * Redirect/connection-related debug logs
      */
     public static void redirect(String message) {
-        debug("[REDIRECT] " + message);
+        if (debugRedirect) {
+            debug("[REDIRECT] " + message);
+        }
     }
     
     /**
      * Event-related debug logs
      */
     public static void event(String message) {
-        debug("[EVENT] " + message);
+        if (debugEvent) {
+            debug("[EVENT] " + message);
+        }
     }
     
     /**
      * Texture/resource-related debug logs
      */
     public static void resource(String message) {
-        debug("[RESOURCE] " + message);
+        if (debugResource) {
+            debug("[RESOURCE] " + message);
+        }
     }
     
     // ═══════════════════════════════════════════════════════════════

@@ -2,6 +2,78 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.233] - 2025-12-06
+
+### Added - Quality of Life & Robustness Improvements
+- **GuiCompatibilityDetector System** (180 lines): Automatic GUI compatibility detection
+  - Percentage-based positioning (5% left, 85% right, 75% vertical) - works on any screen size
+  - Button overlap detection and auto-spacing (10% screen height per button)
+  - Screen bounds constraint (10px margins) - prevents off-screen buttons
+  - Safe mode support - uses vanilla button style when enabled
+- **ErrorToastManager System** (165 lines): In-game toast notifications for errors
+  - SystemToast integration with colored titles (§c red, §e yellow, §a green)
+  - 11 pre-built notification methods:
+    * `showRedirectError()` - Connection failures
+    * `showConfigError()` - Invalid configs
+    * `showButtonDisabled()` - Disabled button info
+    * `showInvalidServerError()` - Bad server addresses
+    * `showRedirectTimeout()` - Connection timeouts (30s default)
+    * `showRedirectSuccess()` - Successful connections
+    * `showOverlapWarning()` - Button collisions
+    * `showSafeModeInfo()` - Safe mode activation
+    * Generic `showError/Warning/Info()` methods
+- **RedirectManager System** (150 lines): Server redirect timeout handling
+  - 30-second default timeout (configurable 5-120s)
+  - 5-second warning threshold (logs warning if still connecting)
+  - CompletableFuture-based async monitoring (checks every 100ms)
+  - Prevents multiple simultaneous redirects
+  - Returns to server list on timeout
+  - Toast notifications for all states (success, failure, timeout, warning)
+- **Granular Debug Categories**: Fine-grained control over debug logging
+  - 6 independent toggles: `gui`, `config`, `mixin`, `redirect`, `event`, `resource`
+  - Each category can be enabled/disabled individually
+  - Only takes effect when `debugMode = true`
+- **Safety & Compatibility Settings**: New `[safety]` config section
+  - `safeMode = false` - Enable vanilla button style + percentage positioning for maximum compatibility
+  - `autoSpacing = true` - Automatically adjust button positions if they overlap
+  - `redirectTimeout = 30` - Server redirect timeout in seconds (prevents client freeze)
+- **Button Tooltips**: Hover tooltip support for all 6 buttons
+  - Supports Minecraft color codes (`&aGreen`, `&cRed`, etc.)
+  - Optional per-button configuration
+  - Leave empty for no tooltip
+
+### Changed
+- **DebugLogger Enhanced**: Added granular category toggles
+  - New setters: `setDebugGui()`, `setDebugConfig()`, `setDebugMixin()`, `setDebugRedirect()`, `setDebugEvent()`, `setDebugResource()`
+  - Category-specific logging methods now respect individual toggles
+- **WaystoneConfig Expanded**: Added 15 new configuration fields
+  - Debug categories: `DEBUG_GUI`, `DEBUG_CONFIG`, `DEBUG_MIXIN`, `DEBUG_REDIRECT`, `DEBUG_EVENT`, `DEBUG_RESOURCE`
+  - Safety settings: `SAFE_MODE`, `AUTO_SPACING`, `REDIRECT_TIMEOUT_SECONDS`
+  - Tooltips: `BUTTON1-6_TOOLTIP` (6 new fields)
+- **onConfigLoad() Enhanced**: Applies new settings automatically
+  - Applies granular debug category toggles
+  - Applies safety settings (safe mode, auto-spacing)
+  - Shows safe mode toast notification when enabled
+  - Shows config error toasts for visibility
+  - Validates configuration and reports errors/warnings
+
+### Technical
+- Enhanced `DebugLogger.java` (+30 lines) - Granular category toggles
+- New `GuiCompatibilityDetector.java` (180 lines) - GUI compatibility & positioning
+- New `ErrorToastManager.java` (165 lines) - In-game toast notifications
+- New `RedirectManager.java` (150 lines) - Timeout handling & async monitoring
+- Modified `WaystoneConfig.java` (+100 lines) - New config fields & initialization
+- Documentation: `QOL_IMPROVEMENTS_v3.0.233.md`, `CONFIG_PATCH_v3.0.233.md`, `IMPLEMENTATION_STATUS_v3.0.233.md`
+- Total new/modified code: ~670 lines
+- All changes are backwards compatible - existing configs work without modification
+
+### Impact
+- **High Impact**: Prevents client freezes (redirect timeout), improves error visibility (toasts)
+- **Medium Impact**: Enhances compatibility (safe mode), improves diagnostics (granular debug)
+- **Backwards Compatible**: All new features have defaults that maintain current behavior
+
+---
+
 ## [3.0.232] - 2025-12-06
 
 ### Added
