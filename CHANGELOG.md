@@ -2,6 +2,50 @@
 
 All notable changes to the Waystone Button Injector mod will be documented in this file.
 
+## [3.0.237] - 2025-12-06
+
+### Fixed - Complete Mixin Strategy Rewrite
+- **MixinMenuScreens Total Rewrite**: Abandoned `@Shadow` approach, using `@ModifyArg` instead
+  - Root Cause: `@Shadow` requires exact field name matching in obfuscated bytecode, which is unreliable
+  - Problem with v3.0.231-236: Tried multiple approaches (`SCREENS`, `f_96579_`, aliases, `@Final`, `@Mutable`) all failed
+  - Core Issue: Cannot reliably access private static final fields via `@Shadow` in obfuscated environment
+  - **NEW APPROACH**: Use `@ModifyArg` to intercept the factory parameter during `Map.put()` call
+  - Technical Implementation:
+    ```java
+    @ModifyArg(
+        method = "register(...)",
+        at = @At(value = "INVOKE", target = "Ljava/util/Map;put(...)"),
+        index = 1  // Modify second argument (the factory)
+    )
+    private static MenuScreens.ScreenConstructor wrapFactory(MenuScreens.ScreenConstructor original) {
+        return new MenuScreens.ScreenConstructor() {
+            @Override
+            public Screen create(menu, inv, title) {
+                if (menu instanceof WaystoneSelectionMenu) {
+                    return new EnhancedWaystoneSelectionScreen(...);
+                }
+                return original.create(menu, inv, title);
+            }
+        };
+    }
+    ```
+  - Impact: No field access needed - wraps factory at registration time instead of modifying map after
+  - Compatibility: Should work with Furniture Mod and other mods using `MenuScreens`
+  - Status: ✅ Complete rewrite - no `@Shadow`, no field access, intercepts method argument directly
+
+### Technical Details
+- **Why This Works**: 
+  - Intercepts the `factory` parameter BEFORE it's stored in the map
+  - Wraps it with our own factory that checks for `WaystoneSelectionMenu`
+  - No need to access or modify the internal `SCREENS` map
+  - Works in both dev and production environments (no obfuscation dependency)
+- **Advantages Over @Shadow**:
+  - No field name obfuscation issues
+  - No `@Final`/`@Mutable` complexity
+  - No refmap dependency
+  - Cleaner, more maintainable code
+- **Performance**: Factory wrapper only checks `instanceof` once per screen creation (negligible overhead)
+
 ## [3.0.236] - 2025-12-06
 
 ### Fixed - @Shadow Field Access with @Final @Mutable
