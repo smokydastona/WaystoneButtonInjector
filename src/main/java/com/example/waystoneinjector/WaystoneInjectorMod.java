@@ -23,6 +23,11 @@ public class WaystoneInjectorMod {
             WaystoneConfig.register();
             System.out.println("[WaystoneInjector] Config registered!");
             
+            // Initialize config (load debug settings + validate)
+            System.out.println("[WaystoneInjector] Loading and validating config...");
+            WaystoneConfig.onConfigLoad();
+            System.out.println("[WaystoneInjector] Config loaded and validated!");
+            
             // Register screen replacement handler (Sodium-inspired approach using events)
             System.out.println("[WaystoneInjector] Registering ScreenReplacementHandler...");
             com.example.waystoneinjector.client.ScreenReplacementHandler.register();

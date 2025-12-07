@@ -10,6 +10,10 @@ import java.util.List;
 public class WaystoneConfig {
     public static final ForgeConfigSpec SPEC;
     
+    // Debug/logging settings
+    public static final ForgeConfigSpec.BooleanValue DEBUG_MODE;
+    public static final ForgeConfigSpec.BooleanValue VERBOSE_MODE;
+    
     // Individual button configs
     public static final ForgeConfigSpec.BooleanValue BUTTON1_ENABLED;
     public static final ForgeConfigSpec.ConfigValue<String> BUTTON1_LABEL;
@@ -112,6 +116,10 @@ public class WaystoneConfig {
                         "  3. Set command: Use 'redirect @s server.ip:port' OR any server command",
                         "  4. Customize appearance (optional): width, height, position, color",
                         "",
+                        "DEBUG OPTIONS:",
+                        "  - Set 'debugMode = true' for detailed logs (helps diagnose issues)",
+                        "  - Set 'verboseMode = true' for ultra-detailed logs (very spammy!)",
+                        "",
                         "═══════════════════════════════════════════════════════════════════════════════",
                         "  COMPLETE BUTTON EXAMPLE",
                         "═══════════════════════════════════════════════════════════════════════════════",
@@ -168,6 +176,28 @@ public class WaystoneConfig {
                         "  0xFFD700 = Gold      0xC0C0C0 = Silver     0x808080 = Gray",
                         "",
                         "═══════════════════════════════════════════════════════════════════════════════");
+        
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // Debug Settings - Helps diagnose issues
+        // ═══════════════════════════════════════════════════════════════════════════════
+        builder.push("debug");
+        
+        DEBUG_MODE = builder
+                .comment("",
+                        "Enable debug mode for detailed logging",
+                        "Logs: GUI injection, button presses, redirects, config validation",
+                        "Recommended: Enable when troubleshooting issues",
+                        "")
+                .define("debugMode", false);
+        
+        VERBOSE_MODE = builder
+                .comment("",
+                        "Enable verbose mode for ULTRA-detailed logging (very spammy!)",
+                        "Only use when diagnosing complex issues",
+                        "")
+                .define("verboseMode", false);
+        
+        builder.pop();
         
         // ═══════════════════════════════════════════════════════════════════════════════
         // Button 1 - Configure your first custom button here!
@@ -615,5 +645,36 @@ public class WaystoneConfig {
 
     public static void register() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, SPEC, "waystoneinjector-client.toml");
+    }
+    
+    /**
+     * Called when config is loaded or reloaded
+     * Applies debug settings and validates configuration
+     * This should be called from WaystoneInjectorMod during initialization
+     */
+    public static void onConfigLoad() {
+        // Apply debug settings to DebugLogger
+        com.example.waystoneinjector.util.DebugLogger.setDebugMode(DEBUG_MODE.get());
+        com.example.waystoneinjector.util.DebugLogger.setVerboseMode(VERBOSE_MODE.get());
+        
+        // Validate configuration
+        com.example.waystoneinjector.util.ConfigValidator.ValidationResult result = 
+            com.example.waystoneinjector.util.ConfigValidator.validateAllButtons();
+        
+        if (result.hasErrors()) {
+            com.example.waystoneinjector.util.DebugLogger.error("═══════════════════════════════════════════════════════");
+            com.example.waystoneinjector.util.DebugLogger.error("CONFIG VALIDATION FAILED - Found " + result.errors.size() + " error(s):");
+            for (String error : result.errors) {
+                com.example.waystoneinjector.util.DebugLogger.error("  • " + error);
+            }
+            com.example.waystoneinjector.util.DebugLogger.error("Buttons with errors will be disabled to prevent crashes.");
+            com.example.waystoneinjector.util.DebugLogger.error("═══════════════════════════════════════════════════════");
+        }
+        
+        if (result.hasWarnings()) {
+            for (String warning : result.warnings) {
+                com.example.waystoneinjector.util.DebugLogger.warn(warning);
+            }
+        }
     }
 }
