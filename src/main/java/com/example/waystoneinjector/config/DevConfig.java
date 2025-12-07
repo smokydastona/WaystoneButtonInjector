@@ -91,6 +91,7 @@ public class DevConfig {
      */
     public static void load() {
         if (!CONFIG_FILE.exists()) {
+            System.out.println("[WaystoneInjector] Dev config not found, creating default at: " + CONFIG_FILE.getAbsolutePath());
             data = new DevConfigData();
             save();
             return;
@@ -99,6 +100,10 @@ public class DevConfig {
         try (FileReader reader = new FileReader(CONFIG_FILE)) {
             data = GSON.fromJson(reader, DevConfigData.class);
             lastModified = CONFIG_FILE.lastModified();
+            System.out.println("[WaystoneInjector] Dev config loaded! Enabled=" + data.enabled + " from: " + CONFIG_FILE.getAbsolutePath());
+            if (data.enabled) {
+                System.out.println("[WaystoneInjector]   Scroll list: " + data.scrollList.width + "x" + data.scrollList.height + " centered=" + data.scrollList.centered);
+            }
         } catch (IOException e) {
             System.err.println("Failed to load dev config: " + e.getMessage());
             data = new DevConfigData();
@@ -124,8 +129,8 @@ public class DevConfig {
         if (!data.enabled) return;
         
         if (CONFIG_FILE.exists() && CONFIG_FILE.lastModified() > lastModified) {
+            System.out.println("[WaystoneInjector] Dev config file changed, reloading...");
             load();
-            System.out.println("Dev config reloaded!");
         }
     }
     

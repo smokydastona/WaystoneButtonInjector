@@ -87,6 +87,8 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         // Load/reload dev config
         DevConfig.checkReload();
         
+        System.out.println("[WaystoneInjector] Dev mode enabled: " + DevConfig.isEnabled());
+        
         try {
             // Get waystones from menu via reflection
             if (waystoneFieldCache == null) {
@@ -108,6 +110,9 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
             int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 80);
             int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.height - 40);
             int itemHeight = DevConfig.isEnabled() ? listSettings.itemHeight : 22;
+            
+            System.out.println("[WaystoneInjector] List dimensions: " + listWidth + "x" + (listBottom - listTop) + " at y=" + listTop);
+            System.out.println("[WaystoneInjector] Screen dimensions: " + this.width + "x" + this.height);
             
             waystoneList = new WaystoneListWidget(
                 this.minecraft,
