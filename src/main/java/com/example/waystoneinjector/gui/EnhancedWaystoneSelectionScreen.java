@@ -106,9 +106,9 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
             // Get settings from dev config or use defaults
             DevConfig.ScrollListSettings listSettings = DevConfig.getScrollList();
             
-            int listWidth = DevConfig.isEnabled() ? listSettings.width : 250;
-            int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 60);
-            int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.topPos + 210);
+            int listWidth = DevConfig.isEnabled() ? listSettings.width : Math.min(300, this.width - 40);
+            int listTop = DevConfig.isEnabled() ? listSettings.topMargin : (this.topPos + 80);
+            int listBottom = DevConfig.isEnabled() ? (this.height - listSettings.bottomMargin) : (this.height - 40);
             int itemHeight = DevConfig.isEnabled() ? listSettings.itemHeight : 22;
             
             System.out.println("[WaystoneInjector] List dimensions: " + listWidth + "x" + (listBottom - listTop) + " at y=" + listTop);
@@ -295,9 +295,15 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         
         @Override
         protected void renderBackground(@Nonnull GuiGraphics guiGraphics) {
+            // Fixed size centered background: 250 wide x 150 high
+            int bgWidth = DevConfig.isEnabled() ? this.width : 250;
+            int bgHeight = DevConfig.isEnabled() ? (this.y1 - this.y0) : 150;
+            int bgX = DevConfig.isEnabled() ? this.xPos : (this.minecraft.getWindow().getGuiScaledWidth() - bgWidth) / 2;
+            int bgY = DevConfig.isEnabled() ? this.y0 : (this.minecraft.getWindow().getGuiScaledHeight() - bgHeight) / 2;
+            
             // Semi-transparent dark background
-            guiGraphics.fill(this.xPos, this.y0, 
-                           this.xPos + this.width, this.y1, 
+            guiGraphics.fill(bgX, bgY, 
+                           bgX + bgWidth, bgY + bgHeight, 
                            0xAA000000);
         }
         
