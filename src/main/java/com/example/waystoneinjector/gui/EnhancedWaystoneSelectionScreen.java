@@ -36,7 +36,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         Thread animationLoader = new Thread(() -> {
             try {
                 for (int i = 0; i < ANIMATION_FRAME_COUNT; i++) {
-                    MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + (i + 1) + ".png");
+                    MYSTICAL_PORTALS[i] = new ResourceLocation("waystoneinjector", "textures/gui/animations/portal/mystic_" + (i + 1) + ".png");
                     if (i % 5 == 0 && i > 0) {
                         Thread.sleep(10);
                     }

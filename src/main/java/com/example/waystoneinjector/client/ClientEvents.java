@@ -42,61 +42,61 @@ public class ClientEvents {
     private static final AtomicReference<String> currentWaystoneType = new AtomicReference<>("regular");
     
     // Custom GUI texture locations - Waystone Blocks
-    private static final ResourceLocation TEXTURE_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/waystone_regular.png");
-    private static final ResourceLocation TEXTURE_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/waystone_mossy.png");
-    private static final ResourceLocation TEXTURE_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_blackstone.png");
-    private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_deepslate.png");
-    private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/waystone_endstone.png");
-    private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone.png");
-    private static final ResourceLocation TEXTURE_WARP_PLATE = new ResourceLocation("waystoneinjector", "textures/gui/warp_plate.png");
-    private static final ResourceLocation TEXTURE_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/portstone.png");
+    private static final ResourceLocation TEXTURE_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/variants/waystone_regular.png");
+    private static final ResourceLocation TEXTURE_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/variants/waystone_mossy.png");
+    private static final ResourceLocation TEXTURE_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/waystone_blackstone.png");
+    private static final ResourceLocation TEXTURE_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/variants/waystone_deepslate.png");
+    private static final ResourceLocation TEXTURE_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/waystone_endstone.png");
+    private static final ResourceLocation TEXTURE_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/items/sharestone.png");
+    private static final ResourceLocation TEXTURE_WARP_PLATE = new ResourceLocation("waystoneinjector", "textures/gui/items/warp_plate.png");
+    private static final ResourceLocation TEXTURE_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/items/portstone.png");
     
     // Waystone list entry overlays (220x36 for each waystone button in the list)
-    private static final ResourceLocation OVERLAY_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/overlays/regular.png");
-    private static final ResourceLocation OVERLAY_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/overlays/mossy.png");
-    private static final ResourceLocation OVERLAY_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/blackstone.png");
-    private static final ResourceLocation OVERLAY_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/deepslate.png");
-    private static final ResourceLocation OVERLAY_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/endstone.png");
-    private static final ResourceLocation OVERLAY_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/sharestone.png");
-    private static final ResourceLocation OVERLAY_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/overlays/warp_scroll.png");
-    private static final ResourceLocation OVERLAY_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/warp_stone.png");
-    private static final ResourceLocation OVERLAY_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/overlays/portstone.png");
+    private static final ResourceLocation OVERLAY_REGULAR = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/regular.png");
+    private static final ResourceLocation OVERLAY_MOSSY = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/mossy.png");
+    private static final ResourceLocation OVERLAY_BLACKSTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/blackstone.png");
+    private static final ResourceLocation OVERLAY_DEEPSLATE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/deepslate.png");
+    private static final ResourceLocation OVERLAY_ENDSTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/endstone.png");
+    private static final ResourceLocation OVERLAY_SHARESTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/sharestone.png");
+    private static final ResourceLocation OVERLAY_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/warp_scroll.png");
+    private static final ResourceLocation OVERLAY_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/warp_stone.png");
+    private static final ResourceLocation OVERLAY_PORTSTONE = new ResourceLocation("waystoneinjector", "textures/gui/variants/overlays/portstone.png");
     
     // Mystical portal overlay textures (26 frames for random selection)
     private static final ResourceLocation[] MYSTICAL_PORTALS = new ResourceLocation[26];
     static {
         for (int i = 1; i <= 26; i++) {
-            MYSTICAL_PORTALS[i-1] = new ResourceLocation("waystoneinjector", "textures/gui/mystical/mystic_" + i + ".png");
+            MYSTICAL_PORTALS[i-1] = new ResourceLocation("waystoneinjector", "textures/gui/animations/portal/mystic_" + i + ".png");
         }
     }
     
     // Custom GUI textures - Teleportation Items
-    private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/warp_scroll.png");
-    private static final ResourceLocation TEXTURE_BOUND_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/bound_scroll.png");
-    private static final ResourceLocation TEXTURE_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/warp_stone.png");
-    private static final ResourceLocation TEXTURE_RETURN_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/return_scroll.png");
+    private static final ResourceLocation TEXTURE_WARP_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/items/warp_scroll.png");
+    private static final ResourceLocation TEXTURE_BOUND_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/items/bound_scroll.png");
+    private static final ResourceLocation TEXTURE_WARP_STONE = new ResourceLocation("waystoneinjector", "textures/gui/items/warp_stone.png");
+    private static final ResourceLocation TEXTURE_RETURN_SCROLL = new ResourceLocation("waystoneinjector", "textures/gui/items/return_scroll.png");
     
     // Animated portal background for waystone GUIs
-    private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/portal_animation.png");
-    private static final ResourceLocation PORTSTONE_PORTAL = new ResourceLocation("waystoneinjector", "textures/gui/portstone_portal.png");
+    private static final ResourceLocation PORTAL_ANIMATION = new ResourceLocation("waystoneinjector", "textures/gui/animations/portal_animation.png");
+    private static final ResourceLocation PORTSTONE_PORTAL = new ResourceLocation("waystoneinjector", "textures/gui/animations/portstone_portal.png");
     
     // Sharestone portal backgrounds (animated, color-specific)
-    private static final ResourceLocation SHARESTONE_PORTAL_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/black.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/blue.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_BROWN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/brown.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_CYAN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/cyan.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/gray.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_GREEN = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/green.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/light_blue.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/light_gray.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_LIME = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/lime.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_MAGENTA = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/magenta.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_ORANGE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/orange.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_PINK = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/pink.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_PURPLE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/purple.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_RED = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/red.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/white.png");
-    private static final ResourceLocation SHARESTONE_PORTAL_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/sharestone_portals/yellow.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_BLACK = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/black.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/blue.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_BROWN = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/brown.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_CYAN = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/cyan.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/gray.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_GREEN = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/green.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_BLUE = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/light_blue.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIGHT_GRAY = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/light_gray.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_LIME = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/lime.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_MAGENTA = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/magenta.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_ORANGE = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/orange.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_PINK = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/pink.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_PURPLE = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/purple.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_RED = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/red.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_WHITE = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/white.png");
+    private static final ResourceLocation SHARESTONE_PORTAL_YELLOW = new ResourceLocation("waystoneinjector", "textures/gui/animations/sharestone/yellow.png");
     
     // Track the specific sharestone color variant
     private static final ThreadLocal<String> currentSharestoneColor = ThreadLocal.withInitial(() -> "purple");
