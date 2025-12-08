@@ -68,14 +68,30 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     @Override
     protected void renderBg(@Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        // Render custom centered background instead of full-screen dirt
-        int bgWidth = 250;
-        int bgHeight = 150;
+        // Get background settings from dev config
+        DevConfig.BackgroundSettings bgSettings = DevConfig.getBackground();
+        
+        int bgWidth = DevConfig.isEnabled() && DevConfig.getScrollList().centered ? 
+            DevConfig.getScrollList().width : 250;
+        int bgHeight = DevConfig.isEnabled() ? 
+            DevConfig.getScrollList().height : 150;
         int bgX = (this.width - bgWidth) / 2;
         int bgY = (this.height - bgHeight) / 2;
         
-        // Render semi-transparent dark background
-        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA000000);
+        if (DevConfig.isEnabled()) {
+            bgX += DevConfig.getScrollList().xOffset;
+            bgY += DevConfig.getScrollList().yOffset;
+        }
+        
+        // Render background based on config
+        if (DevConfig.isEnabled() && bgSettings.renderMenuBackground) {
+            int alpha = bgSettings.menuBackgroundAlpha;
+            int color = (alpha << 24) | (bgSettings.backgroundColor & 0x00FFFFFF);
+            guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, color);
+        } else if (!DevConfig.isEnabled()) {
+            // Default: semi-transparent dark background
+            guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xAA000000);
+        }
     }
     
     @Override
@@ -258,12 +274,15 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
      */
     private static class WaystoneListWidget extends ObjectSelectionList<WaystoneListWidget.Entry> {
         private int xPos;
+        private int listWidth;
         
         public WaystoneListWidget(net.minecraft.client.Minecraft minecraft, int width, int height, 
                                    int y0, int y1, int itemHeight, List<IWaystone> waystones,
                                    java.util.function.Consumer<IWaystone> onSelect,
                                    DevConfig.ScrollListSettings settings) {
             super(minecraft, width, height, y0, y1, itemHeight);
+            
+            this.listWidth = width;
             
             // Center horizontally if enabled
             if (DevConfig.isEnabled() && settings.centered) {
@@ -274,20 +293,24 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 this.xPos = (minecraft.getWindow().getGuiScaledWidth() - width) / 2;
             }
             
+            // CRITICAL: Update the list's actual X boundaries
+            this.x0 = this.xPos;
+            this.x1 = this.xPos + width;
+            
             // Add entries for each waystone
             for (IWaystone waystone : waystones) {
                 this.addEntry(new Entry(waystone, onSelect, width - 8));
             }
         }
         
-        public int getX0() { return this.xPos; }
+        public int getX0() { return this.x0; }
         public int getY0() { return this.y0; }
-        public int getListWidth() { return this.width; }
+        public int getListWidth() { return this.listWidth; }
         public int getListHeight() { return this.height; }
         
         @Override
         public int getRowLeft() {
-            return this.xPos + 4;
+            return this.x0 + 4;
         }
         
         @Override
@@ -297,7 +320,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         
         @Override
         protected int getScrollbarPosition() {
-            return this.xPos + this.width - 6;
+            return this.x1 - 6;
         }
         
         @Override
