@@ -404,23 +404,25 @@ public class DevConfig {
     }
     
     /**
-     * Get waystone variant texture based on config
+     * Get waystone variant texture based on current profile
      */
     public static ResourceLocation getWaystoneVariantTexture() {
         if (!data.enabled) return null;
         
-        String variant = data.waystoneVariant.variant.toLowerCase();
+        VariantProfile profile = getCurrentProfile();
+        String variant = profile.variantId.toLowerCase();
         return new ResourceLocation("waystoneinjector", 
             "textures/gui/variants/waystone_" + variant + ".png");
     }
     
     /**
-     * Get sharestone color texture based on config
+     * Get sharestone color texture based on current profile
      */
     public static ResourceLocation getSharestoneTexture() {
         if (!data.enabled) return null;
         
-        String color = data.waystoneVariant.sharestoneColor.toLowerCase();
+        VariantProfile profile = getCurrentProfile();
+        String color = profile.display.sharestoneColor.toLowerCase();
         return new ResourceLocation("waystoneinjector", 
             "textures/gui/animations/sharestone/" + color + ".png");
     }
