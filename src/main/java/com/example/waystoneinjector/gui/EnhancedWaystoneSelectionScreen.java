@@ -185,9 +185,16 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         // Render portal
         int[] portalBounds = renderMysticalPortal(guiGraphics);
         
+        // Render waystone variant textures if enabled
+        renderWaystoneVariants(guiGraphics);
+        
         // Render title
-        int titleX = this.width / 2 - this.font.width(this.title) / 2;
-        guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
+        DevConfig.TextSettings textSettings = DevConfig.getText();
+        if (textSettings.showTitle) {
+            int titleX = (this.width / 2 - this.font.width(this.title) / 2) + textSettings.titleX;
+            int titleY = this.topPos + textSettings.titleY;
+            guiGraphics.drawString(this.font, this.title, titleX, titleY, textSettings.titleColor, textSettings.titleShadow);
+        }
         
         // Render widgets
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -199,6 +206,68 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 waystoneList.getListWidth(), waystoneList.getListHeight(),
                 portalBounds[0], portalBounds[1], portalBounds[2], portalBounds[3]);
         }
+    }
+    
+    private void renderWaystoneVariants(GuiGraphics guiGraphics) {
+        if (!DevConfig.isEnabled()) return;
+        
+        DevConfig.WaystoneVariantSettings variant = DevConfig.getWaystoneVariant();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.enableBlend();
+        
+        int centerX = this.width / 2;
+        int centerY = this.height / 2;
+        
+        // Render waystone variant
+        if (variant.showVariantTexture) {
+            ResourceLocation texture = DevConfig.getWaystoneVariantTexture();
+            if (texture != null) {
+                int x = centerX + variant.variantX;
+                int y = centerY + variant.variantY;
+                guiGraphics.blit(texture, x, y, 0, 0, variant.variantWidth, variant.variantHeight, variant.variantWidth, variant.variantHeight);
+            }
+        }
+        
+        // Render sharestone
+        if (variant.showSharestoneTexture) {
+            ResourceLocation texture = DevConfig.getSharestoneTexture();
+            if (texture != null) {
+                int x = centerX + variant.sharestoneX;
+                int y = centerY + variant.sharestoneY;
+                guiGraphics.blit(texture, x, y, 0, 0, variant.sharestoneWidth, variant.sharestoneHeight, variant.sharestoneWidth, variant.sharestoneHeight);
+            }
+        }
+        
+        // Render items
+        int itemY = centerY + 100;
+        int itemSpacing = 40;
+        int currentX = centerX - (itemSpacing * 3);
+        
+        if (variant.showWarpScroll) {
+            guiGraphics.blit(DevConfig.getItemTexture("warp_scroll"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+            currentX += itemSpacing;
+        }
+        if (variant.showBoundScroll) {
+            guiGraphics.blit(DevConfig.getItemTexture("bound_scroll"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+            currentX += itemSpacing;
+        }
+        if (variant.showReturnScroll) {
+            guiGraphics.blit(DevConfig.getItemTexture("return_scroll"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+            currentX += itemSpacing;
+        }
+        if (variant.showWarpStone) {
+            guiGraphics.blit(DevConfig.getItemTexture("warp_stone"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+            currentX += itemSpacing;
+        }
+        if (variant.showPortstone) {
+            guiGraphics.blit(DevConfig.getItemTexture("portstone"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+            currentX += itemSpacing;
+        }
+        if (variant.showWarpPlate) {
+            guiGraphics.blit(DevConfig.getItemTexture("warp_plate"), currentX, itemY, 0, 0, 32, 32, 32, 32);
+        }
+        
+        RenderSystem.disableBlend();
     }
     
     private int[] renderMysticalPortal(GuiGraphics guiGraphics) {
