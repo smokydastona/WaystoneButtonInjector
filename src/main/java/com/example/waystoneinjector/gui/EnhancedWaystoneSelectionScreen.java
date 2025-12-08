@@ -306,16 +306,9 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         int centerX = this.width / 2;
         int centerY = this.height / 2;
         
-        System.out.println("[WaystoneInjector] renderWaystoneVariants called - showVariantTexture: " + 
-            variant.showVariantTexture + ", showSharestoneTexture: " + variant.showSharestoneTexture);
-        
         // Render waystone variant (centered)
         if (variant.showVariantTexture) {
             ResourceLocation texture = DevConfig.getWaystoneVariantTexture();
-            System.out.println("[WaystoneInjector] Rendering variant texture: " + texture + 
-                " at (" + (centerX - (variant.variantWidth / 2) + variant.variantX) + ", " + 
-                (centerY - (variant.variantHeight / 2) + variant.variantY) + ") size: " + 
-                variant.variantWidth + "x" + variant.variantHeight);
             if (texture != null) {
                 int x = centerX - (variant.variantWidth / 2) + variant.variantX;
                 int y = centerY - (variant.variantHeight / 2) + variant.variantY;
@@ -326,10 +319,6 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         // Render sharestone (centered)
         if (variant.showSharestoneTexture) {
             ResourceLocation texture = DevConfig.getSharestoneTexture();
-            System.out.println("[WaystoneInjector] Rendering sharestone texture: " + texture + 
-                " at (" + (centerX - (variant.sharestoneWidth / 2) + variant.sharestoneX) + ", " + 
-                (centerY - (variant.sharestoneHeight / 2) + variant.sharestoneY) + ") size: " + 
-                variant.sharestoneWidth + "x" + variant.sharestoneHeight);
             if (texture != null) {
                 int x = centerX - (variant.sharestoneWidth / 2) + variant.sharestoneX;
                 int y = centerY - (variant.sharestoneHeight / 2) + variant.sharestoneY;

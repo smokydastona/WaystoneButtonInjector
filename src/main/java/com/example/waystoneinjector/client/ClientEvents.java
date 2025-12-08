@@ -616,7 +616,7 @@ public class ClientEvents {
         // Get the appropriate texture based on waystone type
         String waystoneType = currentWaystoneType.get();
         ResourceLocation texture = getTextureForType(waystoneType);
-        System.out.println("[WaystoneInjector] Rendering background - Type: " + waystoneType + ", Texture: " + texture);
+
         
         GuiGraphics graphics = event.getGuiGraphics();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -652,7 +652,7 @@ public class ClientEvents {
             String color = currentSharestoneColor.get();
             ResourceLocation sharestonePortal = getSharestonePortalTexture(color);
             
-            System.out.println("[WaystoneInjector] Rendering sharestone - Color: " + color + ", Portal: " + sharestonePortal);
+
             
             // Render color-specific animated portal background
             graphics.blit(sharestonePortal, x, y, 0, 0, 256, 256, 256, 256);
@@ -664,7 +664,7 @@ public class ClientEvents {
             // Render sharestone.png on top
             graphics.blit(TEXTURE_SHARESTONE, x, y, 0, 0, 256, 256, 256, 256);
             
-            System.out.println("[WaystoneInjector] Sharestone rendering complete");
+
         } else {
             // For regular waystones, render the main texture on top of portal animation
             graphics.blit(texture, x, y, 0, 0, 256, 256, 256, 256);
@@ -731,7 +731,7 @@ public class ClientEvents {
                                                 
                                                 // Render waystone-type overlay texture based on THIS waystone's type
                                                 ResourceLocation overlayTexture = getOverlayTextureForType(type);
-                                                System.out.println("[WaystoneInjector] Rendering overlay at X=" + listX + ", Y=" + entryY + ", texture=" + overlayTexture);
+
                                                 
                                                 if (overlayTexture != null) {
                                                     RenderSystem.enableBlend();

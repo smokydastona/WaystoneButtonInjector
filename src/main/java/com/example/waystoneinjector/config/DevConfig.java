@@ -409,43 +409,27 @@ public class DevConfig {
      * Get waystone variant texture based on current profile
      */
     public static ResourceLocation getWaystoneVariantTexture() {
-        if (!data.enabled) {
-            System.out.println("[WaystoneInjector] getWaystoneVariantTexture: Dev config disabled");
-            return null;
-        }
+        if (!data.enabled) return null;
         
         VariantProfile profile = getCurrentProfile();
         String variant = profile.variantId != null ? profile.variantId.toLowerCase() : "regular";
         
-        System.out.println("[WaystoneInjector] getWaystoneVariantTexture: profile.variantId=" + 
-            profile.variantId + ", using variant=" + variant);
-        
-        ResourceLocation texture = new ResourceLocation("waystoneinjector", 
+        return new ResourceLocation("waystoneinjector", 
             "textures/gui/variants/waystone_" + variant + ".png");
-        System.out.println("[WaystoneInjector] getWaystoneVariantTexture returning: " + texture);
-        return texture;
     }
     
     /**
      * Get sharestone color texture based on current profile
      */
     public static ResourceLocation getSharestoneTexture() {
-        if (!data.enabled) {
-            System.out.println("[WaystoneInjector] getSharestoneTexture: Dev config disabled");
-            return null;
-        }
+        if (!data.enabled) return null;
         
         VariantProfile profile = getCurrentProfile();
         String color = profile.display.sharestoneColor != null ? 
             profile.display.sharestoneColor.toLowerCase() : "purple";
         
-        System.out.println("[WaystoneInjector] getSharestoneTexture: profile.display.sharestoneColor=" + 
-            profile.display.sharestoneColor + ", using color=" + color);
-        
-        ResourceLocation texture = new ResourceLocation("waystoneinjector", 
+        return new ResourceLocation("waystoneinjector", 
             "textures/gui/animations/sharestone/" + color + ".png");
-        System.out.println("[WaystoneInjector] getSharestoneTexture returning: " + texture);
-        return texture;
     }
     
     /**
