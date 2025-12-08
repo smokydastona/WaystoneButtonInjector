@@ -1,6 +1,6 @@
 package com.example.waystoneinjector.mixin;
 
-import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
+import com.example.waystoneinjector.gui.ScrollableWaystoneSelectionScreen;
 import net.blay09.mods.waystones.menu.WaystoneSelectionMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /**
  * MIXIN #2 - Intercepts MenuScreens registration
- * Wraps the factory to return our enhanced screen
+ * Wraps the factory to return our scrollable screen that matches original layout
  */
 @Mixin(MenuScreens.class)
 public class MixinMenuScreens {
@@ -39,8 +39,8 @@ public class MixinMenuScreens {
             @Override
             public Screen create(AbstractContainerMenu menu, net.minecraft.world.entity.player.Inventory inv, net.minecraft.network.chat.Component title) {
                 if (menu instanceof WaystoneSelectionMenu) {
-                    System.out.println("[WaystoneInjector] → Creating EnhancedWaystoneSelectionScreen");
-                    return new EnhancedWaystoneSelectionScreen(
+                    System.out.println("[WaystoneInjector] → Creating ScrollableWaystoneSelectionScreen");
+                    return new ScrollableWaystoneSelectionScreen(
                         (WaystoneSelectionMenu) menu,
                         inv,
                         title
