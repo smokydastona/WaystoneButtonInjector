@@ -226,6 +226,12 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     }
     
     @Override
+    public void renderBackground(@Nonnull GuiGraphics guiGraphics) {
+        // Override to completely disable all background rendering
+        // No dirt, no darkening, nothing
+    }
+    
+    @Override
     public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         DevConfig.checkReload();
         
