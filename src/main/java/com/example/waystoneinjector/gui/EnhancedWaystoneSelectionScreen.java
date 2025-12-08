@@ -182,11 +182,8 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     }
     
     private void renderInDevMode(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        // Render portal
+        // Render portal (behind everything)
         int[] portalBounds = renderMysticalPortal(guiGraphics);
-        
-        // Render waystone variant textures if enabled
-        renderWaystoneVariants(guiGraphics);
         
         // Render title
         DevConfig.TextSettings textSettings = DevConfig.getText();
@@ -196,8 +193,11 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
             guiGraphics.drawString(this.font, this.title, titleX, titleY, textSettings.titleColor, textSettings.titleShadow);
         }
         
-        // Render widgets
+        // Render widgets (scrollable list)
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        
+        // Render waystone variant textures ON TOP of list to cover edges
+        renderWaystoneVariants(guiGraphics);
         
         // Render debug overlay on top
         if (waystoneList != null) {
@@ -218,22 +218,22 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         int centerX = this.width / 2;
         int centerY = this.height / 2;
         
-        // Render waystone variant
+        // Render waystone variant (centered)
         if (variant.showVariantTexture) {
             ResourceLocation texture = DevConfig.getWaystoneVariantTexture();
             if (texture != null) {
-                int x = centerX + variant.variantX;
-                int y = centerY + variant.variantY;
+                int x = centerX - (variant.variantWidth / 2) + variant.variantX;
+                int y = centerY - (variant.variantHeight / 2) + variant.variantY;
                 guiGraphics.blit(texture, x, y, 0, 0, variant.variantWidth, variant.variantHeight, variant.variantWidth, variant.variantHeight);
             }
         }
         
-        // Render sharestone
+        // Render sharestone (centered)
         if (variant.showSharestoneTexture) {
             ResourceLocation texture = DevConfig.getSharestoneTexture();
             if (texture != null) {
-                int x = centerX + variant.sharestoneX;
-                int y = centerY + variant.sharestoneY;
+                int x = centerX - (variant.sharestoneWidth / 2) + variant.sharestoneX;
+                int y = centerY - (variant.sharestoneHeight / 2) + variant.sharestoneY;
                 guiGraphics.blit(texture, x, y, 0, 0, variant.sharestoneWidth, variant.sharestoneHeight, variant.sharestoneWidth, variant.sharestoneHeight);
             }
         }
