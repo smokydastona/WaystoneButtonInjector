@@ -388,6 +388,13 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         return new int[]{portalX, portalY, portalWidth, portalHeight};
     }
     
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Always allow clicks to pass through to the list
+        // The variant texture is purely decorative and should not block interaction
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+    
     private void selectWaystone(IWaystone waystone) {
         try {
             if (selectWaystoneMethodCache == null) {
