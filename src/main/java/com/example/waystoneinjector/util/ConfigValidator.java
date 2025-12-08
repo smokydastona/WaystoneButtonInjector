@@ -16,6 +16,7 @@ public class ConfigValidator {
     private static final Pattern SERVER_ADDRESS_PATTERN = Pattern.compile(
         "^([a-zA-Z0-9.-]+)(:\\d{1,5})?$"
     );
+    @SuppressWarnings("unused")
     private static final Pattern WAYSTONE_NAME_PATTERN = Pattern.compile(
         "^[a-zA-Z0-9_ ]+$"
     );

@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
  * Displays user-friendly error messages as in-game toasts
  * Much better UX than log-only errors
  */
+@SuppressWarnings("null")
 public class ErrorToastManager {
     
     /**

@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class DebugOverlay {
     
+    @SuppressWarnings("null")
     public static void render(GuiGraphics guiGraphics, int screenWidth, int screenHeight, 
                              int listX, int listY, int listWidth, int listHeight,
                              int portalX, int portalY, int portalWidth, int portalHeight) {

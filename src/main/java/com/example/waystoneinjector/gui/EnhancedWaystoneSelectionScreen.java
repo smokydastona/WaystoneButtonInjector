@@ -500,6 +500,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
          * Individual waystone entry in the list
          */
         private static class Entry extends ObjectSelectionList.Entry<Entry> {
+            @SuppressWarnings("unused")
             private final IWaystone waystone;
             private final Button button;
             
@@ -537,10 +538,12 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 return this.button.getMessage();
             }
             
+            @SuppressWarnings("unused")
             public @Nonnull List<? extends net.minecraft.client.gui.components.events.GuiEventListener> children() {
                 return java.util.Collections.singletonList(this.button);
             }
             
+            @SuppressWarnings("unused")
             public @Nonnull List<? extends net.minecraft.client.gui.narration.NarratableEntry> narratables() {
                 return java.util.Collections.singletonList(this.button);
             }

@@ -1,5 +1,11 @@
 package com.example.waystoneinjector.compat;
 
+/*
+ * JEI integration disabled - JEI is not a required dependency
+ * To enable: Add JEI to build.gradle dependencies and uncomment this code
+ */
+
+/*
 import com.example.waystoneinjector.gui.EnhancedWaystoneSelectionScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -10,9 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
-/**
- * JEI integration to hide JEI overlay in WaystoneButtonInjector screens
- */
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
     
@@ -25,13 +28,12 @@ public class JEIPlugin implements IModPlugin {
     
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        // Hide JEI completely when our waystone screen is open
         registration.addGuiContainerHandler(EnhancedWaystoneSelectionScreen.class, new IGuiContainerHandler<EnhancedWaystoneSelectionScreen>() {
             @Override
             public List<Rect2i> getGuiExtraAreas(EnhancedWaystoneSelectionScreen screen) {
-                // Return full screen area to block JEI from rendering
                 return List.of(new Rect2i(0, 0, screen.width, screen.height));
             }
         });
     }
 }
+*/

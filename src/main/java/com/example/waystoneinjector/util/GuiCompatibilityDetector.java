@@ -14,6 +14,7 @@ public class GuiCompatibilityDetector {
         DISABLED       // User disabled custom buttons
     }
     
+    @SuppressWarnings("unused")
     private static CompatibilityMode currentMode = CompatibilityMode.STANDARD;
     private static boolean safeModeForcedByUser = false;
     

@@ -6,10 +6,9 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
-import net.minecraft.network.chat.Component;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Manages server redirects with timeout handling
@@ -27,6 +26,7 @@ public class RedirectManager {
     /**
      * Attempt redirect with timeout
      */
+    @SuppressWarnings("null")
     public static CompletableFuture<Boolean> redirectWithTimeout(String serverAddress, int timeoutMs) {
         if (currentRedirect != null && !currentRedirect.isDone()) {
             DebugLogger.warn("Redirect already in progress to: " + currentTarget);
@@ -42,15 +42,16 @@ public class RedirectManager {
         currentRedirect = CompletableFuture.supplyAsync(() -> {
             try {
                 // Parse server address
-                ServerAddress server = ServerAddress.parseString(serverAddress);
+                @Nonnull ServerAddress server = ServerAddress.parseString(serverAddress);
                 
                 // Start connection on main thread
                 Minecraft.getInstance().execute(() -> {
                     try {
-                        ServerData serverData = new ServerData("", serverAddress, false);
+                        @Nonnull ServerData serverData = new ServerData("", serverAddress, false);
+                        @Nonnull Minecraft mc = Minecraft.getInstance();
                         ConnectScreen.startConnecting(
                             new JoinMultiplayerScreen(new TitleScreen()),
-                            Minecraft.getInstance(),
+                            mc,
                             server,
                             serverData,
                             false
@@ -77,9 +78,8 @@ public class RedirectManager {
                     
                     // Check if connected
                     if (isConnectedToServer(serverAddress)) {
-                        long totalTime = System.currentTimeMillis() - redirectStartTime;
                         DebugLogger.redirectResult(true, serverAddress, "");
-                        DebugLogger.info("Connection successful in " + totalTime + "ms");
+                        DebugLogger.info("Connection successful in " + (System.currentTimeMillis() - redirectStartTime) + "ms");
                         ErrorToastManager.showRedirectSuccess(serverAddress);
                         return true;
                     }
@@ -87,7 +87,6 @@ public class RedirectManager {
                     // Check if connection failed (back to multiplayer screen or title screen)
                     if (Minecraft.getInstance().screen instanceof JoinMultiplayerScreen ||
                         Minecraft.getInstance().screen instanceof TitleScreen) {
-                        long totalTime = System.currentTimeMillis() - redirectStartTime;
                         DebugLogger.redirectResult(false, serverAddress, "Connection failed (returned to menu)");
                         ErrorToastManager.showRedirectError(serverAddress, "Connection failed");
                         return false;
@@ -125,8 +124,9 @@ public class RedirectManager {
      */
     private static boolean isConnectedToServer(String serverAddress) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.getCurrentServer() != null) {
-            String currentServer = mc.getCurrentServer().ip;
+        ServerData currentServerData = mc.getCurrentServer();
+        if (currentServerData != null) {
+            String currentServer = currentServerData.ip;
             return currentServer != null && 
                    (currentServer.equalsIgnoreCase(serverAddress) ||
                     currentServer.contains(serverAddress) ||
@@ -140,8 +140,9 @@ public class RedirectManager {
      */
     private static String getCurrentServer() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.getCurrentServer() != null) {
-            return mc.getCurrentServer().ip;
+        ServerData currentServerData = mc.getCurrentServer();
+        if (currentServerData != null) {
+            return currentServerData.ip;
         }
         return "singleplayer";
     }

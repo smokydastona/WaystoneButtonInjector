@@ -368,6 +368,7 @@ public class DevConfig {
     /**
      * Get portal texture for frame (with override support)
      */
+    @SuppressWarnings("null")
     public static ResourceLocation getPortalTexture(int frame) {
         if (data.enabled && data.textures.portalAnimation != null) {
             String path = String.format(data.textures.portalAnimation, frame + 1);
@@ -382,6 +383,7 @@ public class DevConfig {
     /**
      * Get texture override or default
      */
+    @SuppressWarnings("null")
     public static ResourceLocation getTexture(String key, ResourceLocation defaultTexture) {
         if (!data.enabled) return defaultTexture;
         
