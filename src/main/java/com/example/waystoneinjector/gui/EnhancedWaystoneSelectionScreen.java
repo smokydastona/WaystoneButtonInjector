@@ -170,6 +170,11 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     protected void init() {
         super.init();
         
+        // Disable rendering backgrounds completely
+        if (this.minecraft != null) {
+            this.minecraft.options.hideGui = false;
+        }
+        
         // Load/reload dev config
         DevConfig.checkReload();
         
