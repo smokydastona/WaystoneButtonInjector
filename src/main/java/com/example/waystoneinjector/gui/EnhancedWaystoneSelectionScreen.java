@@ -253,8 +253,14 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         int titleX = this.width / 2 - this.font.width(this.title) / 2;
         guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
         
-        // Render widgets (scrollable list) and container
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        // Manually render widgets WITHOUT calling super.render() to avoid background rendering
+        // This bypasses AbstractContainerScreen.render() which calls renderBackground()
+        for (var widget : this.renderables) {
+            widget.render(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+        
+        // Render tooltips if hovering over something
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
     
     private void renderInDevMode(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -269,8 +275,14 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
             guiGraphics.drawString(this.font, this.title, titleX, titleY, textSettings.titleColor, textSettings.titleShadow);
         }
         
-        // Render widgets (scrollable list)
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        // Manually render widgets WITHOUT calling super.render() to avoid background rendering
+        // This bypasses AbstractContainerScreen.render() which calls renderBackground()
+        for (var widget : this.renderables) {
+            widget.render(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+        
+        // Render tooltips if hovering over something
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
         
         // Render waystone variant textures ON TOP of list to cover edges
         renderWaystoneVariants(guiGraphics);
