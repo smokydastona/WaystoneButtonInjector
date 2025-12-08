@@ -226,10 +226,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         
         // Render background based on config
         DevConfig.BackgroundSettings bgSettings = DevConfig.getBackground();
-        if (!bgSettings.renderDirtBackground) {
-            // Render only world background, no dirt
-            this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
-        } else {
+        if (bgSettings.renderDirtBackground) {
             // Render default dirt background
             this.renderBackground(guiGraphics);
         }
@@ -240,9 +237,6 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         } else {
             renderInNormalMode(guiGraphics, mouseX, mouseY, partialTicks);
         }
-        
-        // Render tooltips on top
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
     
     private void renderInNormalMode(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -253,7 +247,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         int titleX = this.width / 2 - this.font.width(this.title) / 2;
         guiGraphics.drawString(this.font, this.title, titleX, this.topPos + 6, 0xFFFFFF, true);
         
-        // Render widgets (scrollable list)
+        // Render widgets (scrollable list) and container
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
     
