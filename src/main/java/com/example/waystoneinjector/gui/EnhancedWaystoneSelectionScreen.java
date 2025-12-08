@@ -284,6 +284,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         // Render waystone variant (centered)
         if (variant.showVariantTexture) {
             ResourceLocation texture = DevConfig.getWaystoneVariantTexture();
+            System.out.println("[WaystoneInjector] Rendering variant texture: " + texture);
             if (texture != null) {
                 int x = centerX - (variant.variantWidth / 2) + variant.variantX;
                 int y = centerY - (variant.variantHeight / 2) + variant.variantY;
