@@ -57,6 +57,7 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     // Cached reflection objects
     private static Field waystoneFieldCache = null;
+    private static Field fromWaystoneFieldCache = null;
     private static Method selectWaystoneMethodCache = null;
     
     public EnhancedWaystoneSelectionScreen(WaystoneSelectionMenu container, Inventory playerInventory, Component title) {
@@ -64,6 +65,68 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
         this.animationStartTime = System.currentTimeMillis();
         this.imageWidth = 256;
         this.imageHeight = 256;
+        
+        // Detect waystone variant from the clicked block
+        detectWaystoneVariant();
+    }
+    
+    /**
+     * Detect which waystone variant was clicked and set the appropriate profile
+     */
+    private void detectWaystoneVariant() {
+        try {
+            // Get the fromWaystone from the menu
+            if (fromWaystoneFieldCache == null) {
+                fromWaystoneFieldCache = this.menu.getClass().getDeclaredField("fromWaystone");
+                fromWaystoneFieldCache.setAccessible(true);
+            }
+            
+            Object fromWaystone = fromWaystoneFieldCache.get(this.menu);
+            if (fromWaystone == null || this.minecraft == null || this.minecraft.level == null) {
+                DevConfig.setCurrentVariant("regular");  // Default
+                return;
+            }
+            
+            // Get the block position
+            Method getPosMethod = fromWaystone.getClass().getMethod("getPos");
+            Object posObj = getPosMethod.invoke(fromWaystone);
+            if (!(posObj instanceof net.minecraft.core.BlockPos)) {
+                DevConfig.setCurrentVariant("regular");
+                return;
+            }
+            
+            net.minecraft.core.BlockPos pos = (net.minecraft.core.BlockPos) posObj;
+            net.minecraft.world.level.block.state.BlockState state = this.minecraft.level.getBlockState(pos);
+            net.minecraft.world.level.block.Block block = state.getBlock();
+            
+            // Get the block's registry name
+            net.minecraft.resources.ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+            
+            if (blockId == null) {
+                DevConfig.setCurrentVariant("regular");
+                return;
+            }
+            
+            // Map block ID to variant name
+            String path = blockId.getPath();
+            String variant = switch (path) {
+                case "waystone" -> "regular";
+                case "mossy_waystone" -> "mossy";
+                case "sandy_waystone" -> "sandy";
+                case "blackstone_waystone" -> "blackstone";
+                case "deepslate_waystone" -> "deepslate";
+                case "end_stone_waystone" -> "endstone";
+                default -> "regular";
+            };
+            
+            DevConfig.setCurrentVariant(variant);
+            System.out.println("[WaystoneInjector] Detected waystone variant: " + variant + " (block: " + blockId + ")");
+            
+        } catch (Exception e) {
+            System.err.println("[WaystoneInjector] Failed to detect waystone variant: " + e.getMessage());
+            e.printStackTrace();
+            DevConfig.setCurrentVariant("regular");  // Fallback
+        }
     }
     
     @Override

@@ -15,41 +15,43 @@ import java.util.Map;
 /**
  * Development configuration for live GUI editing.
  * Changes in config/waystoneinjector-dev.json are applied immediately.
+ * NOW SUPPORTS PER-VARIANT PROFILES!
  */
 public class DevConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File(FMLPaths.CONFIGDIR.get().toFile(), "waystoneinjector-dev.json");
     private static DevConfigData data = new DevConfigData();
     private static long lastModified = 0;
+    private static String currentVariantId = "regular";  // Track which variant is currently being displayed
     
     public static class DevConfigData {
         // Master toggle
         public boolean enabled = false;
         public boolean showDebugOverlay = true;
         
-        // Scroll list settings
+        // Scroll list settings (shared across all variants)
         public ScrollListSettings scrollList = new ScrollListSettings();
         
-        // Portal settings
-        public PortalSettings portal = new PortalSettings();
-        
-        // Background settings
-        public BackgroundSettings background = new BackgroundSettings();
-        
-        // Texture overrides
-        public TextureOverrides textures = new TextureOverrides();
-        
-        // Waystone/Block variant settings
-        public WaystoneVariantSettings waystoneVariant = new WaystoneVariantSettings();
-        
-        // Button settings
+        // Button settings (shared across all variants)
         public ButtonSettings buttons = new ButtonSettings();
         
-        // Title/Text settings
-        public TextSettings text = new TextSettings();
-        
-        // Render order (higher = rendered on top)
+        // Render order (shared across all variants)
         public RenderOrder renderOrder = new RenderOrder();
+        
+        // PER-VARIANT PROFILES
+        public Map<String, VariantProfile> variantProfiles = new HashMap<>();
+        
+        // DEPRECATED: Legacy single-variant settings (kept for backward compatibility)
+        @Deprecated
+        public PortalSettings portal = new PortalSettings();
+        @Deprecated
+        public BackgroundSettings background = new BackgroundSettings();
+        @Deprecated
+        public TextureOverrides textures = new TextureOverrides();
+        @Deprecated
+        public WaystoneVariantSettings waystoneVariant = new WaystoneVariantSettings();
+        @Deprecated
+        public TextSettings text = new TextSettings();
     }
     
     public static class ScrollListSettings {
@@ -200,16 +202,167 @@ public class DevConfig {
         }
     }
     
-    // Getters
+    /**
+     * Set the current waystone variant being displayed
+     */
+    public static void setCurrentVariant(String variantId) {
+        currentVariantId = variantId;
+        System.out.println("[WaystoneInjector] Switched to variant profile: " + variantId);
+    }
+    
+    /**
+     * Get the current variant profile (or create default if missing)
+     */
+    public static VariantProfile getCurrentProfile() {
+        if (!data.enabled || data.variantProfiles.isEmpty()) {
+            // Fallback to legacy settings
+            return createLegacyProfile();
+        }
+        
+        return data.variantProfiles.computeIfAbsent(currentVariantId, k -> {
+            System.out.println("[WaystoneInjector] Creating new profile for variant: " + k);
+            return new VariantProfile();
+        });
+    }
+    
+    /**
+     * Create a profile from legacy settings for backward compatibility
+     */
+    private static VariantProfile createLegacyProfile() {
+        VariantProfile profile = new VariantProfile();
+        profile.variantId = data.waystoneVariant.variant;
+        
+        // Copy portal settings
+        profile.portal.xOffset = data.portal.xOffset;
+        profile.portal.yOffset = data.portal.yOffset;
+        profile.portal.width = data.portal.width;
+        profile.portal.height = data.portal.height;
+        profile.portal.centered = data.portal.centered;
+        profile.portal.animationSpeed = data.portal.animationSpeed;
+        
+        // Copy background settings
+        profile.background.renderDirtBackground = data.background.renderDirtBackground;
+        profile.background.backgroundColor = data.background.backgroundColor;
+        profile.background.renderMenuBackground = data.background.renderMenuBackground;
+        profile.background.menuBackgroundAlpha = data.background.menuBackgroundAlpha;
+        
+        // Copy texture overrides
+        profile.textures.portalAnimation = data.textures.portalAnimation;
+        profile.textures.listBackground = data.textures.listBackground;
+        profile.textures.menuBackground = data.textures.menuBackground;
+        profile.textures.entryBackground = data.textures.entryBackground;
+        profile.textures.portalFrame = data.textures.portalFrame;
+        
+        // Copy display settings
+        profile.display.showVariantTexture = data.waystoneVariant.showVariantTexture;
+        profile.display.variantX = data.waystoneVariant.variantX;
+        profile.display.variantY = data.waystoneVariant.variantY;
+        profile.display.variantWidth = data.waystoneVariant.variantWidth;
+        profile.display.variantHeight = data.waystoneVariant.variantHeight;
+        profile.display.sharestoneColor = data.waystoneVariant.sharestoneColor;
+        profile.display.showSharestoneTexture = data.waystoneVariant.showSharestoneTexture;
+        profile.display.sharestoneX = data.waystoneVariant.sharestoneX;
+        profile.display.sharestoneY = data.waystoneVariant.sharestoneY;
+        profile.display.sharestoneWidth = data.waystoneVariant.sharestoneWidth;
+        profile.display.sharestoneHeight = data.waystoneVariant.sharestoneHeight;
+        profile.display.showWarpScroll = data.waystoneVariant.showWarpScroll;
+        profile.display.showBoundScroll = data.waystoneVariant.showBoundScroll;
+        profile.display.showReturnScroll = data.waystoneVariant.showReturnScroll;
+        profile.display.showWarpStone = data.waystoneVariant.showWarpStone;
+        profile.display.showPortstone = data.waystoneVariant.showPortstone;
+        profile.display.showWarpPlate = data.waystoneVariant.showWarpPlate;
+        
+        // Copy text settings
+        profile.text.showTitle = data.text.showTitle;
+        profile.text.titleX = data.text.titleX;
+        profile.text.titleY = data.text.titleY;
+        profile.text.titleColor = data.text.titleColor;
+        profile.text.titleShadow = data.text.titleShadow;
+        profile.text.nameColor = data.text.nameColor;
+        profile.text.nameShadow = data.text.nameShadow;
+        profile.text.customDebugText = data.text.customDebugText;
+        
+        return profile;
+    }
+    
+    // Legacy getters (for backward compatibility - convert profile to legacy types)
+    public static PortalSettings getPortal() { 
+        VariantProfile profile = getCurrentProfile();
+        PortalSettings legacy = new PortalSettings();
+        legacy.xOffset = profile.portal.xOffset;
+        legacy.yOffset = profile.portal.yOffset;
+        legacy.width = profile.portal.width;
+        legacy.height = profile.portal.height;
+        legacy.centered = profile.portal.centered;
+        legacy.animationSpeed = profile.portal.animationSpeed;
+        return legacy;
+    }
+    
+    public static BackgroundSettings getBackground() { 
+        VariantProfile profile = getCurrentProfile();
+        BackgroundSettings legacy = new BackgroundSettings();
+        legacy.renderDirtBackground = profile.background.renderDirtBackground;
+        legacy.backgroundColor = profile.background.backgroundColor;
+        legacy.renderMenuBackground = profile.background.renderMenuBackground;
+        legacy.menuBackgroundAlpha = profile.background.menuBackgroundAlpha;
+        return legacy;
+    }
+    
+    public static TextureOverrides getTextures() { 
+        VariantProfile profile = getCurrentProfile();
+        TextureOverrides legacy = new TextureOverrides();
+        legacy.portalAnimation = profile.textures.portalAnimation;
+        legacy.listBackground = profile.textures.listBackground;
+        legacy.menuBackground = profile.textures.menuBackground;
+        legacy.entryBackground = profile.textures.entryBackground;
+        legacy.portalFrame = profile.textures.portalFrame;
+        return legacy;
+    }
+    
+    public static WaystoneVariantSettings getWaystoneVariant() { 
+        // Convert new display settings to legacy format
+        VariantProfile profile = getCurrentProfile();
+        WaystoneVariantSettings legacy = new WaystoneVariantSettings();
+        legacy.variant = profile.variantId;
+        legacy.showVariantTexture = profile.display.showVariantTexture;
+        legacy.variantX = profile.display.variantX;
+        legacy.variantY = profile.display.variantY;
+        legacy.variantWidth = profile.display.variantWidth;
+        legacy.variantHeight = profile.display.variantHeight;
+        legacy.sharestoneColor = profile.display.sharestoneColor;
+        legacy.showSharestoneTexture = profile.display.showSharestoneTexture;
+        legacy.sharestoneX = profile.display.sharestoneX;
+        legacy.sharestoneY = profile.display.sharestoneY;
+        legacy.sharestoneWidth = profile.display.sharestoneWidth;
+        legacy.sharestoneHeight = profile.display.sharestoneHeight;
+        legacy.showWarpScroll = profile.display.showWarpScroll;
+        legacy.showBoundScroll = profile.display.showBoundScroll;
+        legacy.showReturnScroll = profile.display.showReturnScroll;
+        legacy.showWarpStone = profile.display.showWarpStone;
+        legacy.showPortstone = profile.display.showPortstone;
+        legacy.showWarpPlate = profile.display.showWarpPlate;
+        return legacy;
+    }
+    
+    public static TextSettings getText() { 
+        VariantProfile profile = getCurrentProfile();
+        TextSettings legacy = new TextSettings();
+        legacy.showTitle = profile.text.showTitle;
+        legacy.titleX = profile.text.titleX;
+        legacy.titleY = profile.text.titleY;
+        legacy.titleColor = profile.text.titleColor;
+        legacy.titleShadow = profile.text.titleShadow;
+        legacy.nameColor = profile.text.nameColor;
+        legacy.nameShadow = profile.text.nameShadow;
+        legacy.customDebugText = profile.text.customDebugText;
+        return legacy;
+    }
+    
+    // Shared getters (not variant-specific)
     public static boolean isEnabled() { return data.enabled; }
     public static boolean showDebugOverlay() { return data.enabled && data.showDebugOverlay; }
     public static ScrollListSettings getScrollList() { return data.scrollList; }
-    public static PortalSettings getPortal() { return data.portal; }
-    public static BackgroundSettings getBackground() { return data.background; }
-    public static TextureOverrides getTextures() { return data.textures; }
-    public static WaystoneVariantSettings getWaystoneVariant() { return data.waystoneVariant; }
     public static ButtonSettings getButtons() { return data.buttons; }
-    public static TextSettings getText() { return data.text; }
     public static RenderOrder getRenderOrder() { return data.renderOrder; }
     
     /**
