@@ -420,12 +420,6 @@ public class DevConfig {
         System.out.println("[WaystoneInjector] getWaystoneVariantTexture: profile.variantId=" + 
             profile.variantId + ", using variant=" + variant);
         
-        // Fallback to regular if sandy (texture doesn't exist yet)
-        if ("sandy".equals(variant)) {
-            System.out.println("[WaystoneInjector] Sandy variant detected, falling back to regular");
-            variant = "regular";
-        }
-        
         ResourceLocation texture = new ResourceLocation("waystoneinjector", 
             "textures/gui/variants/waystone_" + variant + ".png");
         System.out.println("[WaystoneInjector] getWaystoneVariantTexture returning: " + texture);
