@@ -405,14 +405,17 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
     
     private void selectWaystone(IWaystone waystone) {
         try {
+            System.out.println("[WaystoneInjector] Attempting to select waystone: " + waystone.getName());
             if (selectWaystoneMethodCache == null) {
                 selectWaystoneMethodCache = this.menu.getClass().getDeclaredMethod("selectWaystone", IWaystone.class);
                 selectWaystoneMethodCache.setAccessible(true);
             }
             selectWaystoneMethodCache.invoke(this.menu, waystone);
+            System.out.println("[WaystoneInjector] Waystone selection successful, closing GUI");
             this.onClose();
         } catch (Exception e) {
             System.err.println("[WaystoneInjector] Failed to select waystone: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -489,7 +492,10 @@ public class EnhancedWaystoneSelectionScreen extends AbstractContainerScreen<Way
                 
                 this.button = Button.builder(
                     Component.literal(displayName),
-                    btn -> onSelect.accept(waystone)
+                    btn -> {
+                        System.out.println("[WaystoneInjector] Button clicked for waystone: " + displayName);
+                        onSelect.accept(waystone);
+                    }
                 ).bounds(0, 0, width, 20).build();
             }
             
